@@ -1,74 +1,106 @@
-import './App.css';
-import { Link } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import Shipments from './components/Shipments';
+import Carriers from './components/Carriers';
 
 function App() {
   return (
-    <div className="flex h-screen">
-      {/* Sidebar */}
-      <aside className="w-64 bg-gray-800 text-white p-4">
-        <div className="text-xl font-bold mb-6">FleetMate TMS</div>
-        <nav className="space-y-2">
-          <Link to="/" className="block py-2 px-4 rounded hover:bg-gray-700">Dashboard</Link>
-          <Link to="/shipments" className="block py-2 px-4 rounded hover:bg-gray-700">Shipments</Link>
-          <Link to="/carriers" className="block py-2 px-4 rounded hover:bg-gray-700">Carriers</Link>
-          <Link to="/customers" className="block py-2 px-4 rounded hover:bg-gray-700">Customers</Link>
-          <Link to="/reports" className="block py-2 px-4 rounded hover:bg-gray-700">Reports</Link>
-        </nav>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 p-8 bg-gray-100">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-        </div>
-
-        {/* Dashboard Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-lg font-semibold mb-2">Active Shipments</h2>
-            <p className="text-3xl font-bold">24</p>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-lg font-semibold mb-2">Revenue (MTD)</h2>
-            <p className="text-3xl font-bold">$45,678</p>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-lg font-semibold mb-2">Pending Deliveries</h2>
-            <p className="text-3xl font-bold">12</p>
+    <Router>
+      <div className="flex h-screen bg-gray-100">
+        {/* Sidebar */}
+        <div className="hidden md:flex md:flex-shrink-0">
+          <div className="flex flex-col w-64 bg-gray-800">
+            <div className="flex flex-col flex-grow pt-5 pb-4 overflow-y-auto">
+              <div className="flex items-center flex-shrink-0 px-4">
+                <span className="text-xl font-semibold text-white">FleetMate TMS</span>
+              </div>
+              <nav className="mt-5 flex-1 px-2 space-y-1">
+                <SidebarLink to="/" icon={
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20" />
+                  </svg>
+                }>
+                  Shipments
+                </SidebarLink>
+                <SidebarLink to="/carriers" icon={
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                  </svg>
+                }>
+                  Carriers
+                </SidebarLink>
+              </nav>
+            </div>
           </div>
         </div>
 
-        {/* Recent Shipments Table */}
-        <div className="mt-8">
-          <h2 className="text-xl font-semibold mb-4">Recent Shipments</h2>
-          <div className="bg-white rounded-lg shadow">
-            <table className="min-w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="px-6 py-3 text-left">Shipment ID</th>
-                  <th className="px-6 py-3 text-left">Customer</th>
-                  <th className="px-6 py-3 text-left">Origin</th>
-                  <th className="px-6 py-3 text-left">Destination</th>
-                  <th className="px-6 py-3 text-left">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b">
-                  <td className="px-6 py-4">#12345</td>
-                  <td className="px-6 py-4">ABC Company</td>
-                  <td className="px-6 py-4">Los Angeles, CA</td>
-                  <td className="px-6 py-4">Chicago, IL</td>
-                  <td className="px-6 py-4">
-                    <span className="px-2 py-1 bg-green-100 text-green-800 rounded">In Transit</span>
-                  </td>
-                </tr>
-                {/* Add more rows as needed */}
-              </tbody>
-            </table>
-          </div>
+        {/* Main Content */}
+        <div className="flex flex-col flex-1 overflow-hidden">
+          {/* Top Navigation */}
+          <header className="bg-white shadow">
+            <div className="px-4 sm:px-6 lg:px-8">
+              <div className="flex items-center justify-between h-16">
+                <PageTitle />
+                <div className="flex items-center">
+                  {/* Add any header content here */}
+                </div>
+              </div>
+            </div>
+          </header>
+
+          {/* Page Content */}
+          <main className="flex-1 relative overflow-y-auto focus:outline-none">
+            <div className="py-6">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+                <Routes>
+                  <Route path="/" element={<Shipments />} />
+                  <Route path="/carriers" element={<Carriers />} />
+                </Routes>
+              </div>
+            </div>
+          </main>
         </div>
-      </main>
-    </div>
+      </div>
+    </Router>
+  );
+}
+
+// Helper Components
+function SidebarLink({ to, children, icon }) {
+  const location = useLocation();
+  const isActive = location.pathname === to;
+  
+  return (
+    <Link
+      to={to}
+      className={`${
+        isActive
+          ? 'bg-gray-900 text-white'
+          : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+      } group flex items-center px-2 py-2 text-sm font-medium rounded-md`}
+    >
+      <div className={`${
+        isActive ? 'text-gray-300' : 'text-gray-400 group-hover:text-gray-300'
+      } mr-3 flex-shrink-0`}>
+        {icon}
+      </div>
+      {children}
+    </Link>
+  );
+}
+
+function PageTitle() {
+  const location = useLocation();
+  const titles = {
+    '/': 'Shipments',
+    '/carriers': 'Carriers'
+  };
+  
+  return (
+    <h1 className="text-2xl font-semibold text-gray-900">
+      {titles[location.pathname]}
+    </h1>
   );
 }
 
