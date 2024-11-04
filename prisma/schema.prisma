@@ -1,0 +1,207 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Shipment {
+  id              String          @id @default(uuid())
+  referenceNumber String          @unique
+  status          ShipmentStatus  @default(PENDING)
+  loadType        LoadType
+  rate            Float
+  currency        Currency        @default(USD)
+  carrierPay      Float
+  pickupDate      DateTime
+  deliveryDate    DateTime
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  // Relations
+  customer        Customer        @relation(fields: [customerId], references: [id])
+  customerId      String
+  carrier         Carrier         @relation(fields: [carrierId], references: [id])
+  carrierId       String
+  origin          Location        @relation("OriginLocation", fields: [originId], references: [id])
+  originId        String
+  destination     Location        @relation("DestinationLocation", fields: [destinationId], references: [id])
+  destinationId   String
+  documents       Document[]
+  trackingEvents  TrackingEvent[]
+  invoice         Invoice?
+}
+
+enum ShipmentStatus {
+  PENDING
+  DISPATCHED
+  IN_TRANSIT
+  DELIVERED
+  CANCELLED
+  EXCEPTION
+}
+
+enum LoadType {
+  FTL
+  LTL
+  PARTIAL
+  INTERMODAL
+}
+
+enum Currency {
+  USD
+  CAD
+  MXN
+}
+
+model Customer {
+  id               String     @id @default(uuid())
+  name             String
+  accountNumber    String     @unique
+  creditLimit      Float?
+  paymentTerms     String
+  active           Boolean    @default(true)
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  
+  // Relations
+  billingAddress   Location   @relation("CustomerBillingAddress", fields: [billingAddressId], references: [id])
+  billingAddressId String
+  shippingAddresses Location[] @relation("CustomerShippingAddresses")
+  contacts         Contact[]
+  shipments        Shipment[]
+  invoices         Invoice[]
+}
+
+model Carrier {
+  id               String     @id @default(uuid())
+  name             String
+  mcNumber         String     @unique
+  dotNumber        String     @unique
+  insuranceExpiry  DateTime
+  insuranceCoverage Float
+  equipmentTypes   String[]
+  safetyRating     String?
+  active           Boolean    @default(true)
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  // Relations
+  address          Location   @relation(fields: [addressId], references: [id])
+  addressId        String
+  contacts         Contact[]
+  preferredLanes   Lane[]
+  shipments        Shipment[]
+}
+
+model Location {
+  id                String     @id @default(uuid())
+  name              String
+  address1          String
+  address2          String?
+  city              String
+  state             String
+  zipCode           String
+  country           String
+  contactName       String?
+  contactPhone      String?
+  contactEmail      String?
+  appointmentRequired Boolean  @default(false)
+  hours             String?
+
+  // Relations
+  originShipments    Shipment[] @relation("OriginLocation")
+  destShipments      Shipment[] @relation("DestinationLocation")
+  carrierAddress     Carrier[]
+  customerBilling    Customer[] @relation("CustomerBillingAddress")
+  customerShipping   Customer[] @relation("CustomerShippingAddresses")
+  trackingEvents     TrackingEvent[]
+}
+
+model Contact {
+  id        String   @id @default(uuid())
+  firstName String
+  lastName  String
+  email     String
+  phone     String
+  role      String
+  primary   Boolean  @default(false)
+  
+  // Relations
+  customer  Customer? @relation(fields: [customerId], references: [id])
+  customerId String?
+  carrier   Carrier?  @relation(fields: [carrierId], references: [id])
+  carrierId String?
+}
+
+model Document {
+  id        String   @id @default(uuid())
+  type      String
+  fileName  String
+  fileUrl   String
+  uploadedAt DateTime @default(now())
+  uploadedBy String
+  
+  // Relations
+  shipment  Shipment @relation(fields: [shipmentId], references: [id])
+  shipmentId String
+}
+
+model TrackingEvent {
+  id        String   @id @default(uuid())
+  status    ShipmentStatus
+  timestamp DateTime @default(now())
+  notes     String?
+  createdBy String
+  
+  // Relations
+  shipment  Shipment @relation(fields: [shipmentId], references: [id])
+  shipmentId String
+  location  Location? @relation(fields: [locationId], references: [id])
+  locationId String?
+}
+
+model Lane {
+  id              String   @id @default(uuid())
+  originState     String
+  destinationState String
+  preferredRate   Float?
+  
+  // Relations
+  carrier         Carrier  @relation(fields: [carrierId], references: [id])
+  carrierId       String
+}
+
+model Invoice {
+  id            String   @id @default(uuid())
+  invoiceNumber String   @unique
+  amount        Float
+  currency      Currency @default(USD)
+  status        String
+  dueDate       DateTime
+  issuedDate    DateTime @default(now())
+  paidDate      DateTime?
+  
+  // Relations
+  shipment      Shipment @relation(fields: [shipmentId], references: [id])
+  shipmentId    String   @unique
+  customer      Customer @relation(fields: [customerId], references: [id])
+  customerId    String
+  lineItems     InvoiceLineItem[]
+}
+
+model InvoiceLineItem {
+  id          String   @id @default(uuid())
+  description String
+  quantity    Int
+  rate        Float
+  amount      Float
+  
+  // Relations
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id])
+  invoiceId   String
+}
+
+// Add other models following the TypeScript interfaces... 
