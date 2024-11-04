@@ -425,12 +425,11 @@ export const mockShipments = [
   }
 ];
 
-const Shipments = () => {
+const Shipments = ({ isNewShipmentModalOpen, setIsNewShipmentModalOpen }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState("id");
   const [sortDirection, setSortDirection] = useState("asc");
   const [selectedCarrier, setSelectedCarrier] = useState("all");
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedShipment, setSelectedShipment] = useState(null);
 
   // Get unique carriers for filter dropdown
@@ -469,7 +468,7 @@ const Shipments = () => {
         <h1 className="text-2xl font-bold">Shipments</h1>
         <button 
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => setIsNewShipmentModalOpen(true)}
         >
           New Shipment
         </button>
@@ -572,11 +571,6 @@ const Shipments = () => {
         </table>
       </div>
 
-      <NewShipmentModal 
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
-      
       <ShipmentDetailsModal
         isOpen={!!selectedShipment}
         onClose={() => setSelectedShipment(null)}
