@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { mockShipments } from './Shipments';
+import CustomerDetailsModal from './CustomerDetailsModal';
 
 // Extract unique customers and create enriched customer data
 const mockCustomers = Array.from(
@@ -38,6 +39,7 @@ const Customers = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState("id");
   const [sortDirection, setSortDirection] = useState("asc");
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   // Handle sorting
   const handleSort = (field) => {
@@ -133,7 +135,8 @@ const Customers = () => {
             {filteredCustomers.map((customer) => (
               <tr 
                 key={customer.id}
-                className="hover:bg-gray-50"
+                className="hover:bg-gray-50 cursor-pointer"
+                onClick={() => setSelectedCustomer(customer)}
               >
                 <td className="px-6 py-4 border-b">{customer.id}</td>
                 <td className="px-6 py-4 border-b font-medium">{customer.name}</td>
@@ -148,6 +151,13 @@ const Customers = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Details Modal */}
+      <CustomerDetailsModal
+        isOpen={!!selectedCustomer}
+        onClose={() => setSelectedCustomer(null)}
+        customer={selectedCustomer}
+      />
     </div>
   );
 };

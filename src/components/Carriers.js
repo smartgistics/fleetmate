@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { mockShipments } from './Shipments';  // Import mockShipments
+import CarrierDetailsModal from './CarrierDetailsModal';
 
 // Extract unique carriers and create enriched carrier data
 const mockCarriers = Array.from(
@@ -27,6 +28,7 @@ const Carriers = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState("id");
   const [sortDirection, setSortDirection] = useState("asc");
+  const [selectedCarrier, setSelectedCarrier] = useState(null);
 
   // Handle sorting
   const handleSort = (field) => {
@@ -126,7 +128,8 @@ const Carriers = () => {
             {filteredCarriers.map((carrier) => (
               <tr 
                 key={carrier.id}
-                className="hover:bg-gray-50"
+                className="hover:bg-gray-50 cursor-pointer"
+                onClick={() => setSelectedCarrier(carrier)}
               >
                 <td className="px-6 py-4 border-b">{carrier.id}</td>
                 <td className="px-6 py-4 border-b font-medium">{carrier.name}</td>
@@ -140,6 +143,13 @@ const Carriers = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Details Modal */}
+      <CarrierDetailsModal
+        isOpen={!!selectedCarrier}
+        onClose={() => setSelectedCarrier(null)}
+        carrier={selectedCarrier}
+      />
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import NewShipmentModal from './NewShipmentModal';
+import ShipmentDetailsModal from './ShipmentDetailsModal';
 
 export const mockShipments = [
   {
@@ -430,6 +431,7 @@ const Shipments = () => {
   const [sortDirection, setSortDirection] = useState("asc");
   const [selectedCarrier, setSelectedCarrier] = useState("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedShipment, setSelectedShipment] = useState(null);
 
   // Get unique carriers for filter dropdown
   const uniqueCarriers = [...new Set(mockShipments.map(ship => ship.carrier))];
@@ -553,7 +555,8 @@ const Shipments = () => {
             {filteredShipments.map((shipment) => (
               <tr 
                 key={shipment.id}
-                className="hover:bg-gray-50"
+                className="hover:bg-gray-50 cursor-pointer"
+                onClick={() => setSelectedShipment(shipment)}
               >
                 <td className="px-6 py-4 border-b">{shipment.id}</td>
                 <td className="px-6 py-4 border-b">{shipment.carrier}</td>
@@ -572,6 +575,12 @@ const Shipments = () => {
       <NewShipmentModal 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+      />
+      
+      <ShipmentDetailsModal
+        isOpen={!!selectedShipment}
+        onClose={() => setSelectedShipment(null)}
+        shipment={selectedShipment}
       />
     </div>
   );
