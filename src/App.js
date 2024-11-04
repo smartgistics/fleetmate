@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react
 import Shipments from './components/Shipments';
 import Carriers from './components/Carriers';
 import Customers from './components/Customers';
+import Dashboard from './components/Dashboard';
 
 function App() {
   return (
@@ -17,6 +18,13 @@ function App() {
               </div>
               <nav className="mt-5 flex-1 px-2 space-y-1">
                 <SidebarLink to="/" icon={
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                }>
+                  Dashboard
+                </SidebarLink>
+                <SidebarLink to="/shipments" icon={
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20" />
                   </svg>
@@ -62,7 +70,8 @@ function App() {
             <div className="py-6">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                 <Routes>
-                  <Route path="/" element={<Shipments />} />
+                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/shipments" element={<Shipments />} />
                   <Route path="/carriers" element={<Carriers />} />
                   <Route path="/customers" element={<Customers />} />
                 </Routes>
@@ -102,7 +111,8 @@ function SidebarLink({ to, children, icon }) {
 function PageTitle() {
   const location = useLocation();
   const titles = {
-    '/': 'Shipments',
+    '/': 'Dashboard',
+    '/shipments': 'Shipments',
     '/carriers': 'Carriers',
     '/customers': 'Customers'
   };
