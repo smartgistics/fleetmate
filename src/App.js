@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import Shipments from './components/Shipments';
 import Carriers from './components/Carriers';
+import Customers from './components/Customers';
 
 function App() {
   return (
@@ -30,6 +31,13 @@ function App() {
                 }>
                   Carriers
                 </SidebarLink>
+                <SidebarLink to="/customers" icon={
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                }>
+                  Customers
+                </SidebarLink>
               </nav>
             </div>
           </div>
@@ -56,6 +64,7 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Shipments />} />
                   <Route path="/carriers" element={<Carriers />} />
+                  <Route path="/customers" element={<Customers />} />
                 </Routes>
               </div>
             </div>
@@ -94,7 +103,8 @@ function PageTitle() {
   const location = useLocation();
   const titles = {
     '/': 'Shipments',
-    '/carriers': 'Carriers'
+    '/carriers': 'Carriers',
+    '/customers': 'Customers'
   };
   
   return (
