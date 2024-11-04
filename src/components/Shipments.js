@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import NewShipmentModal from './NewShipmentModal';
 
 export const mockShipments = [
   {
@@ -428,6 +429,7 @@ const Shipments = () => {
   const [sortField, setSortField] = useState("id");
   const [sortDirection, setSortDirection] = useState("asc");
   const [selectedCarrier, setSelectedCarrier] = useState("all");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Get unique carriers for filter dropdown
   const uniqueCarriers = [...new Set(mockShipments.map(ship => ship.carrier))];
@@ -463,7 +465,10 @@ const Shipments = () => {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Shipments</h1>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        <button 
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          onClick={() => setIsModalOpen(true)}
+        >
           New Shipment
         </button>
       </div>
@@ -563,6 +568,11 @@ const Shipments = () => {
           </tbody>
         </table>
       </div>
+
+      <NewShipmentModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 };
