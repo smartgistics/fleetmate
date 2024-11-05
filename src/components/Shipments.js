@@ -11,7 +11,8 @@ export const mockShipments = [
     deliveryLocation: "Chicago, IL",
     pickupDate: "2024-01-15",
     deliveryDate: "2024-01-17",
-    rate: 1200
+    rate: 1200,
+    dispatch_status: "Available"
   },
   {
     id: 2,
@@ -21,7 +22,8 @@ export const mockShipments = [
     deliveryLocation: "Houston, TX",
     pickupDate: "2024-01-10",
     deliveryDate: "2024-01-13",
-    rate: 1800
+    rate: 1800,
+    dispatch_status: "Planned"
   },
   {
     id: 3,
@@ -31,7 +33,8 @@ export const mockShipments = [
     deliveryLocation: "Miami, FL",
     pickupDate: "2024-02-03",
     deliveryDate: "2024-02-04",
-    rate: 800
+    rate: 800,
+    dispatch_status: "PU TRACKING"
   },
   {
     id: 4,
@@ -41,7 +44,8 @@ export const mockShipments = [
     deliveryLocation: "Detroit, MI",
     pickupDate: "2024-02-14",
     deliveryDate: "2024-02-15",
-    rate: 1100
+    rate: 1100,
+    dispatch_status: "LOADING"
   },
   {
     id: 5,
@@ -51,7 +55,8 @@ export const mockShipments = [
     deliveryLocation: "Denver, CO",
     pickupDate: "2024-02-28",
     deliveryDate: "2024-03-01",
-    rate: 950
+    rate: 950,
+    dispatch_status: "DEL TRACKING"
   },
   {
     id: 6,
@@ -61,7 +66,8 @@ export const mockShipments = [
     deliveryLocation: "San Francisco, CA",
     pickupDate: "2024-03-05",
     deliveryDate: "2024-03-06",
-    rate: 700
+    rate: 700,
+    dispatch_status: "DELIVERING"
   },
   {
     id: 7,
@@ -71,7 +77,8 @@ export const mockShipments = [
     deliveryLocation: "Nashville, TN",
     pickupDate: "2024-03-15",
     deliveryDate: "2024-03-16",
-    rate: 1400
+    rate: 1400,
+    dispatch_status: "Available"
   },
   {
     id: 8,
@@ -81,7 +88,8 @@ export const mockShipments = [
     deliveryLocation: "Dallas, TX",
     pickupDate: "2024-04-04",
     deliveryDate: "2024-04-05",
-    rate: 1350
+    rate: 1350,
+    dispatch_status: "Planned"
   },
   {
     id: 9,
@@ -91,7 +99,8 @@ export const mockShipments = [
     deliveryLocation: "St. Louis, MO",
     pickupDate: "2024-04-12",
     deliveryDate: "2024-04-12",
-    rate: 550
+    rate: 550,
+    dispatch_status: "PU TRACKING"
   },
   {
     id: 10,
@@ -101,7 +110,8 @@ export const mockShipments = [
     deliveryLocation: "Kansas City, MO",
     pickupDate: "2024-04-19",
     deliveryDate: "2024-04-20",
-    rate: 950
+    rate: 950,
+    dispatch_status: "LOADING"
   },
   {
     id: 11,
@@ -111,7 +121,8 @@ export const mockShipments = [
     deliveryLocation: "Phoenix, AZ",
     pickupDate: "2024-04-24",
     deliveryDate: "2024-04-26",
-    rate: 1250
+    rate: 1250,
+    dispatch_status: "DEL TRACKING"
   },
   {
     id: 12,
@@ -121,7 +132,8 @@ export const mockShipments = [
     deliveryLocation: "Atlanta, GA",
     pickupDate: "2024-05-01",
     deliveryDate: "2024-05-02",
-    rate: 900
+    rate: 900,
+    dispatch_status: "DELIVERING"
   },
   {
     id: 13,
@@ -131,7 +143,8 @@ export const mockShipments = [
     deliveryLocation: "Nashville, TN",
     pickupDate: "2024-05-07",
     deliveryDate: "2024-05-08",
-    rate: 1150
+    rate: 1150,
+    dispatch_status: "Available"
   },
   {
     id: 14,
@@ -141,7 +154,8 @@ export const mockShipments = [
     deliveryLocation: "Las Vegas, NV",
     pickupDate: "2024-05-13",
     deliveryDate: "2024-05-15",
-    rate: 1650
+    rate: 1650,
+    dispatch_status: "Planned"
   },
   {
     id: 15,
@@ -151,7 +165,8 @@ export const mockShipments = [
     deliveryLocation: "Atlanta, GA",
     pickupDate: "2024-05-22",
     deliveryDate: "2024-05-23",
-    rate: 1250
+    rate: 1250,
+    dispatch_status: "PU TRACKING"
   },
   {
     id: 16,
@@ -161,7 +176,8 @@ export const mockShipments = [
     deliveryLocation: "Portland, OR",
     pickupDate: "2024-05-25",
     deliveryDate: "2024-05-26",
-    rate: 1400
+    rate: 1400,
+    dispatch_status: "LOADING"
   },
   {
     id: 17,
@@ -171,7 +187,8 @@ export const mockShipments = [
     deliveryLocation: "Las Vegas, NV",
     pickupDate: "2024-06-01",
     deliveryDate: "2024-06-02",
-    rate: 950
+    rate: 950,
+    dispatch_status: "DEL TRACKING"
   },
   {
     id: 18,
@@ -181,7 +198,8 @@ export const mockShipments = [
     deliveryLocation: "Chicago, IL",
     pickupDate: "2024-06-07",
     deliveryDate: "2024-06-09",
-    rate: 1350
+    rate: 1350,
+    dispatch_status: "DELIVERING"
   },
   {
     id: 19,
@@ -191,7 +209,8 @@ export const mockShipments = [
     deliveryLocation: "Denver, CO",
     pickupDate: "2024-06-13",
     deliveryDate: "2024-06-15",
-    rate: 800
+    rate: 800,
+    dispatch_status: "Available"
   },
   {
     id: 20,
@@ -201,7 +220,8 @@ export const mockShipments = [
     deliveryLocation: "New Orleans, LA",
     pickupDate: "2024-06-19",
     deliveryDate: "2024-06-20",
-    rate: 700
+    rate: 700,
+    dispatch_status: "Planned"
   },
   {
     id: 21,
@@ -211,7 +231,8 @@ export const mockShipments = [
     deliveryLocation: "Chicago, IL",
     pickupDate: "2024-06-25",
     deliveryDate: "2024-06-26",
-    rate: 1600
+    rate: 1600,
+    dispatch_status: "PU TRACKING"
   },
   {
     id: 22,
@@ -221,7 +242,8 @@ export const mockShipments = [
     deliveryLocation: "Orlando, FL",
     pickupDate: "2024-07-02",
     deliveryDate: "2024-07-03",
-    rate: 900
+    rate: 900,
+    dispatch_status: "LOADING"
   },
   {
     id: 23,
@@ -231,7 +253,8 @@ export const mockShipments = [
     deliveryLocation: "Houston, TX",
     pickupDate: "2024-07-07",
     deliveryDate: "2024-07-07",
-    rate: 500
+    rate: 500,
+    dispatch_status: "DEL TRACKING"
   },
   {
     id: 24,
@@ -241,7 +264,8 @@ export const mockShipments = [
     deliveryLocation: "Kansas City, MO",
     pickupDate: "2024-07-12",
     deliveryDate: "2024-07-13",
-    rate: 950
+    rate: 950,
+    dispatch_status: "DELIVERING"
   },
   {
     id: 25,
@@ -251,7 +275,8 @@ export const mockShipments = [
     deliveryLocation: "Los Angeles, CA",
     pickupDate: "2024-07-19",
     deliveryDate: "2024-07-19",
-    rate: 700
+    rate: 700,
+    dispatch_status: "Available"
   },
   {
     id: 26,
@@ -261,7 +286,8 @@ export const mockShipments = [
     deliveryLocation: "Portland, OR",
     pickupDate: "2024-07-25",
     deliveryDate: "2024-07-25",
-    rate: 600
+    rate: 600,
+    dispatch_status: "Planned"
   },
   {
     id: 27,
@@ -271,7 +297,8 @@ export const mockShipments = [
     deliveryLocation: "Boston, MA",
     pickupDate: "2024-07-29",
     deliveryDate: "2024-07-29",
-    rate: 400
+    rate: 400,
+    dispatch_status: "PU TRACKING"
   },
   {
     id: 28,
@@ -281,7 +308,8 @@ export const mockShipments = [
     deliveryLocation: "Miami, FL",
     pickupDate: "2024-08-05",
     deliveryDate: "2024-08-05",
-    rate: 500
+    rate: 500,
+    dispatch_status: "LOADING"
   },
   {
     id: 29,
@@ -291,7 +319,8 @@ export const mockShipments = [
     deliveryLocation: "Phoenix, AZ",
     pickupDate: "2024-08-10",
     deliveryDate: "2024-08-11",
-    rate: 850
+    rate: 850,
+    dispatch_status: "DEL TRACKING"
   },
   {
     id: 30,
@@ -301,7 +330,8 @@ export const mockShipments = [
     deliveryLocation: "Charlotte, NC",
     pickupDate: "2024-08-16",
     deliveryDate: "2024-08-16",
-    rate: 600
+    rate: 600,
+    dispatch_status: "DELIVERING"
   },
   {
     id: 31,
@@ -311,7 +341,8 @@ export const mockShipments = [
     deliveryLocation: "Seattle, WA",
     pickupDate: "2024-08-20",
     deliveryDate: "2024-08-21",
-    rate: 1250
+    rate: 1250,
+    dispatch_status: "Available"
   },
   {
     id: 32,
@@ -321,7 +352,8 @@ export const mockShipments = [
     deliveryLocation: "New York, NY",
     pickupDate: "2024-08-27",
     deliveryDate: "2024-08-27",
-    rate: 500
+    rate: 500,
+    dispatch_status: "Planned"
   },
   {
     id: 33,
@@ -331,7 +363,8 @@ export const mockShipments = [
     deliveryLocation: "Denver, CO",
     pickupDate: "2024-09-02",
     deliveryDate: "2024-09-03",
-    rate: 1100
+    rate: 1100,
+    dispatch_status: "PU TRACKING"
   },
   {
     id: 34,
@@ -341,7 +374,8 @@ export const mockShipments = [
     deliveryLocation: "Las Vegas, NV",
     pickupDate: "2024-09-06",
     deliveryDate: "2024-09-06",
-    rate: 700
+    rate: 700,
+    dispatch_status: "LOADING"
   },
   {
     id: 35,
@@ -351,7 +385,8 @@ export const mockShipments = [
     deliveryLocation: "Atlanta, GA",
     pickupDate: "2024-09-12",
     deliveryDate: "2024-09-13",
-    rate: 650
+    rate: 650,
+    dispatch_status: "DEL TRACKING"
   },
   {
     id: 36,
@@ -361,7 +396,8 @@ export const mockShipments = [
     deliveryLocation: "Chicago, IL",
     pickupDate: "2024-09-18",
     deliveryDate: "2024-09-19",
-    rate: 1500
+    rate: 1500,
+    dispatch_status: "DELIVERING"
   },
   {
     id: 37,
@@ -371,7 +407,8 @@ export const mockShipments = [
     deliveryLocation: "San Francisco, CA",
     pickupDate: "2024-09-25",
     deliveryDate: "2024-09-25",
-    rate: 900
+    rate: 900,
+    dispatch_status: "Available"
   },
   {
     id: 38,
@@ -381,7 +418,8 @@ export const mockShipments = [
     deliveryLocation: "Nashville, TN",
     pickupDate: "2024-10-02",
     deliveryDate: "2024-10-03",
-    rate: 1400
+    rate: 1400,
+    dispatch_status: "Planned"
   },
   {
     id: 39,
@@ -391,7 +429,8 @@ export const mockShipments = [
     deliveryLocation: "Dallas, TX",
     pickupDate: "2024-10-10",
     deliveryDate: "2024-10-11",
-    rate: 1100
+    rate: 1100,
+    dispatch_status: "PU TRACKING"
   },
   {
     id: 40,
@@ -401,7 +440,8 @@ export const mockShipments = [
     deliveryLocation: "Miami, FL",
     pickupDate: "2024-10-16",
     deliveryDate: "2024-10-16",
-    rate: 500
+    rate: 500,
+    dispatch_status: "LOADING"
   },
   {
     id: 41,
@@ -411,7 +451,8 @@ export const mockShipments = [
     deliveryLocation: "Charlotte, NC",
     pickupDate: "2024-10-20",
     deliveryDate: "2024-10-20",
-    rate: 700
+    rate: 700,
+    dispatch_status: "DEL TRACKING"
   },
   {
     id: 42,
@@ -421,9 +462,28 @@ export const mockShipments = [
     deliveryLocation: "Phoenix, AZ",
     pickupDate: "2024-10-25",
     deliveryDate: "2024-10-26",
-    rate: 800
+    rate: 800,
+    dispatch_status: "DELIVERING"
   }
-];
+].map((shipment, index) => {
+  // Evenly distribute shipments across the 6 statuses
+  const statuses = [
+    "Available",
+    "Planned", 
+    "PU TRACKING",
+    "LOADING",
+    "DEL TRACKING",
+    "DELIVERING"
+  ];
+  
+  // Use modulo to cycle through statuses
+  const statusIndex = index % 6;
+  
+  return {
+    ...shipment,
+    dispatch_status: statuses[statusIndex]
+  };
+});
 
 const Shipments = ({ isNewShipmentModalOpen, setIsNewShipmentModalOpen }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -548,6 +608,12 @@ const Shipments = ({ isNewShipmentModalOpen, setIsNewShipmentModalOpen }) => {
               >
                 Rate {sortField === 'rate' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th>
+              <th 
+                className="px-6 py-3 border-b cursor-pointer hover:bg-gray-200"
+                onClick={() => handleSort('dispatch_status')}
+              >
+                Dispatch Status {sortField === 'dispatch_status' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -565,6 +631,7 @@ const Shipments = ({ isNewShipmentModalOpen, setIsNewShipmentModalOpen }) => {
                 <td className="px-6 py-4 border-b">{shipment.pickupDate}</td>
                 <td className="px-6 py-4 border-b">{shipment.deliveryDate}</td>
                 <td className="px-6 py-4 border-b">${shipment.rate.toLocaleString()}</td>
+                <td className="px-6 py-4 border-b">{shipment.dispatch_status}</td>
               </tr>
             ))}
           </tbody>
