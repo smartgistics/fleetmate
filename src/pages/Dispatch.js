@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { mockShipments } from '../components/Shipments';
 import ShipmentDetailsModal from '../components/ShipmentDetailsModal';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
 const statusColors = {
   'NOT_STARTED': 'bg-blue-200',
@@ -9,27 +10,59 @@ const statusColors = {
   'DELAYED': 'bg-red-200'
 };
 
-const DispatchColumn = ({ title, shipments, statusColor, onShipmentClick }) => (
-  <div className="flex-1 min-w-[300px] border-r border-gray-300 last:border-r-0 px-4">
-    <h3 className="font-bold mb-4 text-center bg-gray-100 py-2">{title}</h3>
-    <div className="space-y-2">
-      {shipments.map((shipment) => (
-        <div 
-          key={shipment.id} 
-          className={`p-3 rounded text-sm ${statusColor} cursor-pointer hover:opacity-80`}
-          onClick={() => onShipmentClick(shipment)}
+const DispatchColumn = ({ title, shipments, statusColor, onShipmentClick }) => {
+  return (
+    <Droppable droppableId={title}>
+      {(provided, snapshot) => (
+        <div
+          ref={provided.innerRef}
+          {...provided.droppableProps}
+          className={`flex-1 min-w-[300px] border-r border-gray-300 last:border-r-0 px-4 
+            ${snapshot.isDraggingOver ? 'bg-gray-50' : ''}`}
         >
-          <div className="font-semibold mb-1">{shipment.pickupLocation} → {shipment.deliveryLocation}</div>
-          <div className="text-xs mb-1">
-            {shipment.customer} |   <span>{shipment.carrier}</span>
-          </div>
-          <div className="flex justify-between text-xs">
+          <h3 className="font-bold mb-4 text-center bg-gray-100 py-2">{title}</h3>
+          <div className="space-y-2">
+            {shipments.map((shipment, index) => (
+              <Draggable 
+                key={shipment.id} 
+                draggableId={shipment.id.toString()} 
+                index={index}
+              >
+                {(provided, snapshot) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    className={`p-3 rounded text-sm ${statusColor} 
+                      hover:opacity-80 hover:shadow-md transition-all duration-200
+                      ${snapshot.isDragging ? 'shadow-lg' : ''}`}
+                    onClick={() => onShipmentClick(shipment)}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="font-semibold">{shipment.pickupLocation} → {shipment.deliveryLocation}</div>
+                      <div className="text-gray-500">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M8 6h8v2H8V6zm0 4h8v2H8v-2zm0 4h8v2H8v-2z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="text-xs mb-1">
+                      {shipment.customer} | <span>{shipment.carrier}</span>
+                    </div>
+                    <div className="flex justify-between text-xs">
+                      <span>${shipment.rate}</span>
+                    </div>
+                  </div>
+                )}
+              </Draggable>
+            ))}
+            {provided.placeholder}
           </div>
         </div>
-      ))}
-    </div>
-  </div>
-);
+      )}
+    </Droppable>
+  );
+};
 
 const Dispatch = () => {
   const [brokerTeam, setBrokerTeam] = useState('');
@@ -43,6 +76,9 @@ const Dispatch = () => {
   const [selectedShipment, setSelectedShipment] = useState(null);
   const [isSlideoutOpen, setIsSlideoutOpen] = useState(false);
 
+  // Add state for managing shipments
+  const [shipments, setShipments] = useState(mockShipments);
+
   const handleShipmentClick = (shipment) => {
     setSelectedShipment(shipment);
     setIsSlideoutOpen(true);
@@ -53,15 +89,30 @@ const Dispatch = () => {
     setSelectedShipment(null);
   };
 
+  const handleDragEnd = (result) => {
+    if (!result.destination) return;
+
+    const { draggableId, destination } = result;
+    const newStatus = destination.droppableId;
+
+    setShipments(prevShipments =>
+      prevShipments.map(shipment =>
+        shipment.id.toString() === draggableId
+          ? { ...shipment, dispatch_status: newStatus }
+          : shipment
+      )
+    );
+  };
+
   // Function to distribute shipments into columns based on dates
   const distributeShipments = () => {
     return {
-      available: mockShipments.filter(s => s.dispatch_status === "Available"),
-      planned: mockShipments.filter(s => s.dispatch_status === "Planned"),
-      puTracking: mockShipments.filter(s => s.dispatch_status === "PU TRACKING"),
-      loading: mockShipments.filter(s => s.dispatch_status === "LOADING"),
-      delTracking: mockShipments.filter(s => s.dispatch_status === "DEL TRACKING"),
-      delivering: mockShipments.filter(s => s.dispatch_status === "DELIVERING")
+      available: shipments.filter(s => s.dispatch_status === "Available"),
+      planned: shipments.filter(s => s.dispatch_status === "Planned"),
+      puTracking: shipments.filter(s => s.dispatch_status === "PU TRACKING"),
+      loading: shipments.filter(s => s.dispatch_status === "LOADING"),
+      delTracking: shipments.filter(s => s.dispatch_status === "DEL TRACKING"),
+      delivering: shipments.filter(s => s.dispatch_status === "DELIVERING")
     };
   };
 
@@ -157,44 +208,46 @@ const Dispatch = () => {
       </div>
 
       {/* Dispatch Board */}
-      <div className="flex overflow-x-auto min-h-[600px] border-l border-r border-gray-300">
-        <DispatchColumn 
-          title="Available" 
-          shipments={displayShipments.available} 
-          statusColor="bg-yellow-200"
-          onShipmentClick={handleShipmentClick}
-        />
-        <DispatchColumn 
-          title="Planned" 
-          shipments={displayShipments.planned} 
-          statusColor="bg-blue-200"
-          onShipmentClick={handleShipmentClick}
-        />
-        <DispatchColumn 
-          title="PU TRACKING" 
-          shipments={displayShipments.puTracking} 
-          statusColor="bg-green-200"
-          onShipmentClick={handleShipmentClick}
-        />
-        <DispatchColumn 
-          title="LOADING" 
-          shipments={displayShipments.loading} 
-          statusColor="bg-yellow-200"
-          onShipmentClick={handleShipmentClick}
-        />
-        <DispatchColumn 
-          title="DEL TRACKING" 
-          shipments={displayShipments.delTracking} 
-          statusColor="bg-red-200"
-          onShipmentClick={handleShipmentClick}
-        />
-        <DispatchColumn 
-          title="DELIVERING" 
-          shipments={displayShipments.delivering} 
-          statusColor="bg-yellow-200"
-          onShipmentClick={handleShipmentClick}
-        />
-      </div>
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <div className="flex overflow-x-auto min-h-[600px] border-l border-r border-gray-300">
+          <DispatchColumn 
+            title="Available" 
+            shipments={displayShipments.available} 
+            statusColor="bg-yellow-200"
+            onShipmentClick={handleShipmentClick}
+          />
+          <DispatchColumn 
+            title="Planned" 
+            shipments={displayShipments.planned} 
+            statusColor="bg-blue-200"
+            onShipmentClick={handleShipmentClick}
+          />
+          <DispatchColumn 
+            title="PU TRACKING" 
+            shipments={displayShipments.puTracking} 
+            statusColor="bg-green-200"
+            onShipmentClick={handleShipmentClick}
+          />
+          <DispatchColumn 
+            title="LOADING" 
+            shipments={displayShipments.loading} 
+            statusColor="bg-yellow-200"
+            onShipmentClick={handleShipmentClick}
+          />
+          <DispatchColumn 
+            title="DEL TRACKING" 
+            shipments={displayShipments.delTracking} 
+            statusColor="bg-red-200"
+            onShipmentClick={handleShipmentClick}
+          />
+          <DispatchColumn 
+            title="DELIVERING" 
+            shipments={displayShipments.delivering} 
+            statusColor="bg-yellow-200"
+            onShipmentClick={handleShipmentClick}
+          />
+        </div>
+      </DragDropContext>
 
       {/* Add the ShipmentDetailsModal */}
       <ShipmentDetailsModal
