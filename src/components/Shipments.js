@@ -12,7 +12,8 @@ export const mockShipments = [
     pickupDate: "2024-01-15",
     deliveryDate: "2024-01-17",
     rate: 1200,
-    dispatch_status: "Available"
+    dispatch_status: "Available",
+    planner: "Sarah Johnson"
   },
   {
     id: 2,
@@ -23,7 +24,8 @@ export const mockShipments = [
     pickupDate: "2024-01-10",
     deliveryDate: "2024-01-13",
     rate: 1800,
-    dispatch_status: "Planned"
+    dispatch_status: "Planned",
+    planner: "Mike Chen"
   },
   {
     id: 3,
@@ -34,7 +36,8 @@ export const mockShipments = [
     pickupDate: "2024-02-03",
     deliveryDate: "2024-02-04",
     rate: 800,
-    dispatch_status: "PU TRACKING"
+    dispatch_status: "PU TRACKING",
+    planner: "David Rodriguez"
   },
   {
     id: 4,
@@ -45,7 +48,8 @@ export const mockShipments = [
     pickupDate: "2024-02-14",
     deliveryDate: "2024-02-15",
     rate: 1100,
-    dispatch_status: "LOADING"
+    dispatch_status: "LOADING",
+    planner: "Emily Taylor"
   },
   {
     id: 5,
@@ -56,7 +60,8 @@ export const mockShipments = [
     pickupDate: "2024-02-28",
     deliveryDate: "2024-03-01",
     rate: 950,
-    dispatch_status: "DEL TRACKING"
+    dispatch_status: "DEL TRACKING",
+    planner: "James Wilson"
   },
   {
     id: 6,
@@ -67,7 +72,8 @@ export const mockShipments = [
     pickupDate: "2024-03-05",
     deliveryDate: "2024-03-06",
     rate: 700,
-    dispatch_status: "DELIVERING"
+    dispatch_status: "DELIVERING",
+    planner: "Maria Garcia"
   },
   {
     id: 7,
@@ -78,7 +84,8 @@ export const mockShipments = [
     pickupDate: "2024-03-15",
     deliveryDate: "2024-03-16",
     rate: 1400,
-    dispatch_status: "Available"
+    dispatch_status: "Available",
+    planner: "Tom Anderson"
   },
   {
     id: 8,
@@ -89,7 +96,8 @@ export const mockShipments = [
     pickupDate: "2024-04-04",
     deliveryDate: "2024-04-05",
     rate: 1350,
-    dispatch_status: "Planned"
+    dispatch_status: "Planned",
+    planner: "Lisa Brown"
   },
   {
     id: 9,
@@ -100,7 +108,8 @@ export const mockShipments = [
     pickupDate: "2024-04-12",
     deliveryDate: "2024-04-12",
     rate: 550,
-    dispatch_status: "PU TRACKING"
+    dispatch_status: "PU TRACKING",
+    planner: "Sarah Johnson"
   },
   {
     id: 10,
@@ -111,7 +120,8 @@ export const mockShipments = [
     pickupDate: "2024-04-19",
     deliveryDate: "2024-04-20",
     rate: 950,
-    dispatch_status: "LOADING"
+    dispatch_status: "LOADING",
+    planner: "Mike Chen"
   },
   {
     id: 11,
@@ -122,7 +132,8 @@ export const mockShipments = [
     pickupDate: "2024-04-24",
     deliveryDate: "2024-04-26",
     rate: 1250,
-    dispatch_status: "DEL TRACKING"
+    dispatch_status: "DEL TRACKING",
+    planner: "David Rodriguez"
   },
   {
     id: 12,
@@ -133,7 +144,8 @@ export const mockShipments = [
     pickupDate: "2024-05-01",
     deliveryDate: "2024-05-02",
     rate: 900,
-    dispatch_status: "DELIVERING"
+    dispatch_status: "DELIVERING",
+    planner: "Emily Taylor"
   },
   {
     id: 13,
@@ -144,7 +156,8 @@ export const mockShipments = [
     pickupDate: "2024-05-07",
     deliveryDate: "2024-05-08",
     rate: 1150,
-    dispatch_status: "Available"
+    dispatch_status: "Available",
+    planner: "James Wilson"
   },
   {
     id: 14,
@@ -155,7 +168,8 @@ export const mockShipments = [
     pickupDate: "2024-05-13",
     deliveryDate: "2024-05-15",
     rate: 1650,
-    dispatch_status: "Planned"
+    dispatch_status: "Planned",
+    planner: "Maria Garcia"
   },
   {
     id: 15,
@@ -166,7 +180,8 @@ export const mockShipments = [
     pickupDate: "2024-05-22",
     deliveryDate: "2024-05-23",
     rate: 1250,
-    dispatch_status: "PU TRACKING"
+    dispatch_status: "PU TRACKING",
+    planner: "Tom Anderson"
   },
   {
     id: 16,
@@ -177,7 +192,8 @@ export const mockShipments = [
     pickupDate: "2024-05-25",
     deliveryDate: "2024-05-26",
     rate: 1400,
-    dispatch_status: "LOADING"
+    dispatch_status: "LOADING",
+    planner: "Lisa Brown"
   },
   {
     id: 17,
@@ -188,7 +204,8 @@ export const mockShipments = [
     pickupDate: "2024-06-01",
     deliveryDate: "2024-06-02",
     rate: 950,
-    dispatch_status: "DEL TRACKING"
+    dispatch_status: "DEL TRACKING",
+    planner: "Sarah Johnson"
   },
   {
     id: 18,
@@ -199,7 +216,8 @@ export const mockShipments = [
     pickupDate: "2024-06-07",
     deliveryDate: "2024-06-09",
     rate: 1350,
-    dispatch_status: "DELIVERING"
+    dispatch_status: "DELIVERING",
+    planner: "Mike Chen"
   },
   {
     id: 19,
@@ -210,7 +228,8 @@ export const mockShipments = [
     pickupDate: "2024-06-13",
     deliveryDate: "2024-06-15",
     rate: 800,
-    dispatch_status: "Available"
+    dispatch_status: "Available",
+    planner: "David Rodriguez"
   },
   {
     id: 20,
@@ -221,7 +240,8 @@ export const mockShipments = [
     pickupDate: "2024-06-19",
     deliveryDate: "2024-06-20",
     rate: 700,
-    dispatch_status: "Planned"
+    dispatch_status: "Planned",
+    planner: "Emily Taylor"
   },
   {
     id: 21,
@@ -232,7 +252,8 @@ export const mockShipments = [
     pickupDate: "2024-06-25",
     deliveryDate: "2024-06-26",
     rate: 1600,
-    dispatch_status: "PU TRACKING"
+    dispatch_status: "PU TRACKING",
+    planner: "James Wilson"
   },
   {
     id: 22,
@@ -243,7 +264,8 @@ export const mockShipments = [
     pickupDate: "2024-07-02",
     deliveryDate: "2024-07-03",
     rate: 900,
-    dispatch_status: "LOADING"
+    dispatch_status: "LOADING",
+    planner: "Maria Garcia"
   },
   {
     id: 23,
@@ -254,7 +276,8 @@ export const mockShipments = [
     pickupDate: "2024-07-07",
     deliveryDate: "2024-07-07",
     rate: 500,
-    dispatch_status: "DEL TRACKING"
+    dispatch_status: "DEL TRACKING",
+    planner: "Tom Anderson"
   },
   {
     id: 24,
@@ -265,7 +288,8 @@ export const mockShipments = [
     pickupDate: "2024-07-12",
     deliveryDate: "2024-07-13",
     rate: 950,
-    dispatch_status: "DELIVERING"
+    dispatch_status: "DELIVERING",
+    planner: "Lisa Brown"
   },
   {
     id: 25,
@@ -276,7 +300,8 @@ export const mockShipments = [
     pickupDate: "2024-07-19",
     deliveryDate: "2024-07-19",
     rate: 700,
-    dispatch_status: "Available"
+    dispatch_status: "Available",
+    planner: "Sarah Johnson"
   },
   {
     id: 26,
@@ -287,7 +312,8 @@ export const mockShipments = [
     pickupDate: "2024-07-25",
     deliveryDate: "2024-07-25",
     rate: 600,
-    dispatch_status: "Planned"
+    dispatch_status: "Planned",
+    planner: "Mike Chen"
   },
   {
     id: 27,
@@ -298,7 +324,8 @@ export const mockShipments = [
     pickupDate: "2024-07-29",
     deliveryDate: "2024-07-29",
     rate: 400,
-    dispatch_status: "PU TRACKING"
+    dispatch_status: "PU TRACKING",
+    planner: "David Rodriguez"
   },
   {
     id: 28,
@@ -309,7 +336,8 @@ export const mockShipments = [
     pickupDate: "2024-08-05",
     deliveryDate: "2024-08-05",
     rate: 500,
-    dispatch_status: "LOADING"
+    dispatch_status: "LOADING",
+    planner: "Emily Taylor"
   },
   {
     id: 29,
@@ -320,7 +348,8 @@ export const mockShipments = [
     pickupDate: "2024-08-10",
     deliveryDate: "2024-08-11",
     rate: 850,
-    dispatch_status: "DEL TRACKING"
+    dispatch_status: "DEL TRACKING",
+    planner: "James Wilson"
   },
   {
     id: 30,
@@ -331,7 +360,8 @@ export const mockShipments = [
     pickupDate: "2024-08-16",
     deliveryDate: "2024-08-16",
     rate: 600,
-    dispatch_status: "DELIVERING"
+    dispatch_status: "DELIVERING",
+    planner: "Maria Garcia"
   },
   {
     id: 31,
@@ -342,7 +372,8 @@ export const mockShipments = [
     pickupDate: "2024-08-20",
     deliveryDate: "2024-08-21",
     rate: 1250,
-    dispatch_status: "Available"
+    dispatch_status: "Available",
+    planner: "Tom Anderson"
   },
   {
     id: 32,
@@ -353,7 +384,8 @@ export const mockShipments = [
     pickupDate: "2024-08-27",
     deliveryDate: "2024-08-27",
     rate: 500,
-    dispatch_status: "Planned"
+    dispatch_status: "Planned",
+    planner: "Lisa Brown"
   },
   {
     id: 33,
@@ -364,7 +396,8 @@ export const mockShipments = [
     pickupDate: "2024-09-02",
     deliveryDate: "2024-09-03",
     rate: 1100,
-    dispatch_status: "PU TRACKING"
+    dispatch_status: "PU TRACKING",
+    planner: "Sarah Johnson"
   },
   {
     id: 34,
@@ -375,7 +408,8 @@ export const mockShipments = [
     pickupDate: "2024-09-06",
     deliveryDate: "2024-09-06",
     rate: 700,
-    dispatch_status: "LOADING"
+    dispatch_status: "LOADING",
+    planner: "Mike Chen"
   },
   {
     id: 35,
@@ -386,7 +420,8 @@ export const mockShipments = [
     pickupDate: "2024-09-12",
     deliveryDate: "2024-09-13",
     rate: 650,
-    dispatch_status: "DEL TRACKING"
+    dispatch_status: "DEL TRACKING",
+    planner: "David Rodriguez"
   },
   {
     id: 36,
@@ -397,7 +432,8 @@ export const mockShipments = [
     pickupDate: "2024-09-18",
     deliveryDate: "2024-09-19",
     rate: 1500,
-    dispatch_status: "DELIVERING"
+    dispatch_status: "DELIVERING",
+    planner: "Emily Taylor"
   },
   {
     id: 37,
@@ -408,7 +444,8 @@ export const mockShipments = [
     pickupDate: "2024-09-25",
     deliveryDate: "2024-09-25",
     rate: 900,
-    dispatch_status: "Available"
+    dispatch_status: "Available",
+    planner: "James Wilson"
   },
   {
     id: 38,
@@ -419,7 +456,8 @@ export const mockShipments = [
     pickupDate: "2024-10-02",
     deliveryDate: "2024-10-03",
     rate: 1400,
-    dispatch_status: "Planned"
+    dispatch_status: "Planned",
+    planner: "Maria Garcia"
   },
   {
     id: 39,
@@ -430,7 +468,8 @@ export const mockShipments = [
     pickupDate: "2024-10-10",
     deliveryDate: "2024-10-11",
     rate: 1100,
-    dispatch_status: "PU TRACKING"
+    dispatch_status: "PU TRACKING",
+    planner: "Tom Anderson"
   },
   {
     id: 40,
@@ -441,7 +480,8 @@ export const mockShipments = [
     pickupDate: "2024-10-16",
     deliveryDate: "2024-10-16",
     rate: 500,
-    dispatch_status: "LOADING"
+    dispatch_status: "LOADING",
+    planner: "Lisa Brown"
   },
   {
     id: 41,
@@ -452,7 +492,8 @@ export const mockShipments = [
     pickupDate: "2024-10-20",
     deliveryDate: "2024-10-20",
     rate: 700,
-    dispatch_status: "DEL TRACKING"
+    dispatch_status: "DEL TRACKING",
+    planner: "Sarah Johnson"
   },
   {
     id: 42,
@@ -463,10 +504,21 @@ export const mockShipments = [
     pickupDate: "2024-10-25",
     deliveryDate: "2024-10-26",
     rate: 800,
-    dispatch_status: "DELIVERING"
+    dispatch_status: "DELIVERING",
+    planner: "Mike Chen"
   }
 ].map((shipment, index) => {
-  // Evenly distribute shipments across the 6 statuses
+  const planners = [
+    "Sarah Johnson",
+    "Mike Chen",
+    "David Rodriguez",
+    "Emily Taylor",
+    "James Wilson",
+    "Maria Garcia",
+    "Tom Anderson",
+    "Lisa Brown"
+  ];
+  
   const statuses = [
     "Available",
     "Planned", 
@@ -476,12 +528,14 @@ export const mockShipments = [
     "DELIVERING"
   ];
   
-  // Use modulo to cycle through statuses
+  // Use modulo to cycle through statuses and planners
   const statusIndex = index % 6;
+  const plannerIndex = index % planners.length;
   
   return {
     ...shipment,
-    dispatch_status: statuses[statusIndex]
+    dispatch_status: statuses[statusIndex],
+    planner: planners[plannerIndex]  // Add planner if not already set
   };
 });
 
@@ -614,6 +668,12 @@ const Shipments = ({ isNewShipmentModalOpen, setIsNewShipmentModalOpen }) => {
               >
                 Dispatch Status {sortField === 'dispatch_status' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th>
+              <th 
+                className="px-6 py-3 border-b cursor-pointer hover:bg-gray-200"
+                onClick={() => handleSort('planner')}
+              >
+                Planner {sortField === 'planner' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -632,6 +692,7 @@ const Shipments = ({ isNewShipmentModalOpen, setIsNewShipmentModalOpen }) => {
                 <td className="px-6 py-4 border-b">{shipment.deliveryDate}</td>
                 <td className="px-6 py-4 border-b">${shipment.rate.toLocaleString()}</td>
                 <td className="px-6 py-4 border-b">{shipment.dispatch_status}</td>
+                <td className="px-6 py-4 border-b">{shipment.planner}</td>
               </tr>
             ))}
           </tbody>

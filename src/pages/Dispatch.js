@@ -17,11 +17,13 @@ const DispatchColumn = ({ title, shipments, statusColor, onShipmentClick }) => {
         <div
           ref={provided.innerRef}
           {...provided.droppableProps}
-          className={`flex-1 min-w-[300px] border-r border-gray-300 last:border-r-0 px-4 
+          className={`flex-1 min-w-[200px] border-r border-gray-300 last:border-r-0 px-2 
             ${snapshot.isDraggingOver ? 'bg-gray-50' : ''}`}
         >
-          <h3 className="font-bold mb-4 text-center bg-gray-100 py-2">{title}</h3>
-          <div className="space-y-2">
+          <h3 className="font-bold mb-2 text-center bg-gray-100 py-1 text-sm">
+            {title}
+          </h3>
+          <div className="space-y-1">
             {shipments.map((shipment, index) => (
               <Draggable 
                 key={shipment.id} 
@@ -33,24 +35,26 @@ const DispatchColumn = ({ title, shipments, statusColor, onShipmentClick }) => {
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
-                    className={`p-3 rounded text-sm ${statusColor} 
+                    className={`p-2 rounded text-xs ${statusColor} 
                       hover:opacity-80 hover:shadow-md transition-all duration-200
                       ${snapshot.isDragging ? 'shadow-lg' : ''}`}
                     onClick={() => onShipmentClick(shipment)}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <div className="font-semibold">{shipment.pickupLocation} → {shipment.deliveryLocation}</div>
-                      <div className="text-gray-500">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <div className="font-semibold truncate pr-1">
+                        {shipment.pickupLocation} → {shipment.deliveryLocation}
+                      </div>
+                      <div className="text-gray-500 flex-shrink-0">
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M8 6h8v2H8V6zm0 4h8v2H8v-2zm0 4h8v2H8v-2z" />
                         </svg>
                       </div>
                     </div>
-                    <div className="text-xs mb-1">
-                      {shipment.customer} | <span>{shipment.carrier}</span>
+                    <div className="truncate text-[11px]">
+                      {shipment.customer} | {shipment.carrier}
                     </div>
-                    <div className="flex justify-between text-xs">
-                      <span>${shipment.rate}</span>
+                    <div className="text-[11px] font-medium">
+                      {new Date(shipment.pickupDate).toLocaleDateString()}
                     </div>
                   </div>
                 )}
@@ -65,7 +69,7 @@ const DispatchColumn = ({ title, shipments, statusColor, onShipmentClick }) => {
 };
 
 const Dispatch = () => {
-  const [brokerTeam, setBrokerTeam] = useState('');
+  const [planner, setPlanner] = useState('');
   const [customer, setCustomer] = useState('');
   const [pickRegion, setPickRegion] = useState('');
   const [date, setDate] = useState('');
@@ -123,7 +127,7 @@ const Dispatch = () => {
     return Object.keys(shipments).reduce((acc, key) => {
       acc[key] = shipments[key].filter(shipment => {
         return (
-          (!brokerTeam || shipment.carrier.toLowerCase().includes(brokerTeam.toLowerCase())) &&
+          (!planner || shipment.planner.toLowerCase().includes(planner.toLowerCase())) &&
           (!customer || shipment.customer.toLowerCase().includes(customer.toLowerCase())) &&
           (!pickRegion || shipment.pickupLocation.toLowerCase().includes(pickRegion.toLowerCase())) &&
           (!delRegion || shipment.deliveryLocation.toLowerCase().includes(delRegion.toLowerCase())) &&
@@ -145,10 +149,10 @@ const Dispatch = () => {
           <div className="space-y-2">
             <input
               type="text"
-              placeholder="BROKER TEAM/REP"
+              placeholder="PLANNER"
               className="border p-2 w-full"
-              value={brokerTeam}
-              onChange={(e) => setBrokerTeam(e.target.value)}
+              value={planner}
+              onChange={(e) => setPlanner(e.target.value)}
             />
             <div className="flex gap-2">
               <input
@@ -209,7 +213,7 @@ const Dispatch = () => {
 
       {/* Dispatch Board */}
       <DragDropContext onDragEnd={handleDragEnd}>
-        <div className="flex overflow-x-auto min-h-[600px] border-l border-r border-gray-300">
+        <div className="flex min-h-[600px] border-l border-r border-gray-300 w-full">
           <DispatchColumn 
             title="Available" 
             shipments={displayShipments.available} 
