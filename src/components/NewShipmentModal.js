@@ -118,6 +118,19 @@ const NewShipmentModal = ({ isOpen, onClose }) => {
     }
   ];
 
+  // Add function to handle next tab
+  const handleNext = () => {
+    const currentIndex = tabs.findIndex(tab => tab.id === activeTab);
+    if (currentIndex < tabs.length - 1) {
+      setActiveTab(tabs[currentIndex + 1].id);
+    }
+  };
+
+  // Function to determine if we're on the last tab
+  const isLastTab = () => {
+    return activeTab === tabs[tabs.length - 1].id;
+  };
+
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -198,7 +211,7 @@ const NewShipmentModal = ({ isOpen, onClose }) => {
                 
                 {/* Add other tab contents here */}
 
-                {/* Footer */}
+                {/* Updated Footer */}
                 <div className="mt-8 flex justify-end border-t pt-4">
                   <button
                     type="button"
@@ -207,12 +220,22 @@ const NewShipmentModal = ({ isOpen, onClose }) => {
                   >
                     Cancel
                   </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-                  >
-                    Create Shipment
-                  </button>
+                  {isLastTab() ? (
+                    <button
+                      type="submit"
+                      className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+                    >
+                      Create Shipment
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleNext}
+                      className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+                    >
+                      Next
+                    </button>
+                  )}
                 </div>
               </form>
             </div>

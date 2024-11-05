@@ -3,7 +3,7 @@ import React from 'react';
 const OrderDetailsTab = ({ formData, setFormData }) => {
   return (
     <div className="space-y-6">
-      {/* Equipment Type Selection */}
+      {/* First Row: Contract Type and Equipment Type */}
       <div className="grid grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -35,7 +35,10 @@ const OrderDetailsTab = ({ formData, setFormData }) => {
             <option value="Reefer">Reefer</option>
           </select>
         </div>
+      </div>
 
+      {/* Second Row: Service Level and Temperature Control */}
+      <div className="grid grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Service Level
@@ -50,28 +53,42 @@ const OrderDetailsTab = ({ formData, setFormData }) => {
             <option value="Expedited">Expedited</option>
           </select>
         </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Temperature Control
+          </label>
+          <select
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            value={formData.temperatureControlled}
+            onChange={(e) => {
+              const isTemp = e.target.value === 'true';
+              setFormData({
+                ...formData, 
+                temperatureControlled: isTemp,
+                tempMin: isTemp ? formData.tempMin : '',
+                tempMax: isTemp ? formData.tempMax : ''
+              });
+            }}
+          >
+            <option value="false">No Temperature Control</option>
+            <option value="true">Temperature Controlled</option>
+          </select>
+        </div>
       </div>
 
-      {/* Temperature Control Section */}
-      <div className="border-t pt-6">
-        <div className="flex items-center space-x-4 mb-4">
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              className="form-checkbox h-4 w-4 text-blue-600"
-              checked={formData.temperatureControlled}
-              onChange={(e) => setFormData({...formData, temperatureControlled: e.target.checked})}
-            />
-            <span className="ml-2 text-sm text-gray-700">Temperature Controlled?</span>
-          </label>
-
-          {formData.temperatureControlled && (
+      {/* Temperature Range (shows only when Temperature Controlled is selected) */}
+      {formData.temperatureControlled && (
+        <div className="grid grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Temperature Range (°F)
+            </label>
             <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-700">Range:</span>
               <input
                 type="number"
                 className="w-24 px-2 py-1 border border-gray-300 rounded-md"
-                placeholder="Min °F"
+                placeholder="Min"
                 value={formData.tempMin}
                 onChange={(e) => setFormData({...formData, tempMin: e.target.value})}
               />
@@ -79,15 +96,15 @@ const OrderDetailsTab = ({ formData, setFormData }) => {
               <input
                 type="number"
                 className="w-24 px-2 py-1 border border-gray-300 rounded-md"
-                placeholder="Max °F"
+                placeholder="Max"
                 value={formData.tempMax}
                 onChange={(e) => setFormData({...formData, tempMax: e.target.value})}
               />
               <span>°F</span>
             </div>
-          )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Commodities Section */}
       <div className="border-t pt-6">
