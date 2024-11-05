@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import AddCarrierModal from '../components/AddCarrierModal';
 
-export function Carriers() {
+export default function Carriers() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
   
   const mockCarriers = [
     {
@@ -24,11 +26,20 @@ export function Carriers() {
     },
   ];
 
+  const handleAddCarrier = (carrierData: any) => {
+    console.log('New carrier data:', carrierData);
+    setIsModalOpen(false);
+  };
+
   return (
-    <div>
+    <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Carriers</h1>
-        <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+        <button 
+          type="button"
+          onClick={() => setIsModalOpen(true)}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
           Add Carrier
         </button>
       </div>
@@ -86,6 +97,12 @@ export function Carriers() {
           </tbody>
         </table>
       </div>
+
+      <AddCarrierModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleAddCarrier}
+      />
     </div>
   );
 } 

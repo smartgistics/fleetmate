@@ -1,8 +1,9 @@
+import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { Sidebar } from './components/layout/Sidebar';
+import Sidebar from './components/Sidebar';
 import { Dashboard } from './pages/Dashboard';
 import { Shipments } from './pages/Shipments';
-import { Carriers } from './pages/Carriers';
+import Carriers from './pages/Carriers';
 import { Customers } from './pages/Customers';
 import { Reports } from './pages/Reports';
 

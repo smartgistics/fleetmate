@@ -115,28 +115,10 @@ const GlobalSearch = () => {
   );
 };
 
-// Add+ Dropdown Component
+// Add Button Component
 const AddButton = ({ onNewShipment }) => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
-
-  const handleOptionClick = (type) => {
-    setIsOpen(false);
-    switch (type) {
-      case 'shipment':
-        onNewShipment();
-        navigate('/shipments');
-        break;
-      case 'carrier':
-        navigate('/carriers');
-        break;
-      case 'customer':
-        navigate('/customers');
-        break;
-      default:
-        break;
-    }
-  };
 
   return (
     <div className="relative">
@@ -144,52 +126,12 @@ const AddButton = ({ onNewShipment }) => {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
       >
-        <svg 
-          className="w-5 h-5 mr-2" 
-          fill="none" 
-          stroke="currentColor" 
-          viewBox="0 0 24 24"
-        >
-          <path 
-            strokeLinecap="round" 
-            strokeLinejoin="round" 
-            strokeWidth={2} 
-            d="M12 6v6m0 0v6m0-6h6m-6 0H6" 
-          />
+        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
         </svg>
-        Add+
+        Add
       </button>
-
-      {isOpen && (
-        <div 
-          className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50"
-          onMouseLeave={() => setIsOpen(false)}
-        >
-          <div className="py-1" role="menu">
-            <button
-              onClick={() => handleOptionClick('shipment')}
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              role="menuitem"
-            >
-              New Shipment
-            </button>
-            <button
-              onClick={() => handleOptionClick('carrier')}
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              role="menuitem"
-            >
-              New Carrier
-            </button>
-            <button
-              onClick={() => handleOptionClick('customer')}
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              role="menuitem"
-            >
-              New Customer
-            </button>
-          </div>
-        </div>
-      )}
+      {/* ... rest of the component ... */}
     </div>
   );
 };
