@@ -1,35 +1,26 @@
 import { DashboardCard } from '../components/dashboard/DashboardCard';
-import { ShipmentsTable } from '../components/shipments/ShipmentsTable';
+import ShipmentsTable from '../components/shipments/ShipmentsTable';
+import { Shipment } from '../types/models';
 
 export function Dashboard() {
-  const mockShipments = [
+  const mockShipments: Shipment[] = [
     {
       id: '1',
-      referenceNumber: '12345',
-      customerId: 'ABC Company',
-      origin: { city: 'Los Angeles', state: 'CA' },
-      destination: { city: 'Chicago', state: 'IL' },
-      status: 'In Transit',
+      pickupLocation: 'New York, NY',
+      deliveryLocation: 'Los Angeles, CA',
+      customer: 'Acme Corp',
+      carrier: 'Swift Transport',
+      date: '2024-03-15',
+      status: 'pending'
     },
-    // Add more mock data as needed
+    // ... other shipments
   ];
 
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <DashboardCard title="Active Shipments" value={24} icon="🚚" />
-        <DashboardCard title="Revenue (MTD)" value="$45,678" icon="💰" />
-        <DashboardCard title="Pending Deliveries" value={12} icon="📦" />
-      </div>
-
-      <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-4">Recent Shipments</h2>
+    <div className="space-y-6">
+      <DashboardCard title="Recent Shipments">
         <ShipmentsTable shipments={mockShipments} />
-      </div>
+      </DashboardCard>
     </div>
   );
 } 

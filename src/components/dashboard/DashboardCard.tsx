@@ -1,17 +1,15 @@
-interface DashboardCardProps {
+import React, { ReactNode } from 'react';
+
+export interface DashboardCardProps {
   title: string;
-  value: string | number;
-  icon?: string;
+  children: ReactNode;
 }
 
-export function DashboardCard({ title, value, icon }: DashboardCardProps) {
+export const DashboardCard: React.FC<DashboardCardProps> = ({ title, children }) => {
   return (
-    <div className="bg-white p-6 rounded-lg shadow">
-      <div className="flex items-center justify-between mb-2">
-        <h2 className="text-lg font-semibold">{title}</h2>
-        {icon && <span className="text-2xl">{icon}</span>}
-      </div>
-      <p className="text-3xl font-bold">{value}</p>
+    <div className="bg-white rounded-lg shadow p-6">
+      <h2 className="text-xl font-semibold mb-4">{title}</h2>
+      <div>{children}</div>
     </div>
   );
-} 
+}; 
