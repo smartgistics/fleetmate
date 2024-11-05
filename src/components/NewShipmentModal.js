@@ -1,33 +1,74 @@
 import React, { useState } from 'react';
+import CustomerTab from './CustomerTab';
+import OrderDetailsTab from './OrderDetailsTab';
+import PickupTab from './PickupTab';
+import DeliveryTab from './DeliveryTab';
+import FinancialsTab from './FinancialsTab';
+import SummaryTab from './SummaryTab';
+import CapacityTab from './CapacityTab';
 
 const NewShipmentModal = ({ isOpen, onClose }) => {
-  const [activeTab, setActiveTab] = useState('shipment');
+  const [activeTab, setActiveTab] = useState('customer');
   const [formData, setFormData] = useState({
-    // Shipment Details
-    reference: '',
+    // Customer Tab
     customer: '',
+    customerReference: '',
+    customerContact: '',
+    contactPhone: '',
+    contactEmail: '',
+    billingAddress: '',
+    
+    // Order Details Tab
+    contractType: '',
+    equipmentType: '',
+    serviceLevel: '',
+    temperatureControlled: false,
+    tempMin: '',
+    tempMax: '',
+    commodityCode: '',
+    commodities: [],
+    
+    // Pickup Tab
+    pickupLocations: [{
+      address: '',
+      date: '',
+      startTime: '',
+      endTime: '',
+      confirmed: false,
+      confirmationNumber: '',
+      notes: '',
+      contactName: '',
+      contactPhone: '',
+      contactEmail: ''
+    }],
+    
+    // Delivery Tab
+    deliveryLocations: [{
+      address: '',
+      date: '',
+      startTime: '',
+      endTime: '',
+      confirmed: false,
+      confirmationNumber: '',
+      notes: '',
+      contactName: '',
+      contactPhone: '',
+      contactEmail: ''
+    }],
+    
+    // Financials Tab
+    customerCharges: [],
+    carrierCharges: [],
+    miscCharges: [],
+    
+    // Additional Fields
+    notes: '',
+    accountManager: 'Jim Smith',  // Default value
+    orderPlanner: 'Sherie Connor',  // Default value
     status: 'New',
-    mode: '',
-    service: '',
-    pickupLocation: '',
-    deliveryLocation: '',
-    pickupDate: '',
-    deliveryDate: '',
-    
-    // Carrier Details
-    carrier: '',
-    equipment: '',
-    rate: '',
-    
-    // Equipment Details
-    weight: '',
-    pieces: '',
-    pallets: '',
-    
-    // Additional Details
-    accessorials: [],
-    documents: [],
-    notes: ''
+    parentAccount: '[PARENT ACCOUNT]',
+    customerId: '[Customer ID]',
+    creditStatus: '[STATUS]'
   });
 
   if (!isOpen) return null;
@@ -35,16 +76,46 @@ const NewShipmentModal = ({ isOpen, onClose }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Handle form submission
+    console.log('Form Data:', formData);
     onClose();
   };
 
   const tabs = [
-    { id: 'shipment', name: 'Shipment Details', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' },
-    { id: 'carrier', name: 'Carrier Details', icon: 'M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z' },
-    { id: 'equipment', name: 'Equipment', icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4' },
-    { id: 'accessorials', name: 'Accessorials', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' },
-    { id: 'documents', name: 'Documents', icon: 'M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z' },
-    { id: 'notes', name: 'Notes', icon: 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z' }
+    { 
+      id: 'customer', 
+      name: 'Customer', 
+      icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z'
+    },
+    { 
+      id: 'orderDetails', 
+      name: 'Order Details', 
+      icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'
+    },
+    { 
+      id: 'pickup', 
+      name: 'Pickup', 
+      icon: 'M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4'
+    },
+    { 
+      id: 'delivery', 
+      name: 'Delivery', 
+      icon: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z'
+    },
+    { 
+      id: 'financials', 
+      name: 'Financials', 
+      icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+    },
+    { 
+      id: 'summary', 
+      name: 'Summary', 
+      icon: 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
+    },
+    { 
+      id: 'capacity', 
+      name: 'Capacity', 
+      icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4'
+    }
   ];
 
   return (
@@ -73,7 +144,7 @@ const NewShipmentModal = ({ isOpen, onClose }) => {
 
             {/* Tabs */}
             <div className="border-b border-gray-200">
-              <nav className="flex -mb-px px-6" aria-label="Tabs">
+              <nav className="flex -mb-px px-6 overflow-x-auto" aria-label="Tabs">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
@@ -103,136 +174,28 @@ const NewShipmentModal = ({ isOpen, onClose }) => {
             {/* Form Content */}
             <div className="px-6 py-4">
               <form onSubmit={handleSubmit}>
-                {activeTab === 'shipment' && (
-                  <div className="grid grid-cols-3 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Reference Number
-                      </label>
-                      <input
-                        type="text"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                        value={formData.reference}
-                        onChange={(e) => setFormData({...formData, reference: e.target.value})}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Customer
-                      </label>
-                      <select
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                        value={formData.customer}
-                        onChange={(e) => setFormData({...formData, customer: e.target.value})}
-                      >
-                        <option value="">Select a customer</option>
-                        {/* Add customer options */}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Status
-                      </label>
-                      <select
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                        value={formData.status}
-                        onChange={(e) => setFormData({...formData, status: e.target.value})}
-                      >
-                        <option value="New">New</option>
-                        <option value="Pending">Pending</option>
-                        <option value="In Transit">In Transit</option>
-                        <option value="Delivered">Delivered</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Mode
-                      </label>
-                      <select
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                        value={formData.mode}
-                        onChange={(e) => setFormData({...formData, mode: e.target.value})}
-                      >
-                        <option value="">Select mode</option>
-                        <option value="FTL">FTL</option>
-                        <option value="LTL">LTL</option>
-                        <option value="Intermodal">Intermodal</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Service Level
-                      </label>
-                      <select
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                        value={formData.service}
-                        onChange={(e) => setFormData({...formData, service: e.target.value})}
-                      >
-                        <option value="">Select service</option>
-                        <option value="Standard">Standard</option>
-                        <option value="Expedited">Expedited</option>
-                        <option value="Same Day">Same Day</option>
-                      </select>
-                    </div>
-
-                    <div className="col-span-3 grid grid-cols-2 gap-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Pickup Location
-                        </label>
-                        <input
-                          type="text"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                          value={formData.pickupLocation}
-                          onChange={(e) => setFormData({...formData, pickupLocation: e.target.value})}
-                          placeholder="Enter address"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Delivery Location
-                        </label>
-                        <input
-                          type="text"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                          value={formData.deliveryLocation}
-                          onChange={(e) => setFormData({...formData, deliveryLocation: e.target.value})}
-                          placeholder="Enter address"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Pickup Date
-                        </label>
-                        <input
-                          type="datetime-local"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                          value={formData.pickupDate}
-                          onChange={(e) => setFormData({...formData, pickupDate: e.target.value})}
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Delivery Date
-                        </label>
-                        <input
-                          type="datetime-local"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                          value={formData.deliveryDate}
-                          onChange={(e) => setFormData({...formData, deliveryDate: e.target.value})}
-                        />
-                      </div>
-                    </div>
-                  </div>
+                {activeTab === 'customer' && (
+                  <CustomerTab formData={formData} setFormData={setFormData} />
                 )}
-
+                {activeTab === 'orderDetails' && (
+                  <OrderDetailsTab formData={formData} setFormData={setFormData} />
+                )}
+                {activeTab === 'pickup' && (
+                  <PickupTab formData={formData} setFormData={setFormData} />
+                )}
+                {activeTab === 'delivery' && (
+                  <DeliveryTab formData={formData} setFormData={setFormData} />
+                )}
+                {activeTab === 'financials' && (
+                  <FinancialsTab formData={formData} setFormData={setFormData} />
+                )}
+                {activeTab === 'summary' && (
+                  <SummaryTab formData={formData} />
+                )}
+                {activeTab === 'capacity' && (
+                  <CapacityTab formData={formData} setFormData={setFormData} />
+                )}
+                
                 {/* Add other tab contents here */}
 
                 {/* Footer */}
