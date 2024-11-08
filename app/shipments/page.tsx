@@ -153,10 +153,10 @@ export default function Shipments() {
               </th>
               <th
                 className='px-6 py-3 border-b cursor-pointer hover:bg-gray-200'
-                onClick={() => handleSort("dispatch_status")}
+                onClick={() => handleSort("dispatchStatus")}
               >
                 Dispatch Status{" "}
-                {sortField === "dispatch_status" &&
+                {sortField === "dispatchStatus" &&
                   (sortDirection === "asc" ? "↑" : "↓")}
               </th>
               <th
@@ -191,7 +191,7 @@ export default function Shipments() {
                   ${shipment.rate.toLocaleString()}
                 </td>
                 <td className='px-6 py-4 border-b'>
-                  {shipment.dispatch_status}
+                  {shipment.dispatchStatus}
                 </td>
                 <td className='px-6 py-4 border-b'>{shipment.planner}</td>
               </tr>

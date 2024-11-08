@@ -85,7 +85,9 @@ function DispatchColumn({
                       {shipment.customer} | {shipment.carrier}
                     </div>
                     <div className='text-[11px] font-medium text-gray-800'>
-                      {new Date(shipment.pickupDate).toLocaleDateString()}
+                      {shipment.pickupDate
+                        ? new Date(shipment.pickupDate).toLocaleDateString()
+                        : "Not Specified"}
                     </div>
                   </div>
                 )}
@@ -165,8 +167,8 @@ export default function DispatchPage() {
           shipment.id.toString() === dragConfirmation.shipmentId
             ? {
                 ...shipment,
-                dispatch_status:
-                  dragConfirmation.newStatus || shipment.dispatch_status,
+                dispatchStatus:
+                  dragConfirmation.newStatus || shipment.dispatchStatus,
                 ...(dragConfirmation.newStatus === "Planned" && {
                   carrier: selectedCarrier,
                 }),
@@ -186,14 +188,12 @@ export default function DispatchPage() {
 
   const distributeShipments = (): FilteredShipments => {
     return {
-      available: shipments.filter((s) => s.dispatch_status === "Available"),
-      planned: shipments.filter((s) => s.dispatch_status === "Planned"),
-      puTracking: shipments.filter((s) => s.dispatch_status === "PU TRACKING"),
-      loading: shipments.filter((s) => s.dispatch_status === "LOADING"),
-      delTracking: shipments.filter(
-        (s) => s.dispatch_status === "DEL TRACKING"
-      ),
-      delivering: shipments.filter((s) => s.dispatch_status === "DELIVERING"),
+      available: shipments.filter((s) => s.dispatchStatus === "Available"),
+      planned: shipments.filter((s) => s.dispatchStatus === "Planned"),
+      puTracking: shipments.filter((s) => s.dispatchStatus === "PU TRACKING"),
+      loading: shipments.filter((s) => s.dispatchStatus === "LOADING"),
+      delTracking: shipments.filter((s) => s.dispatchStatus === "DEL TRACKING"),
+      delivering: shipments.filter((s) => s.dispatchStatus === "DELIVERING"),
     };
   };
 
@@ -210,14 +210,14 @@ export default function DispatchPage() {
             shipment.customer.toLowerCase().includes(customer.toLowerCase())) &&
           (!pickRegion ||
             shipment.pickupLocation
-              .toLowerCase()
+              ?.toLowerCase()
               .includes(pickRegion.toLowerCase())) &&
           (!delRegion ||
             shipment.deliveryLocation
               .toLowerCase()
               .includes(delRegion.toLowerCase())) &&
           (!carrier ||
-            shipment.carrier.toLowerCase().includes(carrier.toLowerCase()))
+            shipment.carrier?.toLowerCase().includes(carrier.toLowerCase()))
         );
       });
       return acc;
@@ -225,6 +225,14 @@ export default function DispatchPage() {
   };
 
   const displayShipments = applyFilters(filteredShipments);
+
+  const handleShipmentUpdate = (updatedShipment: Shipment) => {
+    setShipments((prevShipments) =>
+      prevShipments.map((shipment) =>
+        shipment.id === updatedShipment.id ? updatedShipment : shipment
+      )
+    );
+  };
 
   return (
     <div className='p-4 text-gray-900'>
@@ -360,6 +368,7 @@ export default function DispatchPage() {
         isOpen={isSlideoutOpen}
         onClose={handleCloseSlideout}
         shipment={selectedShipment}
+        onUpdate={handleShipmentUpdate}
       />
 
       {dragConfirmation.isOpen && (

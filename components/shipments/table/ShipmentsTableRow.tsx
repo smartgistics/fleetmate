@@ -19,7 +19,7 @@ export function ShipmentsTableRow({
       <td className='px-6 py-4 border-b'>{shipment.pickupDate}</td>
       <td className='px-6 py-4 border-b'>{shipment.deliveryDate}</td>
       <td className='px-6 py-4 border-b'>${shipment.rate.toLocaleString()}</td>
-      <td className='px-6 py-4 border-b'>{shipment.dispatch_status}</td>
+      <td className='px-6 py-4 border-b'>{shipment.dispatchStatus}</td>
       <td className='px-6 py-4 border-b'>{shipment.planner}</td>
     </tr>
   );

@@ -7,15 +7,20 @@ export interface SearchResult {
 
 export interface Shipment {
   id: number;
-  carrier: string;
+  carrier?: string;
   customer: string;
-  pickupLocation: string;
   deliveryLocation: string;
-  pickupDate: string;
   deliveryDate: string;
-  rate: number;
-  dispatch_status: string;
+  deliveryTime: string;
+  dispatchStatus: string;
+  equipmentType: string;
   planner: string;
+  pickupDate?: string;
+  pickupLocation?: string;
+  pickupTime?: string;
+  rate?: number;
+  referenceNumbers: string;
+  specialInstructions?: string;
 }
 
 export interface WeeklyData {

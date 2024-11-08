@@ -20,6 +20,7 @@ export function Shipments({ setIsNewShipmentModalOpen }: ShipmentsProps) {
   const [selectedShipment, setSelectedShipment] = useState<Shipment | null>(
     null
   );
+  const [shipments, setShipments] = useState<Shipment[]>(mockShipments);
 
   const uniqueCarriers = [
     ...new Set(mockShipments.map((ship) => ship.carrier)),
@@ -34,7 +35,7 @@ export function Shipments({ setIsNewShipmentModalOpen }: ShipmentsProps) {
     }
   };
 
-  const filteredShipments = mockShipments
+  const filteredShipments = shipments
     .filter((shipment) => {
       const matchesSearch = Object.values(shipment)
         .join(" ")
@@ -46,10 +47,20 @@ export function Shipments({ setIsNewShipmentModalOpen }: ShipmentsProps) {
     })
     .sort((a, b) => {
       if (sortDirection === "asc") {
-        return a[sortField] > b[sortField] ? 1 : -1;
+        return (a[sortField] ?? "") > (b[sortField] ?? "") ? 1 : -1;
       }
-      return a[sortField] < b[sortField] ? 1 : -1;
+      return (a[sortField] ?? "") < (b[sortField] ?? "") ? 1 : -1;
     });
+
+  const handleShipmentUpdate = (updatedShipment: Shipment) => {
+    // Update the mockShipments array with the updated shipment
+    const updatedShipments = shipments.map((shipment) =>
+      shipment.id === updatedShipment.id ? updatedShipment : shipment
+    );
+    // Note: In a real application, you would typically make an API call here
+    // and use proper state management
+    setShipments(updatedShipments);
+  };
 
   return (
     <div className='p-6'>
@@ -68,7 +79,9 @@ export function Shipments({ setIsNewShipmentModalOpen }: ShipmentsProps) {
         setSearchTerm={setSearchTerm}
         selectedCarrier={selectedCarrier}
         setSelectedCarrier={setSelectedCarrier}
-        uniqueCarriers={uniqueCarriers}
+        uniqueCarriers={
+          uniqueCarriers.filter((carrier) => carrier !== undefined) as string[]
+        }
       />
 
       <div className='overflow-x-auto'>
@@ -96,6 +109,7 @@ export function Shipments({ setIsNewShipmentModalOpen }: ShipmentsProps) {
         isOpen={!!selectedShipment}
         onClose={() => setSelectedShipment(null)}
         shipment={selectedShipment}
+        onUpdate={handleShipmentUpdate}
       />
     </div>
   );
