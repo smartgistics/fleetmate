@@ -6,7 +6,7 @@ import { mockShipments } from "@/mocks/Shipments";
 import { ShipmentsFilters } from "./shipments/filters/ShipmentsFilters";
 import { ShipmentsTableHeader } from "./shipments/table/ShipmentsTableHeader";
 import { ShipmentsTableRow } from "./shipments/table/ShipmentsTableRow";
-import ShipmentDetailsModal from "@/components/shipments/ShipmentDetailsModal";
+import { ShipmentDetailsModal } from "@/components/shipments/ShipmentDetailsModal";
 
 interface ShipmentsProps {
   setIsNewShipmentModalOpen: (isOpen: boolean) => void;

@@ -170,5 +170,3 @@ export function ShipmentDetailsModal({
     </div>
   );
 }
-
-export default ShipmentDetailsModal;

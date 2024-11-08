@@ -1,15 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { FormData } from "@/types";
 
 interface CustomerTabProps {
-  formData: FormData;
-  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
+  initialFormData: FormData;
 }
 
-export default function CustomerTab({
-  formData,
-  setFormData,
-}: CustomerTabProps) {
+export function CustomerTab({ initialFormData }: CustomerTabProps) {
+  const [formData, setFormData] = useState<FormData>(initialFormData);
   return (
     <div className='grid grid-cols-2 gap-6'>
       <div>

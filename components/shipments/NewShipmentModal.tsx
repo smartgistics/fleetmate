@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import { FormData } from "@/types";
 import { ShipmentModalTabs } from "./modal/ShipmentModalTabs";
 import { ShipmentModalFooter } from "./modal/ShipmentModalFooter";
-import CustomerTab from "./tabs/CustomerTab";
-import OrderDetailsTab from "./tabs/OrderDetailsTab";
+import { CustomerTab } from "./tabs/CustomerTab";
+import { OrderDetailsTab } from "./tabs/OrderDetailsTab";
 import { PickupTab } from "./tabs/PickupTab";
 import { DeliveryTab } from "./tabs/DeliveryTab";
-import FinancialsTab from "./tabs/FinancialsTab";
-import SummaryTab from "./tabs/SummaryTab";
-import CapacityTab from "./tabs/CapacityTab";
+import { FinancialsTab } from "./tabs/FinancialsTab";
+import { SummaryTab } from "./tabs/SummaryTab";
+import { CapacityTab } from "./tabs/CapacityTab";
 
 export interface NewShipmentModalProps {
   isOpen: boolean;
@@ -159,7 +159,7 @@ export function NewShipmentModal({ isOpen, onClose }: NewShipmentModalProps) {
             <div className='px-6 py-4'>
               <form onSubmit={handleSubmit}>
                 {activeTab === "customer" && (
-                  <CustomerTab formData={formData} setFormData={setFormData} />
+                  <CustomerTab initialFormData={formData} />
                 )}
                 {activeTab === "orderDetails" && (
                   <OrderDetailsTab

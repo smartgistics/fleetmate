@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { mockShipments } from "@/mocks/Shipments";
-import ShipmentDetailsModal from "@/components/shipments/ShipmentDetailsModal";
+import { ShipmentDetailsModal } from "@/components/shipments/ShipmentDetailsModal";
 import {
   DragDropContext,
   Droppable,
@@ -32,7 +32,7 @@ interface DispatchColumnProps {
   onShipmentClick: (shipment: Shipment) => void;
 }
 
-export function DispatchColumn({
+function DispatchColumn({
   title,
   shipments,
   statusColor,

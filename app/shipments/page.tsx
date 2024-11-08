@@ -3,15 +3,11 @@
 import { useState } from "react";
 import { Shipment } from "@/types";
 import { mockShipments } from "@/mocks/Shipments";
-import ShipmentDetailsModal from "../../components/shipments/ShipmentDetailsModal";
+import { ShipmentDetailsModal } from "@/components/shipments/ShipmentDetailsModal";
+import { NewShipmentModal } from "@/components/shipments/NewShipmentModal";
 
-interface ShipmentsProps {
-  setIsNewShipmentModalOpen: (isOpen: boolean) => void;
-}
-
-export default function Shipments({
-  setIsNewShipmentModalOpen,
-}: ShipmentsProps) {
+export default function Shipments() {
+  const [isNewShipmentModalOpen, setIsNewShipmentModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<keyof Shipment>("id");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
@@ -203,6 +199,14 @@ export default function Shipments({
           </tbody>
         </table>
       </div>
+
+      {/* Add the NewShipmentModal component if you have one */}
+      {isNewShipmentModalOpen && (
+        <NewShipmentModal
+          isOpen={isNewShipmentModalOpen}
+          onClose={() => setIsNewShipmentModalOpen(false)}
+        />
+      )}
 
       <ShipmentDetailsModal
         isOpen={!!selectedShipment}
