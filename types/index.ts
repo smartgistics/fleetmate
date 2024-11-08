@@ -132,6 +132,14 @@ export interface CustomerData {
     delivery: string;
   };
   lastShipmentDate: string;
+  primaryContact: string;
+  contactPhone: string;
+  contactEmail: string;
+  billingAddress?: string;
+  defaultEquipment: string;
+  requiresTemperatureControl: boolean;
+  defaultTempMin?: string;
+  defaultTempMax?: string;
 }
 
 export interface DashboardCardProps {
