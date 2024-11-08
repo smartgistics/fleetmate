@@ -1,8 +1,11 @@
+import { Dashboard } from "@/components/dashboard/Dashboard";
+
 export default function Home() {
   return (
-    <main>
-      <h1>Home Page</h1>
-      <a href="/smartlane">Go to Smartlane</a>
+    <main className='p-6'>
+      <div className='max-w-7xl mx-auto'>
+        <Dashboard />
+      </div>
     </main>
-  )
-} 
+  );
+}
