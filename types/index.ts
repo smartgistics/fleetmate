@@ -53,7 +53,7 @@ export interface Location {
 }
 
 export interface Commodity {
-  name: string;
+  code: string;
   description: string;
   weight: number;
   pieces: number;
