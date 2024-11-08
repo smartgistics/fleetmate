@@ -36,7 +36,7 @@ const getTopItemsByRevenue = (
 ): RevenueItem[] => {
   const revenue = array.reduce<Record<string, number>>((acc, item) => {
     const value = item[key] as string;
-    acc[value] = (acc[value] || 0) + item.rate;
+    acc[value] = (acc[value] || 0) + (item.rate || 0);
     return acc;
   }, {});
 
@@ -49,7 +49,7 @@ const getTopItemsByRevenue = (
 const getWeeklyRevenue = (shipments: Shipment[]): WeeklyData[] => {
   const weeklyData = shipments.reduce<Record<string, WeeklyData>>(
     (acc, shipment) => {
-      const date = new Date(shipment.pickupDate);
+      const date = new Date(shipment.pickupDate ?? "");
       const weekStart = new Date(date.setDate(date.getDate() - date.getDay()));
       const weekKey = weekStart.toISOString().split("T")[0];
 
@@ -61,7 +61,7 @@ const getWeeklyRevenue = (shipments: Shipment[]): WeeklyData[] => {
         };
       }
 
-      acc[weekKey].revenue += shipment.rate;
+      acc[weekKey].revenue += shipment.rate || 0;
       acc[weekKey].shipments += 1;
 
       return acc;

@@ -12,7 +12,7 @@ const getWeekStart = (date: Date): Date => {
 const processWeeklyRevenue = (): WeeklyData[] => {
   const weeklyData = mockShipments.reduce<Record<string, WeeklyData>>(
     (acc, shipment) => {
-      const date = new Date(shipment.pickupDate);
+      const date = new Date(shipment.pickupDate ?? "");
       const weekStart = getWeekStart(date);
       const weekKey = weekStart.toISOString().split("T")[0];
 
@@ -24,7 +24,7 @@ const processWeeklyRevenue = (): WeeklyData[] => {
         };
       }
 
-      acc[weekKey].revenue += shipment.rate;
+      acc[weekKey].revenue += shipment.rate || 0;
       acc[weekKey].shipments += 1;
 
       return acc;

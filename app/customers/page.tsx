@@ -27,17 +27,24 @@ const mockCustomers: CustomerData[] = Array.from(
     id: index + 1,
     name: customer,
     totalShipments: customerShipments.length,
-    totalSpent: customerShipments.reduce((sum, ship) => sum + ship.rate, 0),
+    totalSpent: customerShipments.reduce(
+      (sum, ship) => sum + (ship.rate || 0),
+      0
+    ),
     avgShipmentCost: Math.round(
-      customerShipments.reduce((sum, ship) => sum + ship.rate, 0) /
+      customerShipments.reduce((sum, ship) => sum + (ship.rate || 0), 0) /
         customerShipments.length
     ),
     commonLocations: {
       pickup: getMostFrequent(
-        customerShipments.map((ship) => ship.pickupLocation)
+        customerShipments
+          .map((ship) => ship.pickupLocation)
+          .filter((location): location is string => !!location)
       ),
       delivery: getMostFrequent(
-        customerShipments.map((ship) => ship.deliveryLocation)
+        customerShipments
+          .map((ship) => ship.deliveryLocation)
+          .filter((location): location is string => !!location)
       ),
     },
     lastShipmentDate: new Date(
