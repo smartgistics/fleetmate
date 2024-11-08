@@ -134,6 +134,7 @@ export default function DispatchPage() {
     sourceStatus: null,
   });
   const [selectedCarrier, setSelectedCarrier] = useState("");
+  const [carrierPhone, setCarrierPhone] = useState("");
 
   const handleShipmentClick = (shipment: Shipment) => {
     setSelectedShipment(shipment);
@@ -171,6 +172,7 @@ export default function DispatchPage() {
                   dragConfirmation.newStatus || shipment.dispatchStatus,
                 ...(dragConfirmation.newStatus === "Planned" && {
                   carrier: selectedCarrier,
+                  carrierPhone: carrierPhone,
                 }),
               }
             : shipment
@@ -184,6 +186,7 @@ export default function DispatchPage() {
       sourceStatus: null,
     });
     setSelectedCarrier(""); // Reset selected carrier
+    setCarrierPhone(""); // Reset carrier phone
   };
 
   const distributeShipments = (): FilteredShipments => {
@@ -383,27 +386,50 @@ export default function DispatchPage() {
 
             {dragConfirmation.sourceStatus === "Available" &&
               dragConfirmation.newStatus === "Planned" && (
-                <div className='mb-6'>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
-                    Assign Carrier *
-                  </label>
-                  <select
-                    value={selectedCarrier}
-                    onChange={(e) => setSelectedCarrier(e.target.value)}
-                    className='w-full border rounded-md p-2'
-                    required
-                  >
-                    <option value=''>Select a carrier</option>
-                    <option value='Carrier A'>Carrier A</option>
-                    <option value='Carrier B'>Carrier B</option>
-                    <option value='Carrier C'>Carrier C</option>
-                    <option value='Carrier D'>Carrier D</option>
-                  </select>
-                  {selectedCarrier === "" && (
-                    <p className='text-red-500 text-xs mt-1'>
-                      Please select a carrier
+                <div className='space-y-4 mb-6'>
+                  <div>
+                    <label className='block text-sm font-medium text-gray-700 mb-2'>
+                      Assign Carrier *
+                    </label>
+                    <select
+                      value={selectedCarrier}
+                      onChange={(e) => setSelectedCarrier(e.target.value)}
+                      className='w-full border rounded-md p-2'
+                      required
+                    >
+                      <option value=''>Select a carrier</option>
+                      <option value='Carrier A'>Carrier A</option>
+                      <option value='Carrier B'>Carrier B</option>
+                      <option value='Carrier C'>Carrier C</option>
+                      <option value='Carrier D'>Carrier D</option>
+                    </select>
+                    {selectedCarrier === "" && (
+                      <p className='text-red-500 text-xs mt-1'>
+                        Please select a carrier
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <label className='block text-sm font-medium text-gray-700 mb-2'>
+                      Carrier Phone Number *
+                    </label>
+                    <input
+                      type='tel'
+                      value={carrierPhone}
+                      onChange={(e) => setCarrierPhone(e.target.value)}
+                      placeholder='Enter phone number'
+                      className='w-full border rounded-md p-2'
+                      required
+                    />
+                    <p className='text-xs text-gray-500 mt-1'>
+                      This number will receive the load tracking link
                     </p>
-                  )}
+                    {carrierPhone === "" && (
+                      <p className='text-red-500 text-xs mt-1'>
+                        Please enter a phone number
+                      </p>
+                    )}
+                  </div>
                 </div>
               )}
 
@@ -419,7 +445,7 @@ export default function DispatchPage() {
                 className='px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed'
                 disabled={
                   dragConfirmation.newStatus === "Planned" &&
-                  selectedCarrier === ""
+                  (selectedCarrier === "" || carrierPhone === "")
                 }
               >
                 Confirm
