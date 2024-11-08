@@ -1,0 +1,125 @@
+You are an expert in TypeScript, React, React Query, PWAs, Node.js, Next.js App Router, Shadcn UI, Radix UI, Yarn and Tailwind.
+
+Code Style and Structure
+
+- Write concise, technical TypeScript code following Standard.js and standard TypeScript rules.
+- Always apply SOLID principles
+- Use functional and declarative programming patterns; avoid classes.
+- Prefer iteration and modularization over code duplication.
+- Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError).
+- Structure files: use the app directory structure
+- Use Image components vs img tags
+- Add types to props and store types in a types directory
+- Use next/navigation for routing
+
+Standard.js Rules
+
+- Follow Prettier formatting rules (use .prettierrc file)
+- Do not generate unused variables.
+- Always use === instead of ==.
+
+Naming Conventions
+
+- Use lowercase with dashes for directories (e.g., components/auth-wizard).
+- Favor named exports for components.
+
+React Best Practices
+
+- Use functional components with prop-types for type checking.
+- Do not introduce TypeScript errors
+- Use the "function" keyword for component definitions.
+- Implement hooks correctly (useState, useEffect, useContext, useReducer, useMemo, useCallback).
+- Follow the Rules of Hooks (only call hooks at the top level, only call hooks from React functions).
+- Create custom hooks to extract reusable component logic.
+- Use React.memo() for component memoization when appropriate.
+- Implement useCallback for memoizing functions passed as props.
+- Use useMemo for expensive computations.
+- Avoid inline function definitions in render to prevent unnecessary re-renders.
+- Prefer composition over inheritance.
+- Use children prop and render props pattern for flexible, reusable components.
+- Implement React.lazy() and Suspense for code splitting.
+- Use refs sparingly and mainly for DOM access.
+- Prefer controlled components over uncontrolled components.
+- Implement error boundaries to catch and handle errors gracefully.
+- Use cleanup functions in useEffect to prevent memory leaks.
+- Use short-circuit evaluation and ternary operators for conditional rendering.
+- Ensure that you are suggesting TypeScript types when appropriate.
+
+State Management
+
+- Use React Query for global state management.
+- Lift state up when needed to share state between components.
+- Use context for intermediate state sharing when prop drilling becomes cumbersome.
+
+UI and Styling
+
+- For all styling enhancements, think about readability and responsiveness.
+- Use Shadcn UI for component foundations (use 'npx shadcn@latest add' to add components and not 'npx shadcn@latest install')
+- Use Radix for icons
+- Implement responsive design with Tailwind CSS; use a mobile-first approach.
+- This is a PWA so think about performance and responsiveness, and don't allow zooming
+- Implement a consistent naming convention for CSS classes (e.g., BEM).
+- Use Tailwind for utility classes and rapid prototyping.
+- Use Tailwind for common utilities and layout.
+- Never use the @apply directive
+
+Performance Optimization
+
+- Minimize 'use client', 'useEffect', and 'useState'; favor React Server Components (RSC).
+- Wrap client components in Suspense with fallback.
+- Use dynamic loading for non-critical components.
+- Optimize images: use WebP format, include size data, implement lazy loading.
+- Implement route-based code splitting in Next.js.
+- Minimize the use of global styles; prefer modular, scoped styles.
+- Use PurgeCSS with Tailwind to remove unused styles in production.
+
+Forms and Validation
+
+- Use controlled components for form inputs.
+- Implement form validation (client-side and server-side).
+- Consider using libraries like react-hook-form for complex forms.
+- Use Zod or Joi for schema validation.
+
+Error Handling and Validation
+
+- Prioritize error handling and edge cases.
+- Handle errors and edge cases at the beginning of functions.
+- Use early returns for error conditions to avoid deeply nested if statements.
+- Place the happy path last in the function for improved readability.
+- Avoid unnecessary else statements; use if-return pattern instead.
+- Use guard clauses to handle preconditions and invalid states early.
+- Implement proper error logging and user-friendly error messages.
+- Model expected errors as return values in Server Actions.
+
+Accessibility (a11y)
+
+- Use semantic HTML elements.
+- Implement proper ARIA attributes.
+- Ensure keyboard navigation support.
+
+Testing
+
+- Write unit tests for components using Jest and React Testing Library.
+- Implement integration tests for critical user flows.
+- Use snapshot testing judiciously.
+
+Security
+
+- Sanitize user inputs to prevent XSS attacks.
+- Use dangerouslySetInnerHTML sparingly and only with sanitized content.
+
+Internationalization (i18n)
+
+- Use libraries like react-intl or next-i18next for internationalization.
+
+Key Conventions
+
+- Use 'nuqs' for URL search parameter state management.
+- Optimize Web Vitals (LCP, CLS, FID).
+- Limit 'use client':
+  - Favor server components and Next.js SSR.
+  - Use only for Web API access in small components.
+  - Avoid for data fetching or state management.
+  - Use Tailwind for rapid development and consistent spacing/sizing.
+
+Follow Next.js docs for Data Fetching, Rendering, and Routing.
