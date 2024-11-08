@@ -120,6 +120,18 @@ export default function DispatchPage() {
   );
   const [isSlideoutOpen, setIsSlideoutOpen] = useState(false);
   const [shipments, setShipments] = useState<Shipment[]>(mockShipments);
+  const [dragConfirmation, setDragConfirmation] = useState<{
+    isOpen: boolean;
+    shipmentId: string | null;
+    newStatus: string | null;
+    sourceStatus: string | null;
+  }>({
+    isOpen: false,
+    shipmentId: null,
+    newStatus: null,
+    sourceStatus: null,
+  });
+  const [selectedCarrier, setSelectedCarrier] = useState("");
 
   const handleShipmentClick = (shipment: Shipment) => {
     setSelectedShipment(shipment);
@@ -134,16 +146,42 @@ export default function DispatchPage() {
   const handleDragEnd = (result: DropResult) => {
     if (!result.destination) return;
 
-    const { draggableId, destination } = result;
-    const newStatus = destination.droppableId;
+    const { draggableId, source, destination } = result;
 
-    setShipments((prevShipments) =>
-      prevShipments.map((shipment) =>
-        shipment.id.toString() === draggableId
-          ? { ...shipment, dispatch_status: newStatus }
-          : shipment
-      )
-    );
+    // Don't show confirmation if dropped in same column
+    if (source.droppableId === destination.droppableId) return;
+    setDragConfirmation({
+      isOpen: true,
+      shipmentId: draggableId,
+      newStatus: destination.droppableId,
+      sourceStatus: source.droppableId,
+    });
+  };
+
+  const handleStatusUpdate = (confirmed: boolean) => {
+    if (confirmed) {
+      setShipments((prevShipments) =>
+        prevShipments.map((shipment) =>
+          shipment.id.toString() === dragConfirmation.shipmentId
+            ? {
+                ...shipment,
+                dispatch_status:
+                  dragConfirmation.newStatus || shipment.dispatch_status,
+                ...(dragConfirmation.newStatus === "Planned" && {
+                  carrier: selectedCarrier,
+                }),
+              }
+            : shipment
+        )
+      );
+    }
+    setDragConfirmation({
+      isOpen: false,
+      shipmentId: null,
+      newStatus: null,
+      sourceStatus: null,
+    });
+    setSelectedCarrier(""); // Reset selected carrier
   };
 
   const distributeShipments = (): FilteredShipments => {
@@ -323,6 +361,64 @@ export default function DispatchPage() {
         onClose={handleCloseSlideout}
         shipment={selectedShipment}
       />
+
+      {dragConfirmation.isOpen && (
+        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+          <div className='bg-white p-6 rounded-lg shadow-xl max-w-md w-full'>
+            <h3 className='text-lg font-bold mb-4'>Confirm Status Change</h3>
+            <p className='mb-4'>
+              Are you sure you want to move this shipment from &quot;
+              {dragConfirmation.sourceStatus}&quot; to &quot;
+              {dragConfirmation.newStatus}&quot;?
+            </p>
+
+            {dragConfirmation.sourceStatus === "Available" &&
+              dragConfirmation.newStatus === "Planned" && (
+                <div className='mb-6'>
+                  <label className='block text-sm font-medium text-gray-700 mb-2'>
+                    Assign Carrier *
+                  </label>
+                  <select
+                    value={selectedCarrier}
+                    onChange={(e) => setSelectedCarrier(e.target.value)}
+                    className='w-full border rounded-md p-2'
+                    required
+                  >
+                    <option value=''>Select a carrier</option>
+                    <option value='Carrier A'>Carrier A</option>
+                    <option value='Carrier B'>Carrier B</option>
+                    <option value='Carrier C'>Carrier C</option>
+                    <option value='Carrier D'>Carrier D</option>
+                  </select>
+                  {selectedCarrier === "" && (
+                    <p className='text-red-500 text-xs mt-1'>
+                      Please select a carrier
+                    </p>
+                  )}
+                </div>
+              )}
+
+            <div className='flex justify-end gap-4'>
+              <button
+                onClick={() => handleStatusUpdate(false)}
+                className='px-4 py-2 border border-gray-300 rounded hover:bg-gray-50'
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleStatusUpdate(true)}
+                className='px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed'
+                disabled={
+                  dragConfirmation.newStatus === "Planned" &&
+                  selectedCarrier === ""
+                }
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
