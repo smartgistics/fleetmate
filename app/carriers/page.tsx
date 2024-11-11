@@ -9,7 +9,11 @@ type SortableFields = keyof CarrierData;
 
 // Process carrier data
 const mockCarriers: CarrierData[] = Array.from(
-  new Set(mockShipments.map((ship) => ship.carrier))
+  new Set(
+    mockShipments
+      .map((ship) => ship.carrier)
+      .filter((carrier): carrier is string => !!carrier)
+  )
 ).map((carrier, index) => {
   const carrierShipments = mockShipments.filter(
     (ship) => ship.carrier === carrier
@@ -18,9 +22,12 @@ const mockCarriers: CarrierData[] = Array.from(
     id: index + 1,
     name: carrier,
     totalShipments: carrierShipments.length,
-    totalRevenue: carrierShipments.reduce((sum, ship) => sum + ship.rate, 0),
+    totalRevenue: carrierShipments.reduce(
+      (sum, ship) => sum + (ship.rate || 0),
+      0
+    ),
     avgShipmentRate: Math.round(
-      carrierShipments.reduce((sum, ship) => sum + ship.rate, 0) /
+      carrierShipments.reduce((sum, ship) => sum + (ship.rate || 0), 0) /
         carrierShipments.length
     ),
     activeRoutes: Array.from(

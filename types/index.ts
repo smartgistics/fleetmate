@@ -7,15 +7,21 @@ export interface SearchResult {
 
 export interface Shipment {
   id: number;
-  carrier: string;
+  carrier?: string;
   customer: string;
-  pickupLocation: string;
   deliveryLocation: string;
-  pickupDate: string;
   deliveryDate: string;
-  rate: number;
-  dispatch_status: string;
+  deliveryTime: string;
+  dispatchStatus: string;
+  equipmentType: string;
   planner: string;
+  pickupDate?: string;
+  pickupLocation?: string;
+  planningStatus?: string;
+  pickupTime?: string;
+  rate?: number;
+  referenceNumbers: string;
+  specialInstructions?: string;
 }
 
 export interface WeeklyData {
@@ -48,7 +54,7 @@ export interface Location {
 }
 
 export interface Commodity {
-  name: string;
+  code: string;
   description: string;
   weight: number;
   pieces: number;
@@ -127,6 +133,14 @@ export interface CustomerData {
     delivery: string;
   };
   lastShipmentDate: string;
+  primaryContact: string;
+  contactPhone: string;
+  contactEmail: string;
+  billingAddress?: string;
+  defaultEquipment: string;
+  requiresTemperatureControl: boolean;
+  defaultTempMin?: string;
+  defaultTempMax?: string;
 }
 
 export interface DashboardCardProps {

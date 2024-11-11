@@ -2,59 +2,14 @@
 
 import { useState } from "react";
 import { CustomerData } from "@/types";
-import { mockShipments } from "@/mocks/Shipments";
+import { mockCustomers } from "@/mocks/Customers";
 import CustomerDetailsModal from "../../components/CustomerDetailsModal";
 
 type SortableFields = keyof CustomerData;
 
-function getMostFrequent(arr: string[]): string {
-  return Object.entries(
-    arr.reduce<Record<string, number>>((acc, val) => {
-      acc[val] = (acc[val] || 0) + 1;
-      return acc;
-    }, {})
-  ).reduce((a, b) => (a[1] > b[1] ? a : b))[0];
-}
-
-// Process customer data
-const mockCustomers: CustomerData[] = Array.from(
-  new Set(mockShipments.map((ship) => ship.customer))
-).map((customer, index) => {
-  const customerShipments = mockShipments.filter(
-    (ship) => ship.customer === customer
-  );
-  return {
-    id: index + 1,
-    name: customer,
-    totalShipments: customerShipments.length,
-    totalSpent: customerShipments.reduce((sum, ship) => sum + ship.rate, 0),
-    avgShipmentCost: Math.round(
-      customerShipments.reduce((sum, ship) => sum + ship.rate, 0) /
-        customerShipments.length
-    ),
-    commonLocations: {
-      pickup: getMostFrequent(
-        customerShipments.map((ship) => ship.pickupLocation)
-      ),
-      delivery: getMostFrequent(
-        customerShipments.map((ship) => ship.deliveryLocation)
-      ),
-    },
-    lastShipmentDate: new Date(
-      Math.max(
-        ...customerShipments.map((ship) =>
-          new Date(ship.deliveryDate).getTime()
-        )
-      )
-    )
-      .toISOString()
-      .split("T")[0],
-  };
-});
-
 export default function Customers() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortField, setSortField] = useState<SortableFields>("id");
+  const [sortField, setSortField] = useState<SortableFields>("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerData | null>(
     null
@@ -79,9 +34,9 @@ export default function Customers() {
     )
     .sort((a, b) => {
       if (sortDirection === "asc") {
-        return a[sortField] > b[sortField] ? 1 : -1;
+        return (a[sortField] ?? "") > (b[sortField] ?? "") ? 1 : -1;
       }
-      return a[sortField] < b[sortField] ? 1 : -1;
+      return (a[sortField] ?? "") < (b[sortField] ?? "") ? 1 : -1;
     });
 
   return (
@@ -109,12 +64,6 @@ export default function Customers() {
         <table className='min-w-full bg-white border rounded-lg'>
           <thead>
             <tr className='bg-gray-100 text-gray-900'>
-              <th
-                className='px-6 py-3 border-b cursor-pointer hover:bg-gray-200'
-                onClick={() => handleSort("id")}
-              >
-                ID {sortField === "id" && (sortDirection === "asc" ? "↑" : "↓")}
-              </th>
               <th
                 className='px-6 py-3 border-b cursor-pointer hover:bg-gray-200'
                 onClick={() => handleSort("name")}
@@ -165,7 +114,6 @@ export default function Customers() {
                 className='hover:bg-gray-50 cursor-pointer'
                 onClick={() => setSelectedCustomer(customer)}
               >
-                <td className='px-6 py-4 border-b'>{customer.id}</td>
                 <td className='px-6 py-4 border-b font-medium'>
                   {customer.name}
                 </td>

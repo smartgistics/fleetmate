@@ -20,7 +20,7 @@ export function ShipmentsTableHeader({
     { key: "pickupDate", label: "Pickup Date" },
     { key: "deliveryDate", label: "Delivery Date" },
     { key: "rate", label: "Rate" },
-    { key: "dispatch_status", label: "Dispatch Status" },
+    { key: "dispatchStatus", label: "Dispatch Status" },
     { key: "planner", label: "Planner" },
   ];
 

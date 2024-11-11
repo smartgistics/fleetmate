@@ -44,10 +44,16 @@ export default function Shipments() {
     })
     .sort((a, b) => {
       if (sortDirection === "asc") {
-        return a[sortField] > b[sortField] ? 1 : -1;
+        return (a[sortField] ?? "") > (b[sortField] ?? "") ? 1 : -1;
       }
-      return a[sortField] < b[sortField] ? 1 : -1;
+      return (a[sortField] ?? "") < (b[sortField] ?? "") ? 1 : -1;
     });
+
+  const handleShipmentUpdate = (updatedShipment: Shipment) => {
+    // TODO: Implement actual update logic when backend is ready
+    console.log("Shipment updated:", updatedShipment);
+    setSelectedShipment(null);
+  };
 
   return (
     <div className='p-6 text-gray-900'>
@@ -153,10 +159,10 @@ export default function Shipments() {
               </th>
               <th
                 className='px-6 py-3 border-b cursor-pointer hover:bg-gray-200'
-                onClick={() => handleSort("dispatch_status")}
+                onClick={() => handleSort("dispatchStatus")}
               >
                 Dispatch Status{" "}
-                {sortField === "dispatch_status" &&
+                {sortField === "dispatchStatus" &&
                   (sortDirection === "asc" ? "↑" : "↓")}
               </th>
               <th
@@ -188,10 +194,10 @@ export default function Shipments() {
                 <td className='px-6 py-4 border-b'>{shipment.pickupDate}</td>
                 <td className='px-6 py-4 border-b'>{shipment.deliveryDate}</td>
                 <td className='px-6 py-4 border-b'>
-                  ${shipment.rate.toLocaleString()}
+                  ${shipment.rate?.toLocaleString() ?? "0"}
                 </td>
                 <td className='px-6 py-4 border-b'>
-                  {shipment.dispatch_status}
+                  {shipment.dispatchStatus}
                 </td>
                 <td className='px-6 py-4 border-b'>{shipment.planner}</td>
               </tr>
@@ -212,6 +218,7 @@ export default function Shipments() {
         isOpen={!!selectedShipment}
         onClose={() => setSelectedShipment(null)}
         shipment={selectedShipment}
+        onUpdate={handleShipmentUpdate}
       />
     </div>
   );
