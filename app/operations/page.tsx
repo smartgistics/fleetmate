@@ -114,13 +114,11 @@ interface FilteredShipments {
   assignCarrier: Shipment[];
 }
 
-export default function DispatchPage() {
+export default function OperationsPage() {
   const [activeTab, setActiveTab] = useState("dispatch");
   const [shipments, setShipments] = useState<Shipment[]>(mockShipments);
   const [isSlideoutOpen, setIsSlideoutOpen] = useState(false);
-  const [selectedShipment, setSelectedShipment] = useState<Shipment | null>(
-    null
-  );
+  const [selectedShipment, setSelectedShipment] = useState<Shipment | null>(null);
   const [dragConfirmation, setDragConfirmation] = useState<{
     isOpen: boolean;
     shipmentId: string | null;
@@ -191,8 +189,8 @@ export default function DispatchPage() {
       newStatus: null,
       sourceStatus: null,
     });
-    setSelectedCarrier(""); // Reset selected carrier
-    setCarrierPhone(""); // Reset carrier phone
+    setSelectedCarrier("");
+    setCarrierPhone("");
   };
 
   const distributeShipments = (): FilteredShipments => {
@@ -495,4 +493,4 @@ export default function DispatchPage() {
       )}
     </div>
   );
-}
+} 
