@@ -9,6 +9,7 @@ import { DeliveryTab } from "./tabs/DeliveryTab";
 import { FinancialsTab } from "./tabs/FinancialsTab";
 import { SummaryTab } from "./tabs/SummaryTab";
 import { CapacityTab } from "./tabs/CapacityTab";
+import { InitialScreen } from "./modal/InitialScreen";
 
 export interface NewShipmentModalProps {
   isOpen: boolean;
@@ -16,7 +17,7 @@ export interface NewShipmentModalProps {
 }
 
 export function NewShipmentModal({ isOpen, onClose }: NewShipmentModalProps) {
-  const [activeTab, setActiveTab] = useState<string>("customer");
+  const [activeTab, setActiveTab] = useState<string>("initial");
   const [formData, setFormData] = useState<FormData>({
     // Customer Tab
     customer: "",
@@ -113,6 +114,17 @@ export function NewShipmentModal({ isOpen, onClose }: NewShipmentModalProps) {
     return activeTab === "capacity";
   };
 
+  const handleManualEntry = () => {
+    setActiveTab("customer")
+  }
+
+  const handleFileUpload = () => {
+    // TODO: Implement file upload logic
+    console.log("File upload selected")
+    // For now, move to customer tab after upload
+    setActiveTab("customer")
+  }
+
   return (
     <div className='fixed inset-0 z-50 overflow-y-auto'>
       <div className='flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0'>
@@ -147,43 +159,52 @@ export function NewShipmentModal({ isOpen, onClose }: NewShipmentModalProps) {
               </button>
             </div>
 
-            {/* Tabs */}
-            <div className='border-b border-gray-200'>
-              <ShipmentModalTabs
-                activeTab={activeTab}
-                setActiveTab={setActiveTab}
-              />
-            </div>
+            {/* Show tabs only if not on initial screen */}
+            {activeTab !== "initial" && (
+              <div className='border-b border-gray-200'>
+                <ShipmentModalTabs
+                  activeTab={activeTab}
+                  setActiveTab={setActiveTab}
+                />
+              </div>
+            )}
 
             {/* Form Content */}
             <div className='px-6 py-4'>
-              <form onSubmit={handleSubmit}>
-                {activeTab === "customer" && (
-                  <CustomerTab initialFormData={formData} />
-                )}
-                {activeTab === "orderDetails" && (
-                  <OrderDetailsTab
-                    formData={formData}
-                    setFormData={setFormData}
-                  />
-                )}
-                {activeTab === "pickup" && <PickupTab />}
-                {activeTab === "delivery" && <DeliveryTab />}
-                {activeTab === "financials" && (
-                  <FinancialsTab
-                    formData={formData}
-                    setFormData={setFormData}
-                  />
-                )}
-                {activeTab === "summary" && <SummaryTab formData={formData} />}
-                {activeTab === "capacity" && <CapacityTab />}
-
-                <ShipmentModalFooter
-                  onClose={onClose}
-                  onNext={handleNext}
-                  isLastTab={isLastTab()}
+              {activeTab === "initial" ? (
+                <InitialScreen
+                  onSelectManual={handleManualEntry}
+                  onSelectUpload={handleFileUpload}
                 />
-              </form>
+              ) : (
+                <form onSubmit={handleSubmit}>
+                  {activeTab === "customer" && (
+                    <CustomerTab initialFormData={formData} />
+                  )}
+                  {activeTab === "orderDetails" && (
+                    <OrderDetailsTab
+                      formData={formData}
+                      setFormData={setFormData}
+                    />
+                  )}
+                  {activeTab === "pickup" && <PickupTab />}
+                  {activeTab === "delivery" && <DeliveryTab />}
+                  {activeTab === "financials" && (
+                    <FinancialsTab
+                      formData={formData}
+                      setFormData={setFormData}
+                    />
+                  )}
+                  {activeTab === "summary" && <SummaryTab formData={formData} />}
+                  {activeTab === "capacity" && <CapacityTab />}
+
+                  <ShipmentModalFooter
+                    onClose={onClose}
+                    onNext={handleNext}
+                    isLastTab={isLastTab()}
+                  />
+                </form>
+              )}
             </div>
           </div>
         </div>
