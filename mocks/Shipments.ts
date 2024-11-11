@@ -10,6 +10,7 @@ export const mockShipments = [
     rate: 1200,
     dispatch_status: "Available",
     planner: "Sarah Johnson",
+    planning_status: "Available",
   },
   {
     id: 2,
@@ -22,6 +23,7 @@ export const mockShipments = [
     rate: 1800,
     dispatch_status: "Planned",
     planner: "Mike Chen",
+    planning_status: "Needs Appointments",
   },
   {
     id: 3,
@@ -34,6 +36,7 @@ export const mockShipments = [
     rate: 800,
     dispatch_status: "PU TRACKING",
     planner: "David Rodriguez",
+    planning_status: "Needs Rates",
   },
   {
     id: 4,
@@ -46,6 +49,7 @@ export const mockShipments = [
     rate: 1100,
     dispatch_status: "LOADING",
     planner: "Emily Taylor",
+    planning_status: "Assign Carrier",
   },
   {
     id: 5,
@@ -58,6 +62,7 @@ export const mockShipments = [
     rate: 950,
     dispatch_status: "DEL TRACKING",
     planner: "James Wilson",
+    planning_status: "Available",
   },
   {
     id: 6,
@@ -70,6 +75,7 @@ export const mockShipments = [
     rate: 700,
     dispatch_status: "DELIVERING",
     planner: "Maria Garcia",
+    planning_status: "Needs Appointments",
   },
   {
     id: 7,
@@ -82,6 +88,7 @@ export const mockShipments = [
     rate: 1400,
     dispatch_status: "Available",
     planner: "Tom Anderson",
+    planning_status: "Needs Rates",
   },
   {
     id: 8,
@@ -94,6 +101,7 @@ export const mockShipments = [
     rate: 1350,
     dispatch_status: "Planned",
     planner: "Lisa Brown",
+    planning_status: "Assign Carrier",
   },
   {
     id: 9,
@@ -106,6 +114,7 @@ export const mockShipments = [
     rate: 550,
     dispatch_status: "PU TRACKING",
     planner: "Sarah Johnson",
+    planning_status: "Available",
   },
   {
     id: 10,
@@ -118,6 +127,7 @@ export const mockShipments = [
     rate: 950,
     dispatch_status: "LOADING",
     planner: "Mike Chen",
+    planning_status: "Needs Rates",
   },
   {
     id: 11,
@@ -130,6 +140,7 @@ export const mockShipments = [
     rate: 1250,
     dispatch_status: "DEL TRACKING",
     planner: "David Rodriguez",
+    planning_status: "Assign Carrier",
   },
   {
     id: 12,
@@ -142,6 +153,7 @@ export const mockShipments = [
     rate: 900,
     dispatch_status: "DELIVERING",
     planner: "Emily Taylor",
+    planning_status: "Available",
   },
   {
     id: 13,
@@ -154,6 +166,7 @@ export const mockShipments = [
     rate: 1150,
     dispatch_status: "Available",
     planner: "James Wilson",
+    planning_status: "Needs Rates",
   },
   {
     id: 14,
@@ -166,6 +179,7 @@ export const mockShipments = [
     rate: 1650,
     dispatch_status: "Planned",
     planner: "Maria Garcia",
+    planning_status: "Assign Carrier",
   },
   {
     id: 15,
@@ -178,6 +192,7 @@ export const mockShipments = [
     rate: 1250,
     dispatch_status: "PU TRACKING",
     planner: "Tom Anderson",
+    planning_status: "Available",
   },
   {
     id: 16,
@@ -190,6 +205,7 @@ export const mockShipments = [
     rate: 1400,
     dispatch_status: "LOADING",
     planner: "Lisa Brown",
+    planning_status: "Needs Rates",
   },
   {
     id: 17,
@@ -202,6 +218,7 @@ export const mockShipments = [
     rate: 950,
     dispatch_status: "DEL TRACKING",
     planner: "Sarah Johnson",
+    planning_status: "Assign Carrier",
   },
   {
     id: 18,
@@ -214,6 +231,7 @@ export const mockShipments = [
     rate: 1350,
     dispatch_status: "DELIVERING",
     planner: "Mike Chen",
+    planning_status: "Available",
   },
   {
     id: 19,
@@ -226,6 +244,7 @@ export const mockShipments = [
     rate: 800,
     dispatch_status: "Available",
     planner: "David Rodriguez",
+    planning_status: "Needs Rates",
   },
   {
     id: 20,
@@ -238,6 +257,7 @@ export const mockShipments = [
     rate: 700,
     dispatch_status: "Planned",
     planner: "Emily Taylor",
+    planning_status: "Assign Carrier",
   },
   {
     id: 21,
@@ -250,6 +270,7 @@ export const mockShipments = [
     rate: 1600,
     dispatch_status: "PU TRACKING",
     planner: "James Wilson",
+    planning_status: "Available",
   },
   {
     id: 22,
@@ -262,6 +283,7 @@ export const mockShipments = [
     rate: 900,
     dispatch_status: "LOADING",
     planner: "Maria Garcia",
+    planning_status: "Needs Rates",
   },
   {
     id: 23,
@@ -274,6 +296,7 @@ export const mockShipments = [
     rate: 500,
     dispatch_status: "DEL TRACKING",
     planner: "Tom Anderson",
+    planning_status: "Assign Carrier",
   },
   {
     id: 24,
@@ -286,6 +309,7 @@ export const mockShipments = [
     rate: 950,
     dispatch_status: "DELIVERING",
     planner: "Lisa Brown",
+    planning_status: "Available",
   },
   {
     id: 25,
@@ -298,6 +322,7 @@ export const mockShipments = [
     rate: 700,
     dispatch_status: "Available",
     planner: "Sarah Johnson",
+    planning_status: "Needs Rates",
   },
   {
     id: 26,
@@ -310,6 +335,7 @@ export const mockShipments = [
     rate: 600,
     dispatch_status: "Planned",
     planner: "Mike Chen",
+    planning_status: "Assign Carrier",
   },
   {
     id: 27,
@@ -322,6 +348,7 @@ export const mockShipments = [
     rate: 400,
     dispatch_status: "PU TRACKING",
     planner: "David Rodriguez",
+    planning_status: "Available",
   },
   {
     id: 28,
@@ -334,6 +361,7 @@ export const mockShipments = [
     rate: 500,
     dispatch_status: "LOADING",
     planner: "Emily Taylor",
+    planning_status: "Needs Rates",
   },
   {
     id: 29,
@@ -346,6 +374,7 @@ export const mockShipments = [
     rate: 850,
     dispatch_status: "DEL TRACKING",
     planner: "James Wilson",
+    planning_status: "Assign Carrier",
   },
   {
     id: 30,
@@ -358,6 +387,7 @@ export const mockShipments = [
     rate: 600,
     dispatch_status: "DELIVERING",
     planner: "Maria Garcia",
+    planning_status: "Available",
   },
   {
     id: 31,
@@ -370,6 +400,7 @@ export const mockShipments = [
     rate: 1250,
     dispatch_status: "Available",
     planner: "Tom Anderson",
+    planning_status: "Needs Rates",
   },
   {
     id: 32,
@@ -382,6 +413,7 @@ export const mockShipments = [
     rate: 500,
     dispatch_status: "Planned",
     planner: "Lisa Brown",
+    planning_status: "Assign Carrier",
   },
   {
     id: 33,
@@ -394,6 +426,7 @@ export const mockShipments = [
     rate: 1100,
     dispatch_status: "PU TRACKING",
     planner: "Sarah Johnson",
+    planning_status: "Available",
   },
   {
     id: 34,
@@ -406,6 +439,7 @@ export const mockShipments = [
     rate: 700,
     dispatch_status: "LOADING",
     planner: "Mike Chen",
+    planning_status: "Needs Rates",
   },
   {
     id: 35,
@@ -418,6 +452,7 @@ export const mockShipments = [
     rate: 650,
     dispatch_status: "DEL TRACKING",
     planner: "David Rodriguez",
+    planning_status: "Assign Carrier",
   },
   {
     id: 36,
@@ -430,6 +465,7 @@ export const mockShipments = [
     rate: 1500,
     dispatch_status: "DELIVERING",
     planner: "Emily Taylor",
+    planning_status: "Available",
   },
   {
     id: 37,
@@ -442,6 +478,7 @@ export const mockShipments = [
     rate: 900,
     dispatch_status: "Available",
     planner: "James Wilson",
+    planning_status: "Needs Rates",
   },
   {
     id: 38,
@@ -454,6 +491,7 @@ export const mockShipments = [
     rate: 1400,
     dispatch_status: "Planned",
     planner: "Maria Garcia",
+    planning_status: "Assign Carrier",
   },
   {
     id: 39,
@@ -466,6 +504,7 @@ export const mockShipments = [
     rate: 1100,
     dispatch_status: "PU TRACKING",
     planner: "Tom Anderson",
+    planning_status: "Available",
   },
   {
     id: 40,
@@ -478,6 +517,7 @@ export const mockShipments = [
     rate: 500,
     dispatch_status: "LOADING",
     planner: "Lisa Brown",
+    planning_status: "Needs Rates",
   },
   {
     id: 41,
@@ -490,6 +530,7 @@ export const mockShipments = [
     rate: 700,
     dispatch_status: "DEL TRACKING",
     planner: "Sarah Johnson",
+    planning_status: "Assign Carrier",
   },
   {
     id: 42,
@@ -502,6 +543,7 @@ export const mockShipments = [
     rate: 800,
     dispatch_status: "DELIVERING",
     planner: "Mike Chen",
+    planning_status: "Available",
   },
 ].map((shipment, index) => {
   const planners = [
@@ -524,13 +566,21 @@ export const mockShipments = [
     "DELIVERING",
   ];
 
-  // Use modulo to cycle through statuses and planners
+  const planningStatuses = [
+    "Available",
+    "Needs Appointments",
+    "Needs Rates",
+    "Assign Carrier",
+  ];
+
   const statusIndex = index % 6;
   const plannerIndex = index % planners.length;
+  const planningStatusIndex = index % planningStatuses.length;
 
   return {
     ...shipment,
     dispatch_status: statuses[statusIndex],
-    planner: planners[plannerIndex], // Add planner if not already set
+    planner: planners[plannerIndex],
+    planning_status: planningStatuses[planningStatusIndex],
   };
 });

@@ -10,6 +10,7 @@ import {
   DropResult,
 } from "@hello-pangea/dnd";
 import { Shipment } from "@/types";
+import Tabs from "@/components/Tabs";
 
 interface StatusColors {
   NOT_STARTED: string;
@@ -106,20 +107,18 @@ interface FilteredShipments {
   loading: Shipment[];
   delTracking: Shipment[];
   delivering: Shipment[];
+  needsAppointments: Shipment[];
+  needsRates: Shipment[];
+  assignCarrier: Shipment[];
 }
 
 export default function DispatchPage() {
-  const [planner, setPlanner] = useState("");
-  const [customer, setCustomer] = useState("");
-  const [pickRegion, setPickRegion] = useState("");
-  const [date, setDate] = useState("");
-  const [carrier, setCarrier] = useState("");
-  const [delRegion, setDelRegion] = useState("");
+  const [activeTab, setActiveTab] = useState("dispatch");
+  const [shipments, setShipments] = useState<Shipment[]>(mockShipments);
+  const [isSlideoutOpen, setIsSlideoutOpen] = useState(false);
   const [selectedShipment, setSelectedShipment] = useState<Shipment | null>(
     null
   );
-  const [isSlideoutOpen, setIsSlideoutOpen] = useState(false);
-  const [shipments, setShipments] = useState<Shipment[]>(mockShipments);
   const [dragConfirmation, setDragConfirmation] = useState<{
     isOpen: boolean;
     shipmentId: string | null;
@@ -131,6 +130,13 @@ export default function DispatchPage() {
     newStatus: null,
     sourceStatus: null,
   });
+
+  const [planner, setPlanner] = useState("");
+  const [customer, setCustomer] = useState("");
+  const [pickRegion, setPickRegion] = useState("");
+  const [delRegion, setDelRegion] = useState("");
+  const [carrier, setCarrier] = useState("");
+  const [date, setDate] = useState("");
   const [selectedCarrier, setSelectedCarrier] = useState("");
 
   const handleShipmentClick = (shipment: Shipment) => {
@@ -194,6 +200,15 @@ export default function DispatchPage() {
         (s) => s.dispatch_status === "DEL TRACKING"
       ),
       delivering: shipments.filter((s) => s.dispatch_status === "DELIVERING"),
+      needsAppointments: shipments.filter(
+        (s) => s.planning_status === "Needs Appointments"
+      ),
+      needsRates: shipments.filter(
+        (s) => s.planning_status === "Needs Rates"
+      ),
+      assignCarrier: shipments.filter(
+        (s) => s.planning_status === "Assign Carrier"
+      ),
     };
   };
 
@@ -228,6 +243,18 @@ export default function DispatchPage() {
 
   return (
     <div className='p-4 text-gray-900'>
+      {/* Tabs Component */}
+      <Tabs
+        tabs={[
+          { label: "Dispatch", value: "dispatch" },
+          { label: "Planning", value: "planning" },
+          { label: "Tracking", value: "tracking" },
+          { label: "Billing", value: "billing" },
+        ]}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
+
       {/* Filters Section */}
       <div className='mb-6 border rounded-lg p-4 bg-white'>
         <h2 className='font-bold mb-4 text-gray-900'>FILTERS</h2>
@@ -287,75 +314,87 @@ export default function DispatchPage() {
             />
           </div>
         </div>
-
-        {/* Status Legend */}
-        <div className='mt-4 flex justify-end gap-2'>
-          <div
-            className={`${statusColors.NOT_STARTED} px-2 py-1 text-sm text-gray-900`}
-          >
-            NOT STARTED
-          </div>
-          <div
-            className={`${statusColors.CAUTION} px-2 py-1 text-sm text-gray-900`}
-          >
-            CAUTION
-          </div>
-          <div
-            className={`${statusColors.ON_TRACK} px-2 py-1 text-sm text-gray-900`}
-          >
-            ON TRACK
-          </div>
-          <div
-            className={`${statusColors.DELAYED} px-2 py-1 text-sm text-gray-900`}
-          >
-            DELAYED/BLOCKED
-          </div>
-        </div>
       </div>
 
       {/* Dispatch Board */}
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className='flex min-h-[600px] border-l border-r border-gray-300 w-full bg-white'>
-          <DispatchColumn
-            title='Available'
-            shipments={displayShipments.available}
-            statusColor={statusColors.NOT_STARTED}
-            onShipmentClick={handleShipmentClick}
-          />
-          <DispatchColumn
-            title='Planned'
-            shipments={displayShipments.planned}
-            statusColor={statusColors.CAUTION}
-            onShipmentClick={handleShipmentClick}
-          />
-          <DispatchColumn
-            title='PU TRACKING'
-            shipments={displayShipments.puTracking}
-            statusColor={statusColors.ON_TRACK}
-            onShipmentClick={handleShipmentClick}
-          />
-          <DispatchColumn
-            title='LOADING'
-            shipments={displayShipments.loading}
-            statusColor={statusColors.CAUTION}
-            onShipmentClick={handleShipmentClick}
-          />
-          <DispatchColumn
-            title='DEL TRACKING'
-            shipments={displayShipments.delTracking}
-            statusColor={statusColors.DELAYED}
-            onShipmentClick={handleShipmentClick}
-          />
-          <DispatchColumn
-            title='DELIVERING'
-            shipments={displayShipments.delivering}
-            statusColor={statusColors.DELAYED}
-            onShipmentClick={handleShipmentClick}
-          />
+          {activeTab === "dispatch" && (
+            <>
+              <DispatchColumn
+                title='Available'
+                shipments={displayShipments.available}
+                statusColor={statusColors.NOT_STARTED}
+                onShipmentClick={handleShipmentClick}
+              />
+              <DispatchColumn
+                title='Planned'
+                shipments={displayShipments.planned}
+                statusColor={statusColors.CAUTION}
+                onShipmentClick={handleShipmentClick}
+              />
+              <DispatchColumn
+                title='PU TRACKING'
+                shipments={displayShipments.puTracking}
+                statusColor={statusColors.ON_TRACK}
+                onShipmentClick={handleShipmentClick}
+              />
+              <DispatchColumn
+                title='LOADING'
+                shipments={displayShipments.loading}
+                statusColor={statusColors.CAUTION}
+                onShipmentClick={handleShipmentClick}
+              />
+              <DispatchColumn
+                title='DEL TRACKING'
+                shipments={displayShipments.delTracking}
+                statusColor={statusColors.DELAYED}
+                onShipmentClick={handleShipmentClick}
+              />
+              <DispatchColumn
+                title='DELIVERING'
+                shipments={displayShipments.delivering}
+                statusColor={statusColors.DELAYED}
+                onShipmentClick={handleShipmentClick}
+              />
+            </>
+          )}
+          {activeTab === "planning" && (
+            <>
+              <DispatchColumn
+                title='Needs Appointments'
+                shipments={displayShipments.needsAppointments}
+                statusColor={statusColors.CAUTION}
+                onShipmentClick={handleShipmentClick}
+              />
+              <DispatchColumn
+                title='Needs Rates'
+                shipments={displayShipments.needsRates}
+                statusColor={statusColors.ON_TRACK}
+                onShipmentClick={handleShipmentClick}
+              />
+              <DispatchColumn
+                title='Assign Carrier'
+                shipments={displayShipments.assignCarrier}
+                statusColor={statusColors.DELAYED}
+                onShipmentClick={handleShipmentClick}
+              />
+            </>
+          )}
+          {activeTab === "tracking" && (
+            <>
+              {/* Tracking Columns */}
+            </>
+          )}
+          {activeTab === "billing" && (
+            <>
+              {/* Billing Columns */}
+            </>
+          )}
         </div>
       </DragDropContext>
 
-      {/* Add the ShipmentDetailsModal */}
+      {/* Shipment Details Modal */}
       <ShipmentDetailsModal
         isOpen={isSlideoutOpen}
         onClose={handleCloseSlideout}
@@ -371,33 +410,6 @@ export default function DispatchPage() {
               {dragConfirmation.sourceStatus}&quot; to &quot;
               {dragConfirmation.newStatus}&quot;?
             </p>
-
-            {dragConfirmation.sourceStatus === "Available" &&
-              dragConfirmation.newStatus === "Planned" && (
-                <div className='mb-6'>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
-                    Assign Carrier *
-                  </label>
-                  <select
-                    value={selectedCarrier}
-                    onChange={(e) => setSelectedCarrier(e.target.value)}
-                    className='w-full border rounded-md p-2'
-                    required
-                  >
-                    <option value=''>Select a carrier</option>
-                    <option value='Carrier A'>Carrier A</option>
-                    <option value='Carrier B'>Carrier B</option>
-                    <option value='Carrier C'>Carrier C</option>
-                    <option value='Carrier D'>Carrier D</option>
-                  </select>
-                  {selectedCarrier === "" && (
-                    <p className='text-red-500 text-xs mt-1'>
-                      Please select a carrier
-                    </p>
-                  )}
-                </div>
-              )}
-
             <div className='flex justify-end gap-4'>
               <button
                 onClick={() => handleStatusUpdate(false)}
