@@ -17,14 +17,10 @@ export function Shipments({ setIsNewShipmentModalOpen }: ShipmentsProps) {
   const [sortField, setSortField] = useState<keyof Shipment>("id");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [selectedCarrier, setSelectedCarrier] = useState("all");
-  const [selectedShipment, setSelectedShipment] = useState<Shipment | null>(
-    null
-  );
+  const [selectedShipment, setSelectedShipment] = useState<Shipment | null>(null);
   const [shipments, setShipments] = useState<Shipment[]>(mockShipments);
 
-  const uniqueCarriers = [
-    ...new Set(mockShipments.map((ship) => ship.carrier)),
-  ];
+  const uniqueCarriers = [...new Set(mockShipments.map((ship) => ship.carrier))];
 
   const handleSort = (field: keyof Shipment) => {
     if (sortField === field) {
@@ -53,13 +49,12 @@ export function Shipments({ setIsNewShipmentModalOpen }: ShipmentsProps) {
     });
 
   const handleShipmentUpdate = (updatedShipment: Shipment) => {
-    // Update the mockShipments array with the updated shipment
+    // Update both the shipments array and the selected shipment
     const updatedShipments = shipments.map((shipment) =>
       shipment.id === updatedShipment.id ? updatedShipment : shipment
     );
-    // Note: In a real application, you would typically make an API call here
-    // and use proper state management
     setShipments(updatedShipments);
+    setSelectedShipment(updatedShipment); // Update the selected shipment as well
   };
 
   return (
@@ -79,9 +74,7 @@ export function Shipments({ setIsNewShipmentModalOpen }: ShipmentsProps) {
         setSearchTerm={setSearchTerm}
         selectedCarrier={selectedCarrier}
         setSelectedCarrier={setSelectedCarrier}
-        uniqueCarriers={
-          uniqueCarriers.filter((carrier) => carrier !== undefined) as string[]
-        }
+        uniqueCarriers={uniqueCarriers.filter((carrier) => carrier !== undefined) as string[]}
       />
 
       <div className='overflow-x-auto'>
