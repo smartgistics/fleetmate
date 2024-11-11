@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { GlobalSearch } from "@/components/search/GlobalSearch";
 import { SidebarProvider } from "@/components/layout/SidebarContext";
 import { Sidebar } from "@/components/layout/Sidebar";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -57,6 +58,7 @@ export default function RootLayout({
             </div>
           </div>
         </SidebarProvider>
+        <Toaster />
       </body>
     </html>
   );

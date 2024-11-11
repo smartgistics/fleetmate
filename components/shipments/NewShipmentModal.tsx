@@ -125,6 +125,13 @@ export function NewShipmentModal({ isOpen, onClose }: NewShipmentModalProps) {
     setActiveTab("customer")
   }
 
+  const handleFileProcessed = (data: Partial<FormData>) => {
+    setFormData(prev => ({
+      ...prev,
+      ...data
+    }))
+  }
+
   return (
     <div className='fixed inset-0 z-50 overflow-y-auto'>
       <div className='flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0'>
@@ -175,6 +182,7 @@ export function NewShipmentModal({ isOpen, onClose }: NewShipmentModalProps) {
                 <InitialScreen
                   onSelectManual={handleManualEntry}
                   onSelectUpload={handleFileUpload}
+                  onFileProcessed={handleFileProcessed}
                 />
               ) : (
                 <form onSubmit={handleSubmit}>
