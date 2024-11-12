@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { CustomerData } from "@/types";
+import { Client } from "@/types";
 
 interface CustomerDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  customer: CustomerData | null;
+  customer: Client | null;
 }
 
 export default function CustomerDetailsModal({
@@ -12,7 +12,7 @@ export default function CustomerDetailsModal({
   onClose,
   customer,
 }: CustomerDetailsModalProps) {
-  const [activeTab, setActiveTab] = useState("details"); // ['details', 'requirements', 'rates']
+  const [activeTab, setActiveTab] = useState("details");
 
   if (!isOpen || !customer) return null;
 
@@ -30,253 +30,113 @@ export default function CustomerDetailsModal({
           Details
         </button>
         <button
-          onClick={() => setActiveTab("requirements")}
+          onClick={() => setActiveTab("credit")}
           className={`${
-            activeTab === "requirements"
+            activeTab === "credit"
               ? "border-blue-500 text-blue-600"
               : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
           } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
         >
-          Carrier Requirements
+          Credit Info
         </button>
         <button
-          onClick={() => setActiveTab("rates")}
+          onClick={() => setActiveTab("terms")}
           className={`${
-            activeTab === "rates"
+            activeTab === "terms"
               ? "border-blue-500 text-blue-600"
               : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
           } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
         >
-          Contract Rates
+          Payment Terms
         </button>
       </nav>
     </div>
   );
+
   const renderDetailsContent = () => (
     <div className='space-y-6'>
-      {/* Business Metrics */}
+      {/* Basic Information */}
       <div>
         <h3 className='text-lg font-medium text-gray-900 mb-4'>
-          Business Metrics
+          Basic Information
         </h3>
         <div className='grid grid-cols-2 gap-4'>
           <div>
             <label className='block text-sm font-medium text-gray-500'>
-              Total Shipments
+              Account Number
             </label>
             <p className='mt-1 text-sm text-gray-900'>
-              {customer.totalShipments}
+              {customer.accountNumber}
             </p>
           </div>
           <div>
             <label className='block text-sm font-medium text-gray-500'>
-              Total Spent
+              Type
             </label>
-            <p className='mt-1 text-sm text-gray-900'>
-              ${customer.totalSpent.toLocaleString()}
-            </p>
+            <p className='mt-1 text-sm text-gray-900'>{customer.type}</p>
           </div>
           <div>
             <label className='block text-sm font-medium text-gray-500'>
-              Average Cost per Shipment
+              Status
             </label>
-            <p className='mt-1 text-sm text-gray-900'>
-              ${customer.avgShipmentCost.toLocaleString()}
-            </p>
-          </div>
-        </div>
-      </div>
-      {/* Common Locations */}
-      <div>
-        <h3 className='text-lg font-medium text-gray-900 mb-4'>
-          Common Locations
-        </h3>
-        <div className='space-y-4'>
-          <div>
-            <label className='block text-sm font-medium text-gray-500'>
-              Most Common Pickup
-            </label>
-            <p className='mt-1 text-sm text-gray-900'>
-              {customer.commonLocations.pickup}
-            </p>
+            <p className='mt-1 text-sm text-gray-900'>{customer.status}</p>
           </div>
           <div>
             <label className='block text-sm font-medium text-gray-500'>
-              Most Common Delivery
+              Tax ID
             </label>
-            <p className='mt-1 text-sm text-gray-900'>
-              {customer.commonLocations.delivery}
-            </p>
+            <p className='mt-1 text-sm text-gray-900'>{customer.taxId}</p>
           </div>
-        </div>
-      </div>
-      {/* Recent Activity */}
-      <div>
-        <h3 className='text-lg font-medium text-gray-900 mb-4'>
-          Recent Activity
-        </h3>
-        <div>
-          <label className='block text-sm font-medium text-gray-500'>
-            Last Shipment Date
-          </label>
-          <p className='mt-1 text-sm text-gray-900'>
-            {customer.lastShipmentDate}
-          </p>
         </div>
       </div>
     </div>
   );
-  const renderRequirementsContent = () => (
+
+  const renderCreditContent = () => (
     <div className='space-y-6'>
-      {/* Insurance Requirements */}
+      {/* Credit Information */}
       <div>
         <h3 className='text-lg font-medium text-gray-900 mb-4'>
-          Insurance Requirements
+          Credit Information
         </h3>
-        <div className='space-y-4'>
+        <div className='grid grid-cols-2 gap-4'>
           <div>
             <label className='block text-sm font-medium text-gray-500'>
-              Auto Liability
+              Credit Status
             </label>
-            <p className='mt-1 text-sm text-gray-900'>$1,000,000</p>
-          </div>
-          <div>
-            <label className='block text-sm font-medium text-gray-500'>
-              Cargo Insurance
-            </label>
-            <p className='mt-1 text-sm text-gray-900'>$100,000</p>
+            <p className='mt-1 text-sm text-gray-900'>
+              {customer.creditStatus}
+            </p>
           </div>
           <div>
             <label className='block text-sm font-medium text-gray-500'>
-              General Liability
+              Credit Limit
             </label>
-            <p className='mt-1 text-sm text-gray-900'>$1,000,000</p>
+            <p className='mt-1 text-sm text-gray-900'>
+              ${customer.creditLimit?.toLocaleString()}
+            </p>
           </div>
-        </div>
-      </div>
-      {/* Equipment Requirements */}
-      <div>
-        <h3 className='text-lg font-medium text-gray-900 mb-4'>
-          Equipment Requirements
-        </h3>
-        <div className='space-y-2'>
-          <div className='flex items-center'>
-            <svg
-              className='h-5 w-5 text-green-500'
-              fill='none'
-              viewBox='0 0 24 24'
-              stroke='currentColor'
-            >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth='2'
-                d='M5 13l4 4L19 7'
-              />
-            </svg>
-            <span className='ml-2 text-sm text-gray-900'>
-              Air-Ride Suspension
-            </span>
-          </div>
-          <div className='flex items-center'>
-            <svg
-              className='h-5 w-5 text-green-500'
-              fill='none'
-              viewBox='0 0 24 24'
-              stroke='currentColor'
-            >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth='2'
-                d='M5 13l4 4L19 7'
-              />
-            </svg>
-            <span className='ml-2 text-sm text-gray-900'>Lift Gate</span>
-          </div>
-        </div>
-      </div>
-      {/* Additional Requirements */}
-      <div>
-        <h3 className='text-lg font-medium text-gray-900 mb-4'>
-          Additional Requirements
-        </h3>
-        <div className='bg-yellow-50 p-4 rounded-md'>
-          <p className='text-sm text-yellow-700'>
-            Driver must have minimum 2 years experience. Temperature monitoring
-            required.
-          </p>
         </div>
       </div>
     </div>
   );
-  const renderRatesContent = () => (
+
+  const renderTermsContent = () => (
     <div className='space-y-6'>
-      {/* Contract Rates Table */}
+      {/* Payment Terms */}
       <div>
         <h3 className='text-lg font-medium text-gray-900 mb-4'>
-          Contract Rates
+          Payment Terms
         </h3>
-        <div className='overflow-x-auto'>
-          <table className='min-w-full divide-y divide-gray-200'>
-            <thead className='bg-gray-50'>
-              <tr>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                  Lane
-                </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                  Equipment
-                </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                  Rate
-                </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                  FSC
-                </th>
-              </tr>
-            </thead>
-            <tbody className='bg-white divide-y divide-gray-200'>
-              <tr>
-                <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
-                  Chicago, IL → Detroit, MI
-                </td>
-                <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
-                  53&apos; Dry Van
-                </td>
-                <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
-                  $850
-                </td>
-                <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
-                  25%
-                </td>
-              </tr>
-              <tr>
-                <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
-                  Detroit, MI → Cleveland, OH
-                </td>
-                <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
-                  53&apos; Reefer
-                </td>
-                <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
-                  $950
-                </td>
-                <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
-                  28%
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      {/* Rate Notes */}
-      <div>
-        <h3 className='text-lg font-medium text-gray-900 mb-4'>Rate Notes</h3>
-        <div className='bg-gray-50 p-4 rounded-md'>
-          <ul className='list-disc list-inside text-sm text-gray-700 space-y-2'>
-            <li>All rates subject to fuel surcharge based on DOE index</li>
-            <li>Detention charged after 2 hours at $75/hour</li>
-            <li>Contract rates valid through 12/31/2024</li>
-          </ul>
+        <div className='space-y-4'>
+          <div>
+            <label className='block text-sm font-medium text-gray-500'>
+              Payment Terms
+            </label>
+            <p className='mt-1 text-sm text-gray-900'>
+              {customer.paymentTerms}
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -301,7 +161,7 @@ export default function CustomerDetailsModal({
                       {customer.name}
                     </h2>
                     <p className='text-sm text-gray-500'>
-                      View and manage customer details
+                      {customer.type} - {customer.status}
                     </p>
                   </div>
                   <div className='h-7 flex items-center'>
@@ -334,9 +194,8 @@ export default function CustomerDetailsModal({
                   {renderTabs()}
                   <div className='py-4'>
                     {activeTab === "details" && renderDetailsContent()}
-                    {activeTab === "requirements" &&
-                      renderRequirementsContent()}
-                    {activeTab === "rates" && renderRatesContent()}
+                    {activeTab === "credit" && renderCreditContent()}
+                    {activeTab === "terms" && renderTermsContent()}
                   </div>
                 </div>
 

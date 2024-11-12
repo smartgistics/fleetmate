@@ -101,3 +101,14 @@ export interface TruckMateConfig {
   retryAttempts?: number;
   retryDelay?: number;
 }
+
+// Dashboard Types
+export interface DashboardCardProps {
+  title: string;
+  items: (CountItem | RevenueItem)[];
+  valueLabel: string;
+}
+
+export interface RevenueChartProps {
+  data: WeeklyData[];
+}

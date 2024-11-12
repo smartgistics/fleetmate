@@ -1,6 +1,13 @@
 "use server";
 
-import { Order, Trip, TruckMateResponse, Commodity } from "@/types";
+import {
+  Order,
+  Trip,
+  TruckMateResponse,
+  Commodity,
+  Client,
+  Vendor,
+} from "@/types";
 
 const TRUCKMATE_API_URL = process.env.TRUCKMATE_API_URL;
 const TM_MASTERDATA_API_URL = process.env.TM_MASTERDATA_API_URL;
@@ -98,4 +105,38 @@ export const fetchCommodities = async (): Promise<Commodity[]> => {
   console.log("Fetching commodities from", url);
   const response = await fetchWithAuth<TruckMateResponse<Commodity[]>>(url);
   return response.data || [];
+};
+
+export const fetchCustomers = async (): Promise<Client[]> => {
+  if (!TM_MASTERDATA_API_URL) {
+    throw new Error("TM_MASTERDATA_API_URL is not configured");
+  }
+
+  const url = `${TM_MASTERDATA_API_URL}/clients`;
+  console.log("Fetching customers from", url);
+
+  try {
+    const response = await fetchWithAuth<TruckMateResponse<Client[]>>(url);
+    return response.data || [];
+  } catch (error) {
+    console.error("Failed to fetch customers:", error);
+    throw error;
+  }
+};
+
+export const fetchVendors = async (type?: string): Promise<Vendor[]> => {
+  if (!TM_MASTERDATA_API_URL) {
+    throw new Error("TM_MASTERDATA_API_URL is not configured");
+  }
+
+  const url = `${TM_MASTERDATA_API_URL}/vendors${type ? `?type=${type}` : ""}`;
+  console.log("Fetching vendors from", url);
+
+  try {
+    const response = await fetchWithAuth<TruckMateResponse<Vendor[]>>(url);
+    return response.data || [];
+  } catch (error) {
+    console.error("Failed to fetch vendors:", error);
+    throw error;
+  }
 };

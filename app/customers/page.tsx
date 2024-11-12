@@ -1,21 +1,28 @@
 "use client";
 
 import { useState } from "react";
-import { CustomerData } from "@/types";
-import { mockCustomers } from "@/mocks/Customers";
-import CustomerDetailsModal from "../../components/CustomerDetailsModal";
-
-type SortableFields = keyof CustomerData;
+import { Client } from "@/types";
+import { useQuery } from "@tanstack/react-query";
+import { fetchCustomers } from "@/services/truckMateService";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 
 export default function Customers() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortField, setSortField] = useState<SortableFields>("name");
+  const [sortField, setSortField] = useState<keyof Client>("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const [selectedCustomer, setSelectedCustomer] = useState<CustomerData | null>(
-    null
-  );
+  const [selectedCustomer, setSelectedCustomer] = useState<Client | null>(null);
 
-  const handleSort = (field: SortableFields) => {
+  const {
+    data: customers,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["customers"],
+    queryFn: fetchCustomers,
+  });
+
+  const handleSort = (field: keyof Client) => {
     if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
@@ -25,19 +32,41 @@ export default function Customers() {
   };
 
   // Filter and sort customers
-  const filteredCustomers = mockCustomers
-    .filter((customer) =>
-      Object.values(customer)
-        .join(" ")
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase())
-    )
-    .sort((a, b) => {
-      if (sortDirection === "asc") {
-        return (a[sortField] ?? "") > (b[sortField] ?? "") ? 1 : -1;
-      }
-      return (a[sortField] ?? "") < (b[sortField] ?? "") ? 1 : -1;
-    });
+  const filteredCustomers = Array.isArray(customers)
+    ? customers
+        .filter((customer) =>
+          Object.values(customer)
+            .join(" ")
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())
+        )
+        .sort((a, b) => {
+          if (sortDirection === "asc") {
+            return (a[sortField] ?? "") > (b[sortField] ?? "") ? 1 : -1;
+          }
+          return (a[sortField] ?? "") < (b[sortField] ?? "") ? 1 : -1;
+        })
+    : [];
+
+  if (isLoading) {
+    return (
+      <div className='w-full h-[500px] bg-gray-200 flex justify-center items-center'>
+        <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900' />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className='p-6'>
+        <Alert variant='destructive'>
+          <ExclamationTriangleIcon className='h-4 w-4' />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{error.toString()}</AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   return (
     <div className='p-6 text-gray-900'>
@@ -73,36 +102,41 @@ export default function Customers() {
               </th>
               <th
                 className='px-6 py-3 border-b cursor-pointer hover:bg-gray-200'
-                onClick={() => handleSort("totalShipments")}
+                onClick={() => handleSort("type")}
               >
-                Total Shipments{" "}
-                {sortField === "totalShipments" &&
+                Type{" "}
+                {sortField === "type" && (sortDirection === "asc" ? "↑" : "↓")}
+              </th>
+              <th
+                className='px-6 py-3 border-b cursor-pointer hover:bg-gray-200'
+                onClick={() => handleSort("status")}
+              >
+                Status{" "}
+                {sortField === "status" &&
                   (sortDirection === "asc" ? "↑" : "↓")}
               </th>
               <th
                 className='px-6 py-3 border-b cursor-pointer hover:bg-gray-200'
-                onClick={() => handleSort("totalSpent")}
+                onClick={() => handleSort("creditStatus")}
               >
-                Total Spent{" "}
-                {sortField === "totalSpent" &&
+                Credit Status{" "}
+                {sortField === "creditStatus" &&
                   (sortDirection === "asc" ? "↑" : "↓")}
               </th>
               <th
                 className='px-6 py-3 border-b cursor-pointer hover:bg-gray-200'
-                onClick={() => handleSort("avgShipmentCost")}
+                onClick={() => handleSort("accountNumber")}
               >
-                Avg Cost{" "}
-                {sortField === "avgShipmentCost" &&
+                Account Number{" "}
+                {sortField === "accountNumber" &&
                   (sortDirection === "asc" ? "↑" : "↓")}
               </th>
-              <th className='px-6 py-3 border-b'>Most Common Pickup</th>
-              <th className='px-6 py-3 border-b'>Most Common Delivery</th>
               <th
                 className='px-6 py-3 border-b cursor-pointer hover:bg-gray-200'
-                onClick={() => handleSort("lastShipmentDate")}
+                onClick={() => handleSort("paymentTerms")}
               >
-                Last Shipment{" "}
-                {sortField === "lastShipmentDate" &&
+                Payment Terms{" "}
+                {sortField === "paymentTerms" &&
                   (sortDirection === "asc" ? "↑" : "↓")}
               </th>
             </tr>
@@ -117,24 +151,11 @@ export default function Customers() {
                 <td className='px-6 py-4 border-b font-medium'>
                   {customer.name}
                 </td>
-                <td className='px-6 py-4 border-b'>
-                  {customer.totalShipments}
-                </td>
-                <td className='px-6 py-4 border-b'>
-                  ${customer.totalSpent.toLocaleString()}
-                </td>
-                <td className='px-6 py-4 border-b'>
-                  ${customer.avgShipmentCost.toLocaleString()}
-                </td>
-                <td className='px-6 py-4 border-b'>
-                  {customer.commonLocations.pickup}
-                </td>
-                <td className='px-6 py-4 border-b'>
-                  {customer.commonLocations.delivery}
-                </td>
-                <td className='px-6 py-4 border-b'>
-                  {customer.lastShipmentDate}
-                </td>
+                <td className='px-6 py-4 border-b'>{customer.type}</td>
+                <td className='px-6 py-4 border-b'>{customer.status}</td>
+                <td className='px-6 py-4 border-b'>{customer.creditStatus}</td>
+                <td className='px-6 py-4 border-b'>{customer.accountNumber}</td>
+                <td className='px-6 py-4 border-b'>{customer.paymentTerms}</td>
               </tr>
             ))}
           </tbody>
@@ -142,11 +163,47 @@ export default function Customers() {
       </div>
 
       {/* Details Modal */}
-      <CustomerDetailsModal
-        isOpen={!!selectedCustomer}
-        onClose={() => setSelectedCustomer(null)}
-        customer={selectedCustomer}
-      />
+      {selectedCustomer && (
+        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4'>
+          <div className='bg-white rounded-lg p-6 max-w-2xl w-full'>
+            <div className='flex justify-between items-center mb-4'>
+              <h2 className='text-xl font-bold'>Customer Details</h2>
+              <button
+                onClick={() => setSelectedCustomer(null)}
+                className='text-gray-500 hover:text-gray-700'
+              >
+                ✕
+              </button>
+            </div>
+            <div className='grid grid-cols-2 gap-4'>
+              <div>
+                <label className='font-medium'>Name</label>
+                <p>{selectedCustomer.name}</p>
+              </div>
+              <div>
+                <label className='font-medium'>Account Number</label>
+                <p>{selectedCustomer.accountNumber}</p>
+              </div>
+              <div>
+                <label className='font-medium'>Status</label>
+                <p>{selectedCustomer.status}</p>
+              </div>
+              <div>
+                <label className='font-medium'>Credit Status</label>
+                <p>{selectedCustomer.creditStatus}</p>
+              </div>
+              <div>
+                <label className='font-medium'>Type</label>
+                <p>{selectedCustomer.type}</p>
+              </div>
+              <div>
+                <label className='font-medium'>Payment Terms</label>
+                <p>{selectedCustomer.paymentTerms}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,65 +1,129 @@
-import { Shipment, WeeklyData } from "@/types";
-import { mockShipments } from "@/mocks/Shipments";
+import { WeeklyData, CountItem, RevenueItem, Trip, Order } from "@/types";
+import { fetchOrders, fetchTrips } from "@/services/truckMateService";
+
+// Type guards
+const isOrder = (item: Order | Trip): item is Order => {
+  return "billTo" in item && "totalCharges" in item;
+};
+
+const isTrip = (item: Order | Trip): item is Trip => {
+  return "carriers" in item && "revenue" in item;
+};
+
+// Utility types
+type CommonKeys = keyof (Order & Trip);
+type OrderOnlyKeys = Exclude<keyof Order, CommonKeys>;
+type TripOnlyKeys = Exclude<keyof Trip, CommonKeys>;
+type ValidKeys = CommonKeys | OrderOnlyKeys | TripOnlyKeys;
 
 export async function getWeeklyRevenue(): Promise<WeeklyData[]> {
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  try {
+    const [orders, trips] = await Promise.all([fetchOrders(), fetchTrips()]);
+    const allItems = [...orders, ...trips];
 
-  const weeklyData = mockShipments.reduce<Record<string, WeeklyData>>(
-    (acc, shipment) => {
-      const date = new Date(shipment.pickupDate ?? "");
-      const weekStart = new Date(date.setDate(date.getDate() - date.getDay()));
-      const weekKey = weekStart.toISOString().split("T")[0];
+    const weeklyData = allItems.reduce<Record<string, WeeklyData>>(
+      (acc, item) => {
+        const date = new Date(
+          isOrder(item) ? item.createdTime : item.createdDateTime
+        );
+        const weekStart = new Date(
+          date.setDate(date.getDate() - date.getDay())
+        );
+        const weekKey = weekStart.toISOString().split("T")[0];
 
-      if (!acc[weekKey]) {
-        acc[weekKey] = {
-          week: weekKey,
-          revenue: 0,
-          shipments: 0,
-        };
+        if (!acc[weekKey]) {
+          acc[weekKey] = {
+            week: weekKey,
+            revenue: 0,
+            shipments: 0,
+          };
+        }
+
+        acc[weekKey].revenue += isOrder(item)
+          ? item.totalCharges
+          : item.revenue;
+        acc[weekKey].shipments += 1;
+
+        return acc;
+      },
+      {}
+    );
+
+    return Object.values(weeklyData)
+      .sort((a, b) => new Date(a.week).getTime() - new Date(b.week).getTime())
+      .slice(-8);
+  } catch (error) {
+    console.error("Failed to fetch weekly revenue:", error);
+    return [];
+  }
+}
+
+export async function getTopItems(
+  key: keyof Trip,
+  limit = 5
+): Promise<CountItem[]> {
+  try {
+    const trips = await fetchTrips();
+
+    const counts = trips.reduce<Record<string, number>>((acc, trip) => {
+      let value: string;
+
+      if (key === "carriers") {
+        value = trip.carriers?.[0]?.carrierId || "Unknown";
+      } else if (key === "pickupLocation" || key === "deliveryLocation") {
+        value = String(trip[key] || "Unknown");
+      } else {
+        value = String(trip[key] || "Unknown");
       }
 
-      acc[weekKey].revenue += shipment.rate || 0;
-      acc[weekKey].shipments += 1;
-
+      acc[value] = (acc[value] || 0) + 1;
       return acc;
-    },
-    {}
-  );
+    }, {});
 
-  return Object.values(weeklyData)
-    .sort((a, b) => new Date(a.week).getTime() - new Date(b.week).getTime())
-    .slice(-8);
+    return Object.entries(counts)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, limit)
+      .map(([name, count]) => ({ name, count }));
+  } catch (error) {
+    console.error("Failed to fetch top items:", error);
+    return [];
+  }
 }
 
-export async function getTopItems(key: keyof Shipment, limit = 5) {
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 500));
+export async function getTopItemsByRevenue(
+  key: ValidKeys,
+  limit = 5
+): Promise<RevenueItem[]> {
+  try {
+    const [orders, trips] = await Promise.all([fetchOrders(), fetchTrips()]);
+    const allItems = [...orders, ...trips];
 
-  const counts = mockShipments.reduce<Record<string, number>>((acc, item) => {
-    const value = item[key] as string;
-    acc[value] = (acc[value] || 0) + 1;
-    return acc;
-  }, {});
+    const revenue = allItems.reduce<Record<string, number>>((acc, item) => {
+      let value: string;
 
-  return Object.entries(counts)
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, limit)
-    .map(([name, count]) => ({ name, count }));
-}
+      if (isOrder(item)) {
+        value = String(item[key as keyof Order] || "Unknown");
+      } else if (isTrip(item)) {
+        if (key === "carriers") {
+          value = item.carriers?.[0]?.carrierId || "Unknown";
+        } else {
+          value = String(item[key as keyof Trip] || "Unknown");
+        }
+      } else {
+        value = "Unknown";
+      }
 
-export async function getTopItemsByRevenue(key: keyof Shipment, limit = 5) {
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 500));
+      const amount = isOrder(item) ? item.totalCharges : item.revenue;
+      acc[value] = (acc[value] || 0) + amount;
+      return acc;
+    }, {});
 
-  const revenue = mockShipments.reduce<Record<string, number>>((acc, item) => {
-    const value = item[key] as string;
-    acc[value] = (acc[value] || 0) + (item.rate || 0);
-    return acc;
-  }, {});
-
-  return Object.entries(revenue)
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, limit)
-    .map(([name, total]) => ({ name, total }));
+    return Object.entries(revenue)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, limit)
+      .map(([name, total]) => ({ name, total }));
+  } catch (error) {
+    console.error("Failed to fetch top items by revenue:", error);
+    return [];
+  }
 }

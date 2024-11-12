@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { CarrierData } from "@/types";
+import { Vendor } from "@/types";
 
 interface CarrierDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  carrier: CarrierData | null;
+  carrier: Vendor | null;
 }
 
 export function CarrierDetailsModal({
@@ -42,189 +42,164 @@ export function CarrierDetailsModal({
       </nav>
     </div>
   );
+
   const renderDetailsContent = () => (
     <div className='space-y-6'>
-      {/* Performance Metrics */}
+      {/* Contact Information */}
       <div>
         <h3 className='text-lg font-medium text-gray-900 mb-4'>
-          Performance Metrics
+          Contact Information
         </h3>
         <div className='grid grid-cols-2 gap-4'>
           <div>
             <label className='block text-sm font-medium text-gray-500'>
-              Total Shipments
+              Business Phone
             </label>
             <p className='mt-1 text-sm text-gray-900'>
-              {carrier.totalShipments}
+              {carrier.businessPhone}
+              {carrier.businessPhoneExt && ` ext. ${carrier.businessPhoneExt}`}
             </p>
           </div>
           <div>
             <label className='block text-sm font-medium text-gray-500'>
-              Active Routes
+              Fax
             </label>
-            <p className='mt-1 text-sm text-gray-900'>{carrier.activeRoutes}</p>
+            <p className='mt-1 text-sm text-gray-900'>{carrier.faxPhone}</p>
           </div>
           <div>
             <label className='block text-sm font-medium text-gray-500'>
-              Total Revenue
+              Email
             </label>
-            <p className='mt-1 text-sm text-gray-900'>
-              ${carrier.totalRevenue.toLocaleString()}
-            </p>
+            <p className='mt-1 text-sm text-gray-900'>{carrier.email}</p>
           </div>
           <div>
             <label className='block text-sm font-medium text-gray-500'>
-              Average Rate
+              Primary Contact
             </label>
-            <p className='mt-1 text-sm text-gray-900'>
-              ${carrier.avgShipmentRate.toLocaleString()}
-            </p>
+            <p className='mt-1 text-sm text-gray-900'>{carrier.contact}</p>
           </div>
         </div>
       </div>
-      {/* Recent Activity */}
+
+      {/* Address Information */}
       <div>
         <h3 className='text-lg font-medium text-gray-900 mb-4'>
-          Recent Activity
+          Address Information
         </h3>
-        <div className='space-y-4'>
+        <div className='space-y-2'>
+          <p className='text-sm text-gray-900'>
+            {carrier.address1}
+            {carrier.address2 && <br />}
+            {carrier.address2}
+            <br />
+            {carrier.city}, {carrier.province} {carrier.postalCode}
+            <br />
+            {carrier.country}
+          </p>
+        </div>
+      </div>
+
+      {/* Business Details */}
+      <div>
+        <h3 className='text-lg font-medium text-gray-900 mb-4'>
+          Business Details
+        </h3>
+        <div className='grid grid-cols-2 gap-4'>
           <div>
             <label className='block text-sm font-medium text-gray-500'>
-              Last Shipment Date
+              Vendor Since
+            </label>
+            <p className='mt-1 text-sm text-gray-900'>{carrier.vendorSince}</p>
+          </div>
+          <div>
+            <label className='block text-sm font-medium text-gray-500'>
+              Default Terminal
             </label>
             <p className='mt-1 text-sm text-gray-900'>
-              {carrier.lastShipmentDate}
+              {carrier.defaultTerminal}
             </p>
+          </div>
+          <div>
+            <label className='block text-sm font-medium text-gray-500'>
+              Rate Mode
+            </label>
+            <p className='mt-1 text-sm text-gray-900'>{carrier.rateMode}</p>
+          </div>
+          <div>
+            <label className='block text-sm font-medium text-gray-500'>
+              Default Zone
+            </label>
+            <p className='mt-1 text-sm text-gray-900'>{carrier.defaultZone}</p>
           </div>
         </div>
       </div>
     </div>
   );
+
   const renderComplianceContent = () => (
     <div className='space-y-6'>
-      {/* Insurance Status */}
+      {/* Compliance Information */}
       <div>
         <h3 className='text-lg font-medium text-gray-900 mb-4'>
-          Insurance Status
+          Compliance Information
         </h3>
-        <div className='space-y-4'>
-          <div className='grid grid-cols-2 gap-4'>
-            <div>
-              <label className='block text-sm font-medium text-gray-500'>
-                Auto Liability
-              </label>
-              <p className='mt-1 text-sm text-gray-900'>$1,000,000</p>
-              <div className='flex items-center mt-1'>
-                <div className='h-2 w-2 rounded-full bg-green-500 mr-2'></div>
-                <span className='text-xs text-green-600'>
-                  Active until Dec 31, 2024
-                </span>
-              </div>
-            </div>
-            <div>
-              <label className='block text-sm font-medium text-gray-500'>
-                Cargo Insurance
-              </label>
-              <p className='mt-1 text-sm text-gray-900'>$100,000</p>
-              <div className='flex items-center mt-1'>
-                <div className='h-2 w-2 rounded-full bg-green-500 mr-2'></div>
-                <span className='text-xs text-green-600'>
-                  Active until Dec 31, 2024
-                </span>
-              </div>
-            </div>
-            <div>
-              <label className='block text-sm font-medium text-gray-500'>
-                General Liability
-              </label>
-              <p className='mt-1 text-sm text-gray-900'>$1,000,000</p>
-              <div className='flex items-center mt-1'>
-                <div className='h-2 w-2 rounded-full bg-green-500 mr-2'></div>
-                <span className='text-xs text-green-600'>
-                  Active until Dec 31, 2024
-                </span>
-              </div>
-            </div>
+        <div className='grid grid-cols-2 gap-4'>
+          <div>
+            <label className='block text-sm font-medium text-gray-500'>
+              DOT Number
+            </label>
+            <p className='mt-1 text-sm text-gray-900'>{carrier.dotNumber}</p>
+          </div>
+          <div>
+            <label className='block text-sm font-medium text-gray-500'>
+              ICC Number
+            </label>
+            <p className='mt-1 text-sm text-gray-900'>{carrier.iccNumber}</p>
+          </div>
+          <div>
+            <label className='block text-sm font-medium text-gray-500'>
+              Federal ID
+            </label>
+            <p className='mt-1 text-sm text-gray-900'>{carrier.federalId}</p>
+          </div>
+          <div>
+            <label className='block text-sm font-medium text-gray-500'>
+              W9 Status
+            </label>
+            <p className='mt-1 text-sm text-gray-900'>{carrier.w9}</p>
           </div>
         </div>
       </div>
-      {/* Equipment Compliance */}
+
+      {/* Insurance Information */}
       <div>
         <h3 className='text-lg font-medium text-gray-900 mb-4'>
-          Equipment Compliance
+          Insurance Information
         </h3>
-        <div className='space-y-2'>
-          <div className='flex items-center'>
-            <svg
-              className='h-5 w-5 text-green-500'
-              fill='none'
-              viewBox='0 0 24 24'
-              stroke='currentColor'
-            >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth='2'
-                d='M5 13l4 4L19 7'
-              />
-            </svg>
-            <span className='ml-2 text-sm text-gray-900'>
-              Air-Ride Suspension
-            </span>
+        <div className='grid grid-cols-2 gap-4'>
+          <div>
+            <label className='block text-sm font-medium text-gray-500'>
+              Insurance Status
+            </label>
+            <p className='mt-1 text-sm text-gray-900'>{carrier.insurance}</p>
           </div>
-          <div className='flex items-center'>
-            <svg
-              className='h-5 w-5 text-green-500'
-              fill='none'
-              viewBox='0 0 24 24'
-              stroke='currentColor'
-            >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth='2'
-                d='M5 13l4 4L19 7'
-              />
-            </svg>
-            <span className='ml-2 text-sm text-gray-900'>Lift Gate</span>
+          <div>
+            <label className='block text-sm font-medium text-gray-500'>
+              Liability Coverage
+            </label>
+            <p className='mt-1 text-sm text-gray-900'>{carrier.liability}</p>
           </div>
-        </div>
-      </div>
-      {/* Additional Requirements */}
-      <div>
-        <h3 className='text-lg font-medium text-gray-900 mb-4'>
-          Additional Requirements
-        </h3>
-        <div className='bg-yellow-50 p-4 rounded-md'>
-          <p className='text-sm text-yellow-700'>
-            Driver must have minimum 2 years experience. Temperature monitoring
-            required.
-          </p>
-        </div>
-      </div>
-      {/* Documents */}
-      <div>
-        <h3 className='text-lg font-medium text-gray-900 mb-4'>
-          Required Documents
-        </h3>
-        <div className='space-y-3'>
-          <div className='flex items-center justify-between p-3 bg-gray-50 rounded-md'>
-            <span className='text-sm text-gray-900'>Insurance Certificate</span>
-            <button className='text-blue-600 hover:text-blue-700 text-sm font-medium'>
-              View
-            </button>
+          <div>
+            <label className='block text-sm font-medium text-gray-500'>
+              Cargo Coverage
+            </label>
+            <p className='mt-1 text-sm text-gray-900'>{carrier.cargo}</p>
           </div>
-          <div className='flex items-center justify-between p-3 bg-gray-50 rounded-md'>
-            <span className='text-sm text-gray-900'>Operating Authority</span>
-            <button className='text-blue-600 hover:text-blue-700 text-sm font-medium'>
-              View
-            </button>
-          </div>
-          <div className='flex items-center justify-between p-3 bg-gray-50 rounded-md'>
-            <span className='text-sm text-gray-900'>W9</span>
-            <button className='text-blue-600 hover:text-blue-700 text-sm font-medium'>
-              View
-            </button>
+          <div>
+            <label className='block text-sm font-medium text-gray-500'>
+              Workers Comp
+            </label>
+            <p className='mt-1 text-sm text-gray-900'>{carrier.workComp}</p>
           </div>
         </div>
       </div>
@@ -250,7 +225,7 @@ export function CarrierDetailsModal({
                       {carrier.name}
                     </h2>
                     <p className='text-sm text-gray-500'>
-                      View and manage carrier details
+                      {carrier.vendorType} - {carrier.status}
                     </p>
                   </div>
                   <div className='h-7 flex items-center'>

@@ -1,21 +1,17 @@
 import React, { useState } from "react";
 import { FormData } from "@/types";
-import { ShipmentModalTabs } from "./modal/ShipmentModalTabs";
-import { ShipmentModalFooter } from "./modal/ShipmentModalFooter";
+import { OrderModalTabs } from "./modal/OrderModalTabs";
+import { OrderModalFooter } from "./modal/OrderModalFooter";
 import { CustomerTab } from "./tabs/CustomerTab";
 import { OrderDetailsTab } from "./tabs/OrderDetailsTab";
-import { PickupTab } from "./tabs/PickupTab";
-import { DeliveryTab } from "./tabs/DeliveryTab";
 import { FinancialsTab } from "./tabs/FinancialsTab";
-import { SummaryTab } from "./tabs/SummaryTab";
-import { CapacityTab } from "./tabs/CapacityTab";
 
-export interface NewShipmentModalProps {
+interface NewOrderModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export function NewShipmentModal({ isOpen, onClose }: NewShipmentModalProps) {
+export function NewOrderModal({ isOpen, onClose }: NewOrderModalProps) {
   const [activeTab, setActiveTab] = useState<string>("customer");
   const [formData, setFormData] = useState<FormData>({
     // Customer Tab
@@ -36,38 +32,6 @@ export function NewShipmentModal({ isOpen, onClose }: NewShipmentModalProps) {
     commodityCode: "",
     commodities: [],
 
-    // Pickup Tab
-    pickupLocations: [
-      {
-        address: "",
-        date: "",
-        startTime: "",
-        endTime: "",
-        confirmed: false,
-        confirmationNumber: "",
-        notes: "",
-        contactName: "",
-        contactPhone: "",
-        contactEmail: "",
-      },
-    ],
-
-    // Delivery Tab
-    deliveryLocations: [
-      {
-        address: "",
-        date: "",
-        startTime: "",
-        endTime: "",
-        confirmed: false,
-        confirmationNumber: "",
-        notes: "",
-        contactName: "",
-        contactPhone: "",
-        contactEmail: "",
-      },
-    ],
-
     // Financials Tab
     customerCharges: [],
     carrierCharges: [],
@@ -75,12 +39,12 @@ export function NewShipmentModal({ isOpen, onClose }: NewShipmentModalProps) {
 
     // Additional Fields
     notes: "",
-    accountManager: "Jim Smith", // Default value
-    orderPlanner: "Sherie Connor", // Default value
+    accountManager: "",
+    orderPlanner: "",
     status: "New",
-    parentAccount: "[PARENT ACCOUNT]",
-    customerId: "[Customer ID]",
-    creditStatus: "[STATUS]",
+    parentAccount: "",
+    customerId: "",
+    creditStatus: "",
   });
 
   if (!isOpen) return null;
@@ -91,32 +55,22 @@ export function NewShipmentModal({ isOpen, onClose }: NewShipmentModalProps) {
     onClose();
   };
 
-  // Add function to handle next tab
   const handleNext = () => {
-    const tabs = [
-      "customer",
-      "orderDetails",
-      "pickup",
-      "delivery",
-      "financials",
-      "summary",
-      "capacity",
-    ];
+    const tabs = ["customer", "orderDetails", "financials"];
     const currentIndex = tabs.indexOf(activeTab);
     if (currentIndex < tabs.length - 1) {
       setActiveTab(tabs[currentIndex + 1]);
     }
   };
 
-  // Function to determine if we're on the last tab
   const isLastTab = () => {
-    return activeTab === "capacity";
+    return activeTab === "financials";
   };
 
   return (
     <div className='fixed inset-0 z-50 overflow-y-auto'>
       <div className='flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0'>
-        <div className='fixed inset-0 transition-opacity' aria-hidden='true'>
+        <div className='fixed inset-0 transition-opacity'>
           <div className='absolute inset-0 bg-gray-500 opacity-75'></div>
         </div>
 
@@ -125,7 +79,7 @@ export function NewShipmentModal({ isOpen, onClose }: NewShipmentModalProps) {
             {/* Header */}
             <div className='flex justify-between items-center px-6 py-4 border-b'>
               <h3 className='text-2xl font-semibold text-gray-900'>
-                Create New Shipment
+                Create New Order
               </h3>
               <button
                 onClick={onClose}
@@ -149,7 +103,7 @@ export function NewShipmentModal({ isOpen, onClose }: NewShipmentModalProps) {
 
             {/* Tabs */}
             <div className='border-b border-gray-200'>
-              <ShipmentModalTabs
+              <OrderModalTabs
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
               />
@@ -159,7 +113,7 @@ export function NewShipmentModal({ isOpen, onClose }: NewShipmentModalProps) {
             <div className='px-6 py-4'>
               <form onSubmit={handleSubmit}>
                 {activeTab === "customer" && (
-                  <CustomerTab initialFormData={formData} />
+                  <CustomerTab formData={formData} setFormData={setFormData} />
                 )}
                 {activeTab === "orderDetails" && (
                   <OrderDetailsTab
@@ -167,18 +121,14 @@ export function NewShipmentModal({ isOpen, onClose }: NewShipmentModalProps) {
                     setFormData={setFormData}
                   />
                 )}
-                {activeTab === "pickup" && <PickupTab />}
-                {activeTab === "delivery" && <DeliveryTab />}
                 {activeTab === "financials" && (
                   <FinancialsTab
                     formData={formData}
                     setFormData={setFormData}
                   />
                 )}
-                {activeTab === "summary" && <SummaryTab formData={formData} />}
-                {activeTab === "capacity" && <CapacityTab />}
 
-                <ShipmentModalFooter
+                <OrderModalFooter
                   onClose={onClose}
                   onNext={handleNext}
                   isLastTab={isLastTab()}
@@ -191,5 +141,3 @@ export function NewShipmentModal({ isOpen, onClose }: NewShipmentModalProps) {
     </div>
   );
 }
-
-export default NewShipmentModal;

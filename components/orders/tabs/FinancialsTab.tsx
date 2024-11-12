@@ -1,11 +1,6 @@
 import React, { useState } from "react";
 import { FormData, Charge } from "@/types";
 
-interface ChargeTableProps {
-  charges: Charge[];
-  onDeleteCharge: (index: number) => void;
-}
-
 interface FinancialsTabProps {
   formData: FormData;
   setFormData: React.Dispatch<React.SetStateAction<FormData>>;
@@ -13,32 +8,46 @@ interface FinancialsTabProps {
 
 interface NewCharge {
   type: string;
+  code: string;
+  description: string;
   quantity: string;
-  amount: string;
+  rate: string;
 }
 
-export function ChargeTable({ charges, onDeleteCharge }: ChargeTableProps) {
-  const total = charges.reduce((sum, charge) => sum + (charge.amount || 0), 0);
+interface ChargeTableProps {
+  charges: Charge[];
+  onDeleteCharge: (index: number) => void;
+  currencyCode?: string;
+}
+
+function ChargeTable({
+  charges,
+  onDeleteCharge,
+  currencyCode = "USD",
+}: ChargeTableProps) {
+  const total = charges.reduce((sum, charge) => sum + charge.amount, 0);
   const totalQuantity = charges.reduce(
-    (sum, charge) => sum + (charge.quantity || 0),
+    (sum, charge) => sum + charge.quantity,
     0
   );
 
   return (
     <div className='mt-4'>
-      <div className='grid grid-cols-3 gap-4 font-medium text-gray-700 p-2 border-b'>
+      <div className='grid grid-cols-4 gap-4 font-medium text-gray-700 p-2 border-b'>
         <div>Type</div>
         <div>Quantity</div>
+        <div>Rate</div>
         <div>Amount</div>
       </div>
 
       {charges.map((charge, index) => (
         <div
           key={index}
-          className='grid grid-cols-3 gap-4 p-2 border-b hover:bg-gray-50'
+          className='grid grid-cols-4 gap-4 p-2 border-b hover:bg-gray-50'
         >
-          <div>{charge.type}</div>
+          <div>{charge.description}</div>
           <div>{charge.quantity}</div>
+          <div>${charge.rate.toFixed(2)}</div>
           <div className='flex justify-between'>
             ${charge.amount.toFixed(2)}
             <button
@@ -63,10 +72,13 @@ export function ChargeTable({ charges, onDeleteCharge }: ChargeTableProps) {
         </div>
       ))}
 
-      <div className='grid grid-cols-3 gap-4 p-2 font-bold text-gray-800 bg-gray-50'>
+      <div className='grid grid-cols-4 gap-4 p-2 font-bold text-gray-800 bg-gray-50'>
         <div>Total</div>
         <div>{totalQuantity}</div>
-        <div>${total.toFixed(2)}</div>
+        <div></div>
+        <div>
+          ${total.toFixed(2)} {currencyCode}
+        </div>
       </div>
     </div>
   );
@@ -77,42 +89,56 @@ export function FinancialsTab({ formData, setFormData }: FinancialsTabProps) {
     "customer" | "carrier" | "misc"
   >("customer");
   const [newCharge, setNewCharge] = useState<NewCharge>({
-    type: "Line Haul (all-in)",
+    type: "lineHaul",
+    code: "LH",
+    description: "Line Haul",
     quantity: "",
-    amount: "",
+    rate: "",
   });
 
   const handleAddCharge = () => {
-    if (!newCharge.type || !newCharge.quantity || !newCharge.amount) return;
+    if (!newCharge.quantity || !newCharge.rate) return;
 
-    const updatedCharges = [
-      ...(formData[`${activeChargeType}Charges`] || []),
-      {
-        ...newCharge,
-        amount: parseFloat(newCharge.amount),
-        quantity: parseFloat(newCharge.quantity),
-      },
-    ];
+    const amount = parseFloat(newCharge.rate) * parseFloat(newCharge.quantity);
+    const charge: Charge = {
+      type: newCharge.type,
+      code: newCharge.code,
+      description: newCharge.description,
+      quantity: parseFloat(newCharge.quantity),
+      rate: parseFloat(newCharge.rate),
+      amount,
+      currencyCode: "USD",
+    };
 
+    const chargeArrayKey = `${activeChargeType}Charges` as keyof Pick<
+      FormData,
+      "customerCharges" | "carrierCharges" | "miscCharges"
+    >;
     setFormData({
       ...formData,
-      [`${activeChargeType}Charges`]: updatedCharges,
+      [chargeArrayKey]: [...formData[chargeArrayKey], charge],
     });
 
     setNewCharge({
-      type: "Line Haul (all-in)",
+      type: "lineHaul",
+      code: "LH",
+      description: "Line Haul",
       quantity: "",
-      amount: "",
+      rate: "",
     });
   };
 
   const handleDeleteCharge = (index: number) => {
-    const updatedCharges = formData[`${activeChargeType}Charges`].filter(
+    const chargeArrayKey = `${activeChargeType}Charges` as keyof Pick<
+      FormData,
+      "customerCharges" | "carrierCharges" | "miscCharges"
+    >;
+    const updatedCharges = formData[chargeArrayKey].filter(
       (_, i) => i !== index
     );
     setFormData({
       ...formData,
-      [`${activeChargeType}Charges`]: updatedCharges,
+      [chargeArrayKey]: updatedCharges,
     });
   };
 
@@ -146,7 +172,7 @@ export function FinancialsTab({ formData, setFormData }: FinancialsTabProps) {
 
       {/* Add Charge Form */}
       <div className='bg-gray-50 p-4 rounded-md'>
-        <div className='grid grid-cols-4 gap-4 items-end'>
+        <div className='grid grid-cols-5 gap-4'>
           <div className='col-span-2'>
             <select
               className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500'
@@ -155,18 +181,16 @@ export function FinancialsTab({ formData, setFormData }: FinancialsTabProps) {
                 setNewCharge({ ...newCharge, type: e.target.value })
               }
             >
-              <option>Line Haul (all-in)</option>
-              <option>Fuel Surcharge</option>
-              <option>Detention</option>
-              <option>Stop Fee</option>
+              <option value='lineHaul'>Line Haul</option>
+              <option value='fuelSurcharge'>Fuel Surcharge</option>
+              <option value='detention'>Detention</option>
+              <option value='stopCharge'>Stop Charge</option>
             </select>
           </div>
           <div>
-            <label className='block text-sm font-medium text-gray-700 mb-1'>
-              Quantity
-            </label>
             <input
               type='number'
+              placeholder='Quantity'
               className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500'
               value={newCharge.quantity}
               onChange={(e) =>
@@ -175,38 +199,34 @@ export function FinancialsTab({ formData, setFormData }: FinancialsTabProps) {
             />
           </div>
           <div>
-            <label className='block text-sm font-medium text-gray-700 mb-1'>
-              Amount
-            </label>
             <input
               type='number'
+              placeholder='Rate'
               className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500'
-              value={newCharge.amount}
+              value={newCharge.rate}
               onChange={(e) =>
-                setNewCharge({ ...newCharge, amount: e.target.value })
+                setNewCharge({ ...newCharge, rate: e.target.value })
               }
-              placeholder='$0.00'
             />
           </div>
-        </div>
-        <div className='mt-4 flex justify-end'>
-          <button
-            type='button'
-            onClick={handleAddCharge}
-            className='px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700'
-          >
-            Add
-          </button>
+          <div>
+            <button
+              type='button'
+              onClick={handleAddCharge}
+              disabled={!newCharge.quantity || !newCharge.rate}
+              className='w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:bg-gray-400'
+            >
+              Add
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Charges Table */}
       <ChargeTable
-        charges={formData[`${activeChargeType}Charges`] || []}
+        charges={formData[`${activeChargeType}Charges`]}
         onDeleteCharge={handleDeleteCharge}
       />
     </div>
   );
 }
-
-export default FinancialsTab;

@@ -1,14 +1,14 @@
-interface ShipmentModalFooterProps {
+interface OrderModalFooterProps {
   onClose: () => void;
   onNext: () => void;
   isLastTab: boolean;
 }
 
-export function ShipmentModalFooter({
+export function OrderModalFooter({
   onClose,
   onNext,
   isLastTab,
-}: ShipmentModalFooterProps) {
+}: OrderModalFooterProps) {
   return (
     <div className='mt-8 flex justify-end border-t pt-4'>
       <button
@@ -23,7 +23,7 @@ export function ShipmentModalFooter({
           type='submit'
           className='px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700'
         >
-          Create Shipment
+          Create Order
         </button>
       ) : (
         <button

@@ -17,6 +17,29 @@ export interface Location {
   };
 }
 
+// Commodity related types
+export interface Commodity {
+  code: string;
+  active: boolean;
+  description: string;
+  nmfcNumber?: string;
+  class?: string;
+  weight: number;
+  weightUnits: string;
+  pieces: number;
+  pallets?: number;
+  cube?: number;
+  volume?: number;
+  hazmat?: boolean;
+  hazmatCode?: string;
+  temperature?: {
+    required: boolean;
+    min?: number;
+    max?: number;
+    units?: string;
+  };
+}
+
 export interface Charge {
   type: string;
   code: string;
@@ -49,4 +72,38 @@ export interface ApiError {
   code: string;
   message: string;
   details?: Record<string, unknown>;
+}
+
+export interface FormData {
+  // Customer Tab
+  customer: string;
+  customerReference: string;
+  customerContact: string;
+  contactPhone: string;
+  contactEmail: string;
+  billingAddress: string;
+
+  // Order Details Tab
+  contractType: string;
+  equipmentType: string;
+  serviceLevel: string;
+  temperatureControlled: boolean;
+  tempMin: string;
+  tempMax: string;
+  commodityCode: string;
+  commodities: Commodity[];
+
+  // Financials Tab
+  customerCharges: Charge[];
+  carrierCharges: Charge[];
+  miscCharges: Charge[];
+
+  // Additional Fields
+  notes: string;
+  accountManager: string;
+  orderPlanner: string;
+  status: string;
+  parentAccount: string;
+  customerId: string;
+  creditStatus: string;
 }

@@ -1,4 +1,4 @@
-import { ServiceLevel } from "./common";
+import { ServiceLevel, Commodity } from "./common";
 
 // Base interfaces for common patterns
 interface BaseResponse {
@@ -128,29 +128,6 @@ export interface Vendor {
   isInactive?: boolean;
   defaultTerminal?: string;
   rateMode?: string;
-}
-
-// Commodity related types
-export interface Commodity {
-  code: string;
-  active: boolean;
-  description: string;
-  nmfcNumber?: string;
-  class?: string;
-  weight: number;
-  weightUnits: string;
-  pieces: number;
-  pallets?: number;
-  cube?: number;
-  volume?: number;
-  hazmat?: boolean;
-  hazmatCode?: string;
-  temperature?: {
-    required: boolean;
-    min?: number;
-    max?: number;
-    units?: string;
-  };
 }
 
 // Charge Code types

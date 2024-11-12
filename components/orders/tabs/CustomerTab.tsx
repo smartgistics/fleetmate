@@ -1,43 +1,30 @@
-import React, { useState } from "react";
-import { CustomerData, FormData } from "@/types";
-import { mockCustomers } from "@/mocks/Customers";
+import React from "react";
+import { FormData, Client } from "@/types";
+import { useQuery } from "@tanstack/react-query";
+import { fetchCustomers } from "@/services/truckMateService";
 
 interface CustomerTabProps {
-  initialFormData: FormData;
+  formData: FormData;
+  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
 }
 
-export function CustomerTab({ initialFormData }: CustomerTabProps) {
-  const [formData, setFormData] = useState<FormData>(initialFormData);
+export function CustomerTab({ formData, setFormData }: CustomerTabProps) {
+  const { data: customers, isLoading } = useQuery({
+    queryKey: ["customers"],
+    queryFn: fetchCustomers,
+  });
 
-  // Function to handle customer selection
   const handleCustomerChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedCustomer: CustomerData | undefined = mockCustomers.find(
-      (c) => c.name === e.target.value
+    const selectedCustomer = customers?.find(
+      (c: Client) => c.id === e.target.value
     );
 
     if (selectedCustomer) {
       setFormData({
         ...formData,
         customer: selectedCustomer.name,
-        customerContact: selectedCustomer.primaryContact || "",
-        contactPhone: selectedCustomer.contactPhone || "",
-        contactEmail: selectedCustomer.contactEmail || "",
-        billingAddress: selectedCustomer.billingAddress || "",
-        equipmentType: selectedCustomer.defaultEquipment || "",
-        temperatureControlled:
-          selectedCustomer.requiresTemperatureControl || false,
-        tempMin: selectedCustomer.defaultTempMin || "",
-        tempMax: selectedCustomer.defaultTempMax || "",
-      });
-    } else {
-      // Reset fields if no customer is selected
-      setFormData({
-        ...formData,
-        customer: "",
-        customerContact: "",
-        contactPhone: "",
-        contactEmail: "",
-        billingAddress: "",
+        customerId: selectedCustomer.id,
+        creditStatus: selectedCustomer.creditStatus || "",
       });
     }
   };
@@ -50,13 +37,14 @@ export function CustomerTab({ initialFormData }: CustomerTabProps) {
         </label>
         <select
           className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500'
-          value={formData.customer}
+          value={formData.customerId}
           onChange={handleCustomerChange}
           required
+          disabled={isLoading}
         >
           <option value=''>Select a customer</option>
-          {mockCustomers.map((customer) => (
-            <option key={customer.id} value={customer.name}>
+          {customers?.map((customer) => (
+            <option key={customer.id} value={customer.id}>
               {customer.name}
             </option>
           ))}
@@ -129,6 +117,7 @@ export function CustomerTab({ initialFormData }: CustomerTabProps) {
           rows={3}
         />
       </div>
+
       {formData.customer && (
         <div className='col-span-2 bg-blue-50 p-3 rounded-md'>
           <div className='flex items-center'>

@@ -1,85 +1,11 @@
 "use client";
 
-import React, { useMemo } from "react";
-import { mockShipments } from "@/mocks/Shipments";
-import {
-  Shipment,
-  CountItem,
-  RevenueItem,
-  WeeklyData,
-  DashboardCardProps,
-} from "@/types";
+import { DashboardCardProps } from "@/types";
+import { useDashboard } from "@/hooks/useDashboard";
 import { RevenueChart } from "./RevenueChart";
 
-// Helper functions
-const getTopItems = (
-  array: Shipment[],
-  key: keyof Shipment,
-  limit = 5
-): CountItem[] => {
-  const counts = array.reduce<Record<string, number>>((acc, item) => {
-    const value = item[key] as string;
-    acc[value] = (acc[value] || 0) + 1;
-    return acc;
-  }, {});
-
-  return Object.entries(counts)
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, limit)
-    .map(([name, count]) => ({ name, count }));
-};
-
-const getTopItemsByRevenue = (
-  array: Shipment[],
-  key: keyof Shipment,
-  limit = 5
-): RevenueItem[] => {
-  const revenue = array.reduce<Record<string, number>>((acc, item) => {
-    const value = item[key] as string;
-    acc[value] = (acc[value] || 0) + (item.rate || 0);
-    return acc;
-  }, {});
-
-  return Object.entries(revenue)
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, limit)
-    .map(([name, total]) => ({ name, total }));
-};
-
-const getWeeklyRevenue = (shipments: Shipment[]): WeeklyData[] => {
-  const weeklyData = shipments.reduce<Record<string, WeeklyData>>(
-    (acc, shipment) => {
-      const date = new Date(shipment.pickupDate ?? "");
-      const weekStart = new Date(date.setDate(date.getDate() - date.getDay()));
-      const weekKey = weekStart.toISOString().split("T")[0];
-
-      if (!acc[weekKey]) {
-        acc[weekKey] = {
-          week: weekKey,
-          revenue: 0,
-          shipments: 0,
-        };
-      }
-
-      acc[weekKey].revenue += shipment.rate || 0;
-      acc[weekKey].shipments += 1;
-
-      return acc;
-    },
-    {}
-  );
-
-  return Object.values(weeklyData)
-    .sort((a, b) => new Date(a.week).getTime() - new Date(b.week).getTime())
-    .slice(-8);
-};
-
 // Components
-export function DashboardCard({
-  title,
-  items,
-  valueLabel,
-}: DashboardCardProps) {
+function DashboardCard({ title, items, valueLabel }: DashboardCardProps) {
   return (
     <div className='bg-white overflow-hidden shadow rounded-lg'>
       <div className='p-5'>
@@ -107,22 +33,15 @@ export function DashboardCard({
 }
 
 export function Dashboard() {
-  // Use useMemo to ensure consistent data between renders
-  const dashboardData = useMemo(() => {
-    const topCustomers = getTopItemsByRevenue(mockShipments, "customer");
-    const topCarriers = getTopItemsByRevenue(mockShipments, "carrier");
-    const topOrigins = getTopItems(mockShipments, "pickupLocation");
-    const topDestinations = getTopItems(mockShipments, "deliveryLocation");
-    const weeklyRevenue = getWeeklyRevenue(mockShipments);
+  const { dashboardData, isLoading } = useDashboard();
 
-    return {
-      topCustomers,
-      topCarriers,
-      topOrigins,
-      topDestinations,
-      weeklyRevenue,
-    };
-  }, []); // Empty dependency array since mockShipments is static
+  if (isLoading) {
+    return (
+      <div className='w-full h-[500px] bg-gray-200 flex justify-center items-center'>
+        <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900' />
+      </div>
+    );
+  }
 
   return (
     <div className='p-6'>
