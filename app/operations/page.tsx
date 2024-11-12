@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { ShipmentDetailsModal } from "@/components/shipments/ShipmentDetailsModal";
+import { OrderDetailsModal } from "@/components/orders/OrderDetailsModal";
+import { TripDetailsModal } from "@/components/trips/TripDetailsModal";
 import {
   DragDropContext,
   Droppable,
@@ -9,6 +10,10 @@ import {
   DropResult,
 } from "@hello-pangea/dnd";
 import Tabs from "@/components/Tabs";
+import type { Order, Trip } from "@/types";
+import { useOrders } from "@/hooks/useTruckMate";
+import { useDispatch } from "@/hooks/useDispatch";
+import { Card } from "@/components/ui/card";
 
 interface StatusColors {
   NOT_STARTED: string;
@@ -17,26 +22,30 @@ interface StatusColors {
   DELAYED: string;
 }
 
-const statusColors: StatusColors = {
+const STATUS_COLORS: StatusColors = {
   NOT_STARTED: "bg-blue-200",
   CAUTION: "bg-yellow-200",
   ON_TRACK: "bg-green-200",
   DELAYED: "bg-red-200",
 };
 
-interface DispatchColumnProps {
+interface OperationsColumnProps {
   title: string;
-  shipments: Shipment[];
+  items: (Order | Trip)[];
   statusColor: string;
-  onShipmentClick: (shipment: Shipment) => void;
+  onItemClick: (item: Order | Trip) => void;
 }
 
-function DispatchColumn({
+function OperationsColumn({
   title,
-  shipments,
+  items,
   statusColor,
-  onShipmentClick,
-}: DispatchColumnProps) {
+  onItemClick,
+}: OperationsColumnProps) {
+  const isOrder = (item: Order | Trip): item is Order => {
+    return "orderId" in item;
+  };
+
   return (
     <Droppable droppableId={title}>
       {(provided, snapshot) => (
@@ -50,45 +59,48 @@ function DispatchColumn({
             {title}
           </h3>
           <div className='space-y-1'>
-            {shipments.map((shipment, index) => (
+            {items.map((item, index) => (
               <Draggable
-                key={shipment.id}
-                draggableId={shipment.id.toString()}
+                key={
+                  isOrder(item)
+                    ? `order-${item.orderId}`
+                    : `trip-${item.tripId}`
+                }
+                draggableId={
+                  isOrder(item)
+                    ? item.orderId.toString()
+                    : item.tripId.toString()
+                }
                 index={index}
               >
                 {(provided, snapshot) => (
-                  <div
+                  <Card
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                     className={`p-2 rounded text-xs ${statusColor} text-gray-900
                       hover:opacity-80 hover:shadow-md transition-all duration-200
                       ${snapshot.isDragging ? "shadow-lg" : ""}`}
-                    onClick={() => onShipmentClick(shipment)}
+                    onClick={() => onItemClick(item)}
                   >
                     <div className='flex items-center justify-between mb-1'>
                       <div className='font-semibold truncate pr-1'>
-                        {shipment.pickupLocation} → {shipment.deliveryLocation}
-                      </div>
-                      <div className='text-gray-700 flex-shrink-0'>
-                        <svg
-                          className='w-3 h-3'
-                          fill='currentColor'
-                          viewBox='0 0 24 24'
-                        >
-                          <path d='M8 6h8v2H8V6zm0 4h8v2H8v-2zm0 4h8v2H8v-2z' />
-                        </svg>
+                        {isOrder(item)
+                          ? `Order #${item.orderId}`
+                          : `${item.pickupLocation} → ${item.deliveryLocation}`}
                       </div>
                     </div>
                     <div className='truncate text-[11px] text-gray-800'>
-                      {shipment.customer} | {shipment.carrier}
+                      {isOrder(item) ? item.billTo : item.customer}
                     </div>
                     <div className='text-[11px] font-medium text-gray-800'>
-                      {shipment.pickupDate
-                        ? new Date(shipment.pickupDate).toLocaleDateString()
-                        : "Not Specified"}
+                      {isOrder(item)
+                        ? `$${item.totalCharges?.toLocaleString()}`
+                        : new Date(
+                            item.scheduledStartDate
+                          ).toLocaleDateString()}
                     </div>
-                  </div>
+                  </Card>
                 )}
               </Draggable>
             ))}
@@ -100,387 +112,124 @@ function DispatchColumn({
   );
 }
 
-interface FilteredShipments {
-  available: Shipment[];
-  planned: Shipment[];
-  puTracking: Shipment[];
-  loading: Shipment[];
-  delTracking: Shipment[];
-  delivering: Shipment[];
-  needsAppointments: Shipment[];
-  needsRates: Shipment[];
-  assignCarrier: Shipment[];
-}
-
 export default function OperationsPage() {
   const [activeTab, setActiveTab] = useState("dispatch");
-  const [shipments, setShipments] = useState<Shipment[]>(mockShipments);
-  const [isSlideoutOpen, setIsSlideoutOpen] = useState(false);
-  const [selectedShipment, setSelectedShipment] = useState<Shipment | null>(
-    null
-  );
-  const [dragConfirmation, setDragConfirmation] = useState<{
-    isOpen: boolean;
-    shipmentId: string | null;
-    newStatus: string | null;
-    sourceStatus: string | null;
-  }>({
-    isOpen: false,
-    shipmentId: null,
-    newStatus: null,
-    sourceStatus: null,
-  });
-
-  const [planner, setPlanner] = useState("");
-  const [customer, setCustomer] = useState("");
-  const [pickRegion, setPickRegion] = useState("");
-  const [delRegion, setDelRegion] = useState("");
-  const [carrier, setCarrier] = useState("");
-  const [date, setDate] = useState("");
-  const [selectedCarrier, setSelectedCarrier] = useState("");
-  const [carrierPhone, setCarrierPhone] = useState("");
-
-  const handleShipmentClick = (shipment: Shipment) => {
-    setSelectedShipment(shipment);
-    setIsSlideoutOpen(true);
-  };
-
-  const handleCloseSlideout = () => {
-    setIsSlideoutOpen(false);
-    setSelectedShipment(null);
-  };
+  const { trips, isLoading: tripsLoading } = useDispatch();
+  const { orders, isLoading: ordersLoading } = useOrders();
+  const [selectedItem, setSelectedItem] = useState<{
+    type: "order" | "trip";
+    data: Order | Trip;
+  } | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleDragEnd = (result: DropResult) => {
     if (!result.destination) return;
-
-    const { draggableId, source, destination } = result;
-
-    // Don't show confirmation if dropped in same column
-    if (source.droppableId === destination.droppableId) return;
-    setDragConfirmation({
-      isOpen: true,
-      shipmentId: draggableId,
-      newStatus: destination.droppableId,
-      sourceStatus: source.droppableId,
-    });
+    // Implement drag and drop logic here
+    console.log(result);
   };
 
-  const handleStatusUpdate = (confirmed: boolean) => {
-    if (confirmed) {
-      setShipments((prevShipments) =>
-        prevShipments.map((shipment) =>
-          shipment.id.toString() === dragConfirmation.shipmentId
-            ? {
-                ...shipment,
-                dispatchStatus:
-                  dragConfirmation.newStatus || shipment.dispatchStatus,
-                ...(dragConfirmation.newStatus === "Planned" && {
-                  carrier: selectedCarrier,
-                  carrierPhone: carrierPhone,
-                }),
-              }
-            : shipment
-        )
-      );
-    }
-    setDragConfirmation({
-      isOpen: false,
-      shipmentId: null,
-      newStatus: null,
-      sourceStatus: null,
-    });
-    setSelectedCarrier("");
-    setCarrierPhone("");
+  const handleItemClick = (item: Order | Trip) => {
+    const type = "orderId" in item ? "order" : "trip";
+    setSelectedItem({ type, data: item });
+    setIsModalOpen(true);
   };
 
-  const distributeShipments = (): FilteredShipments => {
-    return {
-      available: shipments.filter((s) => s.dispatchStatus === "Available"),
-      planned: shipments.filter((s) => s.dispatchStatus === "Planned"),
-      puTracking: shipments.filter((s) => s.dispatchStatus === "PU TRACKING"),
-      loading: shipments.filter((s) => s.dispatchStatus === "LOADING"),
-      delTracking: shipments.filter((s) => s.dispatchStatus === "DEL TRACKING"),
-      delivering: shipments.filter((s) => s.dispatchStatus === "DELIVERING"),
-      needsAppointments: shipments.filter(
-        (s) => s.planningStatus === "Needs Appointments"
-      ),
-      needsRates: shipments.filter((s) => s.planningStatus === "Needs Rates"),
-      assignCarrier: shipments.filter(
-        (s) => s.planningStatus === "Assign Carrier"
-      ),
-    };
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedItem(null);
   };
 
-  const filteredShipments = distributeShipments();
-
-  const applyFilters = (shipments: FilteredShipments): FilteredShipments => {
-    return Object.keys(shipments).reduce<FilteredShipments>((acc, key) => {
-      const k = key as keyof FilteredShipments;
-      acc[k] = shipments[k].filter((shipment) => {
+  const renderColumns = () => {
+    switch (activeTab) {
+      case "dispatch":
         return (
-          (!planner ||
-            shipment.planner.toLowerCase().includes(planner.toLowerCase())) &&
-          (!customer ||
-            shipment.customer.toLowerCase().includes(customer.toLowerCase())) &&
-          (!pickRegion ||
-            shipment.pickupLocation
-              ?.toLowerCase()
-              .includes(pickRegion.toLowerCase())) &&
-          (!delRegion ||
-            shipment.deliveryLocation
-              .toLowerCase()
-              .includes(delRegion.toLowerCase())) &&
-          (!carrier ||
-            shipment.carrier?.toLowerCase().includes(carrier.toLowerCase()))
+          <>
+            <OperationsColumn
+              title='Available'
+              items={trips.available}
+              statusColor={STATUS_COLORS.NOT_STARTED}
+              onItemClick={handleItemClick}
+            />
+            <OperationsColumn
+              title='Planned'
+              items={trips.planned}
+              statusColor={STATUS_COLORS.CAUTION}
+              onItemClick={handleItemClick}
+            />
+            <OperationsColumn
+              title='In Transit'
+              items={trips.puTracking}
+              statusColor={STATUS_COLORS.ON_TRACK}
+              onItemClick={handleItemClick}
+            />
+          </>
         );
-      });
-      return acc;
-    }, {} as FilteredShipments);
+      case "planning":
+        return (
+          <>
+            <OperationsColumn
+              title='New Orders'
+              items={orders.filter((order) => order.status === "New")}
+              statusColor={STATUS_COLORS.NOT_STARTED}
+              onItemClick={handleItemClick}
+            />
+            <OperationsColumn
+              title='Planning'
+              items={orders.filter((order) => order.status === "Planning")}
+              statusColor={STATUS_COLORS.CAUTION}
+              onItemClick={handleItemClick}
+            />
+          </>
+        );
+      default:
+        return null;
+    }
   };
 
-  const displayShipments = applyFilters(filteredShipments);
-
-  const handleShipmentUpdate = (updatedShipment: Shipment) => {
-    setShipments((prevShipments) =>
-      prevShipments.map((shipment) =>
-        shipment.id === updatedShipment.id ? updatedShipment : shipment
-      )
+  if (tripsLoading || ordersLoading) {
+    return (
+      <div className='flex items-center justify-center h-screen'>
+        <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900' />
+      </div>
     );
-  };
+  }
 
   return (
     <div className='p-4 text-gray-900'>
-      {/* Tabs Component */}
-      <Tabs
-        tabs={[
-          { label: "Dispatch", value: "dispatch" },
-          { label: "Planning", value: "planning" },
-          { label: "Tracking", value: "tracking" },
-          { label: "Billing", value: "billing" },
-        ]}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-      />
-
-      {/* Filters Section */}
-      <div className='mb-6 border rounded-lg p-4 bg-white'>
-        <h2 className='font-bold mb-4 text-gray-900'>FILTERS</h2>
-        <div className='grid grid-cols-3 gap-4'>
-          <div className='space-y-2'>
-            <input
-              type='text'
-              placeholder='PLANNER'
-              className='border p-2 w-full text-gray-900 placeholder-gray-500'
-              value={planner}
-              onChange={(e) => setPlanner(e.target.value)}
-            />
-            <div className='flex gap-2'>
-              <input
-                type='date'
-                className='border p-2 flex-1 text-gray-900'
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-              />
-              <select className='border p-2 w-20 text-gray-900'>
-                <option>+/-</option>
-                <option>+1</option>
-                <option>-1</option>
-              </select>
-            </div>
-          </div>
-          <div className='space-y-2'>
-            <input
-              type='text'
-              placeholder='CUSTOMER'
-              className='border p-2 w-full text-gray-900 placeholder-gray-500'
-              value={customer}
-              onChange={(e) => setCustomer(e.target.value)}
-            />
-            <input
-              type='text'
-              placeholder='CARRIER'
-              className='border p-2 w-full text-gray-900 placeholder-gray-500'
-              value={carrier}
-              onChange={(e) => setCarrier(e.target.value)}
-            />
-          </div>
-          <div className='space-y-2'>
-            <input
-              type='text'
-              placeholder='PICK REGION'
-              className='border p-2 w-full text-gray-900 placeholder-gray-500'
-              value={pickRegion}
-              onChange={(e) => setPickRegion(e.target.value)}
-            />
-            <input
-              type='text'
-              placeholder='DEL REGION'
-              className='border p-2 w-full text-gray-900 placeholder-gray-500'
-              value={delRegion}
-              onChange={(e) => setDelRegion(e.target.value)}
-            />
-          </div>
-        </div>
+      <div className='mb-6'>
+        <Tabs
+          tabs={[
+            { label: "Dispatch", value: "dispatch" },
+            { label: "Planning", value: "planning" },
+            { label: "Tracking", value: "tracking" },
+            { label: "Billing", value: "billing" },
+          ]}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
       </div>
 
-      {/* Dispatch Board */}
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className='flex min-h-[600px] border-l border-r border-gray-300 w-full bg-white'>
-          {activeTab === "dispatch" && (
-            <>
-              <DispatchColumn
-                title='Available'
-                shipments={displayShipments.available}
-                statusColor={statusColors.NOT_STARTED}
-                onShipmentClick={handleShipmentClick}
-              />
-              <DispatchColumn
-                title='Planned'
-                shipments={displayShipments.planned}
-                statusColor={statusColors.CAUTION}
-                onShipmentClick={handleShipmentClick}
-              />
-              <DispatchColumn
-                title='PU TRACKING'
-                shipments={displayShipments.puTracking}
-                statusColor={statusColors.ON_TRACK}
-                onShipmentClick={handleShipmentClick}
-              />
-              <DispatchColumn
-                title='LOADING'
-                shipments={displayShipments.loading}
-                statusColor={statusColors.CAUTION}
-                onShipmentClick={handleShipmentClick}
-              />
-              <DispatchColumn
-                title='DEL TRACKING'
-                shipments={displayShipments.delTracking}
-                statusColor={statusColors.DELAYED}
-                onShipmentClick={handleShipmentClick}
-              />
-              <DispatchColumn
-                title='DELIVERING'
-                shipments={displayShipments.delivering}
-                statusColor={statusColors.DELAYED}
-                onShipmentClick={handleShipmentClick}
-              />
-            </>
-          )}
-          {activeTab === "planning" && (
-            <>
-              <DispatchColumn
-                title='Needs Appointments'
-                shipments={displayShipments.needsAppointments}
-                statusColor={statusColors.CAUTION}
-                onShipmentClick={handleShipmentClick}
-              />
-              <DispatchColumn
-                title='Needs Rates'
-                shipments={displayShipments.needsRates}
-                statusColor={statusColors.ON_TRACK}
-                onShipmentClick={handleShipmentClick}
-              />
-              <DispatchColumn
-                title='Assign Carrier'
-                shipments={displayShipments.assignCarrier}
-                statusColor={statusColors.DELAYED}
-                onShipmentClick={handleShipmentClick}
-              />
-            </>
-          )}
-          {activeTab === "tracking" && <>{/* Tracking Columns */}</>}
-          {activeTab === "billing" && <>{/* Billing Columns */}</>}
+          {renderColumns()}
         </div>
       </DragDropContext>
 
-      {/* Shipment Details Modal */}
-      <ShipmentDetailsModal
-        isOpen={isSlideoutOpen}
-        onClose={handleCloseSlideout}
-        shipment={selectedShipment}
-        onUpdate={handleShipmentUpdate}
-      />
-
-      {dragConfirmation.isOpen && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
-          <div className='bg-white p-6 rounded-lg shadow-xl max-w-md w-full'>
-            <h3 className='text-lg font-bold mb-4'>Confirm Status Change</h3>
-            <p className='mb-4'>
-              Are you sure you want to move this shipment from &quot;
-              {dragConfirmation.sourceStatus}&quot; to &quot;
-              {dragConfirmation.newStatus}&quot;?
-            </p>
-
-            {dragConfirmation.sourceStatus === "Available" &&
-              dragConfirmation.newStatus === "Planned" && (
-                <div className='space-y-4 mb-6'>
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-2'>
-                      Assign Carrier *
-                    </label>
-                    <select
-                      value={selectedCarrier}
-                      onChange={(e) => setSelectedCarrier(e.target.value)}
-                      className='w-full border rounded-md p-2'
-                      required
-                    >
-                      <option value=''>Select a carrier</option>
-                      <option value='Carrier A'>Carrier A</option>
-                      <option value='Carrier B'>Carrier B</option>
-                      <option value='Carrier C'>Carrier C</option>
-                      <option value='Carrier D'>Carrier D</option>
-                    </select>
-                    {selectedCarrier === "" && (
-                      <p className='text-red-500 text-xs mt-1'>
-                        Please select a carrier
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-2'>
-                      Carrier Phone Number *
-                    </label>
-                    <input
-                      type='tel'
-                      value={carrierPhone}
-                      onChange={(e) => setCarrierPhone(e.target.value)}
-                      placeholder='Enter phone number'
-                      className='w-full border rounded-md p-2'
-                      required
-                    />
-                    <p className='text-xs text-gray-500 mt-1'>
-                      This number will receive the load tracking link
-                    </p>
-                    {carrierPhone === "" && (
-                      <p className='text-red-500 text-xs mt-1'>
-                        Please enter a phone number
-                      </p>
-                    )}
-                  </div>
-                </div>
-              )}
-
-            <div className='flex justify-end gap-4'>
-              <button
-                onClick={() => handleStatusUpdate(false)}
-                className='px-4 py-2 border border-gray-300 rounded hover:bg-gray-50'
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleStatusUpdate(true)}
-                className='px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed'
-                disabled={
-                  dragConfirmation.newStatus === "Planned" &&
-                  (selectedCarrier === "" || carrierPhone === "")
-                }
-              >
-                Confirm
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {selectedItem?.type === "order" ? (
+        <OrderDetailsModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          order={selectedItem.data as Order}
+          onUpdate={handleCloseModal}
+        />
+      ) : selectedItem?.type === "trip" ? (
+        <TripDetailsModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          trip={selectedItem.data as Trip}
+          onUpdate={handleCloseModal}
+        />
+      ) : null}
     </div>
   );
 }
