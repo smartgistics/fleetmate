@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchCustomers } from "@/services/truckMateService";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
+import CustomerDetailsModal from "@/components/CustomerDetailsModal";
 
 export default function Customers() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -14,7 +15,7 @@ export default function Customers() {
   const [selectedCustomer, setSelectedCustomer] = useState<Client | null>(null);
 
   const {
-    data: customers,
+    data: customers = [],
     isLoading,
     error,
   } = useQuery({
@@ -164,45 +165,11 @@ export default function Customers() {
 
       {/* Details Modal */}
       {selectedCustomer && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4'>
-          <div className='bg-white rounded-lg p-6 max-w-2xl w-full'>
-            <div className='flex justify-between items-center mb-4'>
-              <h2 className='text-xl font-bold'>Customer Details</h2>
-              <button
-                onClick={() => setSelectedCustomer(null)}
-                className='text-gray-500 hover:text-gray-700'
-              >
-                ✕
-              </button>
-            </div>
-            <div className='grid grid-cols-2 gap-4'>
-              <div>
-                <label className='font-medium'>Name</label>
-                <p>{selectedCustomer.name}</p>
-              </div>
-              <div>
-                <label className='font-medium'>Account Number</label>
-                <p>{selectedCustomer.accountNumber}</p>
-              </div>
-              <div>
-                <label className='font-medium'>Status</label>
-                <p>{selectedCustomer.status}</p>
-              </div>
-              <div>
-                <label className='font-medium'>Credit Status</label>
-                <p>{selectedCustomer.creditStatus}</p>
-              </div>
-              <div>
-                <label className='font-medium'>Type</label>
-                <p>{selectedCustomer.type}</p>
-              </div>
-              <div>
-                <label className='font-medium'>Payment Terms</label>
-                <p>{selectedCustomer.paymentTerms}</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <CustomerDetailsModal
+          isOpen={!!selectedCustomer}
+          onClose={() => setSelectedCustomer(null)}
+          customer={selectedCustomer}
+        />
       )}
     </div>
   );
