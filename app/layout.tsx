@@ -6,6 +6,7 @@ import { GlobalSearch } from "@/components/search/GlobalSearch";
 import { SidebarProvider } from "@/components/layout/SidebarContext";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Providers } from "./providers";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -59,6 +60,7 @@ export default function RootLayout({
               </div>
             </div>
           </SidebarProvider>
+          <Toaster />
         </Providers>
       </body>
     </html>

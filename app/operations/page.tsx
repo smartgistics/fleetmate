@@ -1,18 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { TripDetailsModal } from "@/components/trips/TripDetailsModal";
+import { ShipmentDetailsModal } from "@/components/shipments/ShipmentDetailsModal";
 import {
   DragDropContext,
   Droppable,
   Draggable,
   DropResult,
 } from "@hello-pangea/dnd";
-import { Trip } from "@/types";
 import Tabs from "@/components/Tabs";
-import { useDispatch } from "@/hooks/useDispatch";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 
 interface StatusColors {
   NOT_STARTED: string;
@@ -30,16 +26,16 @@ const statusColors: StatusColors = {
 
 interface DispatchColumnProps {
   title: string;
-  trips: Trip[];
+  shipments: Shipment[];
   statusColor: string;
-  onTripClick: (trip: Trip) => void;
+  onShipmentClick: (shipment: Shipment) => void;
 }
 
 function DispatchColumn({
   title,
-  trips,
+  shipments,
   statusColor,
-  onTripClick,
+  onShipmentClick,
 }: DispatchColumnProps) {
   return (
     <Droppable droppableId={title}>
@@ -54,10 +50,10 @@ function DispatchColumn({
             {title}
           </h3>
           <div className='space-y-1'>
-            {trips.map((trip, index) => (
+            {shipments.map((shipment, index) => (
               <Draggable
-                key={trip.tripId}
-                draggableId={trip.tripId.toString()}
+                key={shipment.id}
+                draggableId={shipment.id.toString()}
                 index={index}
               >
                 {(provided, snapshot) => (
@@ -68,11 +64,11 @@ function DispatchColumn({
                     className={`p-2 rounded text-xs ${statusColor} text-gray-900
                       hover:opacity-80 hover:shadow-md transition-all duration-200
                       ${snapshot.isDragging ? "shadow-lg" : ""}`}
-                    onClick={() => onTripClick(trip)}
+                    onClick={() => onShipmentClick(shipment)}
                   >
                     <div className='flex items-center justify-between mb-1'>
                       <div className='font-semibold truncate pr-1'>
-                        {trip.pickupLocation} → {trip.deliveryLocation}
+                        {shipment.pickupLocation} → {shipment.deliveryLocation}
                       </div>
                       <div className='text-gray-700 flex-shrink-0'>
                         <svg
@@ -85,11 +81,12 @@ function DispatchColumn({
                       </div>
                     </div>
                     <div className='truncate text-[11px] text-gray-800'>
-                      {trip.customer} |{" "}
-                      {trip.carriers?.[0]?.name || "Unassigned"}
+                      {shipment.customer} | {shipment.carrier}
                     </div>
                     <div className='text-[11px] font-medium text-gray-800'>
-                      {trip.scheduledStartDate}
+                      {shipment.pickupDate
+                        ? new Date(shipment.pickupDate).toLocaleDateString()
+                        : "Not Specified"}
                     </div>
                   </div>
                 )}
@@ -103,24 +100,55 @@ function DispatchColumn({
   );
 }
 
-export default function DispatchPage() {
+interface FilteredShipments {
+  available: Shipment[];
+  planned: Shipment[];
+  puTracking: Shipment[];
+  loading: Shipment[];
+  delTracking: Shipment[];
+  delivering: Shipment[];
+  needsAppointments: Shipment[];
+  needsRates: Shipment[];
+  assignCarrier: Shipment[];
+}
+
+export default function OperationsPage() {
   const [activeTab, setActiveTab] = useState("dispatch");
-  const { trips, isLoading, error, filters, setFilters } = useDispatch();
-  const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
+  const [shipments, setShipments] = useState<Shipment[]>(mockShipments);
+  const [isSlideoutOpen, setIsSlideoutOpen] = useState(false);
+  const [selectedShipment, setSelectedShipment] = useState<Shipment | null>(
+    null
+  );
   const [dragConfirmation, setDragConfirmation] = useState<{
     isOpen: boolean;
-    tripId: string | null;
+    shipmentId: string | null;
     newStatus: string | null;
     sourceStatus: string | null;
   }>({
     isOpen: false,
-    tripId: null,
+    shipmentId: null,
     newStatus: null,
     sourceStatus: null,
   });
 
+  const [planner, setPlanner] = useState("");
+  const [customer, setCustomer] = useState("");
+  const [pickRegion, setPickRegion] = useState("");
+  const [delRegion, setDelRegion] = useState("");
+  const [carrier, setCarrier] = useState("");
+  const [date, setDate] = useState("");
   const [selectedCarrier, setSelectedCarrier] = useState("");
   const [carrierPhone, setCarrierPhone] = useState("");
+
+  const handleShipmentClick = (shipment: Shipment) => {
+    setSelectedShipment(shipment);
+    setIsSlideoutOpen(true);
+  };
+
+  const handleCloseSlideout = () => {
+    setIsSlideoutOpen(false);
+    setSelectedShipment(null);
+  };
 
   const handleDragEnd = (result: DropResult) => {
     if (!result.destination) return;
@@ -131,25 +159,33 @@ export default function DispatchPage() {
     if (source.droppableId === destination.droppableId) return;
     setDragConfirmation({
       isOpen: true,
-      tripId: draggableId,
+      shipmentId: draggableId,
       newStatus: destination.droppableId,
       sourceStatus: source.droppableId,
     });
   };
 
   const handleStatusUpdate = (confirmed: boolean) => {
-    if (confirmed && dragConfirmation.tripId && dragConfirmation.newStatus) {
-      // Here you would typically make an API call to update the trip status
-      console.log("Updating trip status:", {
-        tripId: dragConfirmation.tripId,
-        newStatus: dragConfirmation.newStatus,
-        carrier: selectedCarrier,
-        carrierPhone,
-      });
+    if (confirmed) {
+      setShipments((prevShipments) =>
+        prevShipments.map((shipment) =>
+          shipment.id.toString() === dragConfirmation.shipmentId
+            ? {
+                ...shipment,
+                dispatchStatus:
+                  dragConfirmation.newStatus || shipment.dispatchStatus,
+                ...(dragConfirmation.newStatus === "Planned" && {
+                  carrier: selectedCarrier,
+                  carrierPhone: carrierPhone,
+                }),
+              }
+            : shipment
+        )
+      );
     }
     setDragConfirmation({
       isOpen: false,
-      tripId: null,
+      shipmentId: null,
       newStatus: null,
       sourceStatus: null,
     });
@@ -157,43 +193,76 @@ export default function DispatchPage() {
     setCarrierPhone("");
   };
 
-  if (isLoading) {
-    return (
-      <div className='w-full h-[500px] bg-gray-200 flex justify-center items-center'>
-        <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900' />
-      </div>
-    );
-  }
+  const distributeShipments = (): FilteredShipments => {
+    return {
+      available: shipments.filter((s) => s.dispatchStatus === "Available"),
+      planned: shipments.filter((s) => s.dispatchStatus === "Planned"),
+      puTracking: shipments.filter((s) => s.dispatchStatus === "PU TRACKING"),
+      loading: shipments.filter((s) => s.dispatchStatus === "LOADING"),
+      delTracking: shipments.filter((s) => s.dispatchStatus === "DEL TRACKING"),
+      delivering: shipments.filter((s) => s.dispatchStatus === "DELIVERING"),
+      needsAppointments: shipments.filter(
+        (s) => s.planningStatus === "Needs Appointments"
+      ),
+      needsRates: shipments.filter((s) => s.planningStatus === "Needs Rates"),
+      assignCarrier: shipments.filter(
+        (s) => s.planningStatus === "Assign Carrier"
+      ),
+    };
+  };
 
-  if (error) {
-    return (
-      <div className='p-6'>
-        <Alert variant='destructive'>
-          <ExclamationTriangleIcon className='h-4 w-4' />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error.toString()}</AlertDescription>
-        </Alert>
-      </div>
+  const filteredShipments = distributeShipments();
+
+  const applyFilters = (shipments: FilteredShipments): FilteredShipments => {
+    return Object.keys(shipments).reduce<FilteredShipments>((acc, key) => {
+      const k = key as keyof FilteredShipments;
+      acc[k] = shipments[k].filter((shipment) => {
+        return (
+          (!planner ||
+            shipment.planner.toLowerCase().includes(planner.toLowerCase())) &&
+          (!customer ||
+            shipment.customer.toLowerCase().includes(customer.toLowerCase())) &&
+          (!pickRegion ||
+            shipment.pickupLocation
+              ?.toLowerCase()
+              .includes(pickRegion.toLowerCase())) &&
+          (!delRegion ||
+            shipment.deliveryLocation
+              .toLowerCase()
+              .includes(delRegion.toLowerCase())) &&
+          (!carrier ||
+            shipment.carrier?.toLowerCase().includes(carrier.toLowerCase()))
+        );
+      });
+      return acc;
+    }, {} as FilteredShipments);
+  };
+
+  const displayShipments = applyFilters(filteredShipments);
+
+  const handleShipmentUpdate = (updatedShipment: Shipment) => {
+    setShipments((prevShipments) =>
+      prevShipments.map((shipment) =>
+        shipment.id === updatedShipment.id ? updatedShipment : shipment
+      )
     );
-  }
+  };
 
   return (
-    <div className='p-6 text-gray-900'>
-      {/* Tabs */}
-      <div className='mb-6'>
-        <Tabs
-          tabs={[
-            { label: "Dispatch", value: "dispatch" },
-            { label: "Planning", value: "planning" },
-            { label: "Tracking", value: "tracking" },
-            { label: "Billing", value: "billing" },
-          ]}
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-        />
-      </div>
+    <div className='p-4 text-gray-900'>
+      {/* Tabs Component */}
+      <Tabs
+        tabs={[
+          { label: "Dispatch", value: "dispatch" },
+          { label: "Planning", value: "planning" },
+          { label: "Tracking", value: "tracking" },
+          { label: "Billing", value: "billing" },
+        ]}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
 
-      {/* Filters */}
+      {/* Filters Section */}
       <div className='mb-6 border rounded-lg p-4 bg-white'>
         <h2 className='font-bold mb-4 text-gray-900'>FILTERS</h2>
         <div className='grid grid-cols-3 gap-4'>
@@ -202,36 +271,37 @@ export default function DispatchPage() {
               type='text'
               placeholder='PLANNER'
               className='border p-2 w-full text-gray-900 placeholder-gray-500'
-              value={filters.planner}
-              onChange={(e) =>
-                setFilters({ ...filters, planner: e.target.value })
-              }
+              value={planner}
+              onChange={(e) => setPlanner(e.target.value)}
             />
-            <input
-              type='date'
-              className='border p-2 w-full text-gray-900'
-              value={filters.date}
-              onChange={(e) => setFilters({ ...filters, date: e.target.value })}
-            />
+            <div className='flex gap-2'>
+              <input
+                type='date'
+                className='border p-2 flex-1 text-gray-900'
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+              />
+              <select className='border p-2 w-20 text-gray-900'>
+                <option>+/-</option>
+                <option>+1</option>
+                <option>-1</option>
+              </select>
+            </div>
           </div>
           <div className='space-y-2'>
             <input
               type='text'
               placeholder='CUSTOMER'
               className='border p-2 w-full text-gray-900 placeholder-gray-500'
-              value={filters.customer}
-              onChange={(e) =>
-                setFilters({ ...filters, customer: e.target.value })
-              }
+              value={customer}
+              onChange={(e) => setCustomer(e.target.value)}
             />
             <input
               type='text'
               placeholder='CARRIER'
               className='border p-2 w-full text-gray-900 placeholder-gray-500'
-              value={filters.carrier}
-              onChange={(e) =>
-                setFilters({ ...filters, carrier: e.target.value })
-              }
+              value={carrier}
+              onChange={(e) => setCarrier(e.target.value)}
             />
           </div>
           <div className='space-y-2'>
@@ -239,19 +309,15 @@ export default function DispatchPage() {
               type='text'
               placeholder='PICK REGION'
               className='border p-2 w-full text-gray-900 placeholder-gray-500'
-              value={filters.pickRegion}
-              onChange={(e) =>
-                setFilters({ ...filters, pickRegion: e.target.value })
-              }
+              value={pickRegion}
+              onChange={(e) => setPickRegion(e.target.value)}
             />
             <input
               type='text'
               placeholder='DEL REGION'
               className='border p-2 w-full text-gray-900 placeholder-gray-500'
-              value={filters.delRegion}
-              onChange={(e) =>
-                setFilters({ ...filters, delRegion: e.target.value })
-              }
+              value={delRegion}
+              onChange={(e) => setDelRegion(e.target.value)}
             />
           </div>
         </div>
@@ -264,39 +330,39 @@ export default function DispatchPage() {
             <>
               <DispatchColumn
                 title='Available'
-                trips={trips.available}
+                shipments={displayShipments.available}
                 statusColor={statusColors.NOT_STARTED}
-                onTripClick={setSelectedTrip}
+                onShipmentClick={handleShipmentClick}
               />
               <DispatchColumn
                 title='Planned'
-                trips={trips.planned}
+                shipments={displayShipments.planned}
                 statusColor={statusColors.CAUTION}
-                onTripClick={setSelectedTrip}
+                onShipmentClick={handleShipmentClick}
               />
               <DispatchColumn
                 title='PU TRACKING'
-                trips={trips.puTracking}
+                shipments={displayShipments.puTracking}
                 statusColor={statusColors.ON_TRACK}
-                onTripClick={setSelectedTrip}
+                onShipmentClick={handleShipmentClick}
               />
               <DispatchColumn
                 title='LOADING'
-                trips={trips.loading}
+                shipments={displayShipments.loading}
                 statusColor={statusColors.CAUTION}
-                onTripClick={setSelectedTrip}
+                onShipmentClick={handleShipmentClick}
               />
               <DispatchColumn
                 title='DEL TRACKING'
-                trips={trips.delTracking}
+                shipments={displayShipments.delTracking}
                 statusColor={statusColors.DELAYED}
-                onTripClick={setSelectedTrip}
+                onShipmentClick={handleShipmentClick}
               />
               <DispatchColumn
                 title='DELIVERING'
-                trips={trips.delivering}
+                shipments={displayShipments.delivering}
                 statusColor={statusColors.DELAYED}
-                onTripClick={setSelectedTrip}
+                onShipmentClick={handleShipmentClick}
               />
             </>
           )}
@@ -304,45 +370,43 @@ export default function DispatchPage() {
             <>
               <DispatchColumn
                 title='Needs Appointments'
-                trips={trips.needsAppointments}
+                shipments={displayShipments.needsAppointments}
                 statusColor={statusColors.CAUTION}
-                onTripClick={setSelectedTrip}
+                onShipmentClick={handleShipmentClick}
               />
               <DispatchColumn
                 title='Needs Rates'
-                trips={trips.needsRates}
+                shipments={displayShipments.needsRates}
                 statusColor={statusColors.ON_TRACK}
-                onTripClick={setSelectedTrip}
+                onShipmentClick={handleShipmentClick}
               />
               <DispatchColumn
                 title='Assign Carrier'
-                trips={trips.assignCarrier}
+                shipments={displayShipments.assignCarrier}
                 statusColor={statusColors.DELAYED}
-                onTripClick={setSelectedTrip}
+                onShipmentClick={handleShipmentClick}
               />
             </>
           )}
+          {activeTab === "tracking" && <>{/* Tracking Columns */}</>}
+          {activeTab === "billing" && <>{/* Billing Columns */}</>}
         </div>
       </DragDropContext>
 
-      {/* Trip Details Modal */}
-      <TripDetailsModal
-        isOpen={!!selectedTrip}
-        onClose={() => setSelectedTrip(null)}
-        trip={selectedTrip}
-        onUpdate={() => {
-          // Handle trip update
-          setSelectedTrip(null);
-        }}
+      {/* Shipment Details Modal */}
+      <ShipmentDetailsModal
+        isOpen={isSlideoutOpen}
+        onClose={handleCloseSlideout}
+        shipment={selectedShipment}
+        onUpdate={handleShipmentUpdate}
       />
 
-      {/* Status Change Confirmation Modal */}
       {dragConfirmation.isOpen && (
         <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
           <div className='bg-white p-6 rounded-lg shadow-xl max-w-md w-full'>
             <h3 className='text-lg font-bold mb-4'>Confirm Status Change</h3>
             <p className='mb-4'>
-              Are you sure you want to move this trip from &quot;
+              Are you sure you want to move this shipment from &quot;
               {dragConfirmation.sourceStatus}&quot; to &quot;
               {dragConfirmation.newStatus}&quot;?
             </p>
@@ -363,7 +427,14 @@ export default function DispatchPage() {
                       <option value=''>Select a carrier</option>
                       <option value='Carrier A'>Carrier A</option>
                       <option value='Carrier B'>Carrier B</option>
+                      <option value='Carrier C'>Carrier C</option>
+                      <option value='Carrier D'>Carrier D</option>
                     </select>
+                    {selectedCarrier === "" && (
+                      <p className='text-red-500 text-xs mt-1'>
+                        Please select a carrier
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className='block text-sm font-medium text-gray-700 mb-2'>
@@ -377,6 +448,14 @@ export default function DispatchPage() {
                       className='w-full border rounded-md p-2'
                       required
                     />
+                    <p className='text-xs text-gray-500 mt-1'>
+                      This number will receive the load tracking link
+                    </p>
+                    {carrierPhone === "" && (
+                      <p className='text-red-500 text-xs mt-1'>
+                        Please enter a phone number
+                      </p>
+                    )}
                   </div>
                 </div>
               )}
@@ -390,10 +469,10 @@ export default function DispatchPage() {
               </button>
               <button
                 onClick={() => handleStatusUpdate(true)}
-                className='px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600'
+                className='px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed'
                 disabled={
                   dragConfirmation.newStatus === "Planned" &&
-                  (!selectedCarrier || !carrierPhone)
+                  (selectedCarrier === "" || carrierPhone === "")
                 }
               >
                 Confirm

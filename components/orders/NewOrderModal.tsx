@@ -5,6 +5,7 @@ import { OrderModalFooter } from "./modal/OrderModalFooter";
 import { CustomerTab } from "./tabs/CustomerTab";
 import { OrderDetailsTab } from "./tabs/OrderDetailsTab";
 import { FinancialsTab } from "./tabs/FinancialsTab";
+import { InitialScreen } from "./modal/InitialScreen";
 
 interface NewOrderModalProps {
   isOpen: boolean;
@@ -65,6 +66,24 @@ export function NewOrderModal({ isOpen, onClose }: NewOrderModalProps) {
 
   const isLastTab = () => {
     return activeTab === "financials";
+  };
+
+  const handleManualEntry = () => {
+    setActiveTab("customer");
+  };
+
+  const handleFileUpload = () => {
+    // TODO: Implement file upload logic
+    console.log("File upload selected");
+    // For now, move to customer tab after upload
+    setActiveTab("customer");
+  };
+
+  const handleFileProcessed = (data: Partial<FormData>) => {
+    setFormData((prev) => ({
+      ...prev,
+      ...data,
+    }));
   };
 
   return (
