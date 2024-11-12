@@ -1,27 +1,68 @@
+export * from "./orders";
+export * from "./carriers";
+export * from "./customers";
+export * from "./common";
+export * from "./trips";
+export * from "./interliners";
+export * from "./masterdata";
+
+// TruckMate API Error Types
+export interface TruckMateError {
+  code: string;
+  message: string;
+  details?: Record<string, unknown>;
+}
+
+export type ErrorCode =
+  | "movedPermanently"
+  | "unauthorized"
+  | "forbidden"
+  | "resourceNotFound"
+  | "methodNotAllowed"
+  | "resourceConflict"
+  | "licenseNotAvailable"
+  | "tooManyRequests"
+  | "serverError"
+  | "belowMinValue"
+  | "exceedsMaxLength"
+  | "invalidJsonArray"
+  | "invalidJsonObject"
+  | "noValidFields"
+  | "invalidJsonValue"
+  | "invalidDateTime"
+  | "invalidDate"
+  | "invalidTime"
+  | "invalidPattern"
+  | "invalidFormat"
+  | "invalidDouble"
+  | "invalidEnum"
+  | "invalidInteger"
+  | "invalidString"
+  | "missingRequiredField"
+  | "invalidQueryParameter"
+  | "invalidDBValue"
+  | "invalidBusinessLogic";
+
+// TruckMate API Response Types
+export interface TruckMateResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: TruckMateError;
+}
+
+export interface PaginatedTruckMateResponse<T> extends TruckMateResponse<T[]> {
+  total: number;
+  page: number;
+  pageSize: number;
+  limit?: number;
+}
+
+// Additional shared types
 export interface SearchResult {
   type: "shipment" | "carrier" | "customer";
   id: string | number;
   title: string;
   subtitle: string;
-}
-
-export interface Shipment {
-  id: number;
-  carrier?: string;
-  customer: string;
-  deliveryLocation: string;
-  deliveryDate: string;
-  deliveryTime: string;
-  dispatchStatus: string;
-  equipmentType: string;
-  planner: string;
-  pickupDate?: string;
-  pickupLocation?: string;
-  planningStatus?: string;
-  pickupTime?: string;
-  rate?: number;
-  referenceNumbers: string;
-  specialInstructions?: string;
 }
 
 export interface WeeklyData {
@@ -40,115 +81,23 @@ export interface RevenueItem {
   total: number;
 }
 
-export interface Location {
-  address: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  confirmed: boolean;
-  confirmationNumber: string;
-  notes?: string;
-  contactName?: string;
-  contactPhone?: string;
-  contactEmail?: string;
+// Query Parameters
+export interface TruckMateQueryParams {
+  page?: number;
+  pageSize?: number;
+  limit?: number;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+  expand?: string[];
+  filter?: string;
 }
 
-export interface Commodity {
-  code: string;
-  description: string;
-  weight: number;
-  pieces: number;
-  pallets: number;
-  cube?: number;
-  volume?: number;
-}
-
-export interface FormData {
-  // Customer Tab
-  customer: string;
-  customerReference: string;
-  customerContact: string;
-  contactPhone: string;
-  contactEmail: string;
-  billingAddress: string;
-
-  // Order Details Tab
-  contractType: string;
-  equipmentType: string;
-  serviceLevel: string;
-  temperatureControlled: boolean;
-  tempMin: string;
-  tempMax: string;
-  commodityCode: string;
-  commodities: Commodity[];
-
-  // Pickup/Delivery Tabs
-  pickupLocations: Location[];
-  deliveryLocations: Location[];
-
-  // Financials Tab
-  customerCharges: Charge[];
-  carrierCharges: Charge[];
-  miscCharges: Charge[];
-
-  // Additional Fields
-  notes: string;
-  accountManager: string;
-  orderPlanner: string;
-  status: string;
-  parentAccount: string;
-  customerId: string;
-  creditStatus: string;
-  weight?: string;
-  pieces?: string;
-  pallets?: string;
-  cube?: string;
-  volume?: string;
-}
-
-export interface Charge {
-  type: string;
-  quantity: number;
-  amount: number;
-}
-
-export interface CarrierData {
-  id: number;
-  name: string;
-  totalShipments: number;
-  totalRevenue: number;
-  avgShipmentRate: number;
-  activeRoutes: number;
-  lastShipmentDate: string;
-}
-
-export interface CustomerData {
-  id: number;
-  name: string;
-  totalShipments: number;
-  totalSpent: number;
-  avgShipmentCost: number;
-  commonLocations: {
-    pickup: string;
-    delivery: string;
-  };
-  lastShipmentDate: string;
-  primaryContact: string;
-  contactPhone: string;
-  contactEmail: string;
-  billingAddress?: string;
-  defaultEquipment: string;
-  requiresTemperatureControl: boolean;
-  defaultTempMin?: string;
-  defaultTempMax?: string;
-}
-
-export interface DashboardCardProps {
-  title: string;
-  items: CountItem[] | RevenueItem[];
-  valueLabel: string;
-}
-
-export interface RevenueChartProps {
-  data: WeeklyData[];
+// API Configuration
+export interface TruckMateConfig {
+  baseUrl: string;
+  apiKey?: string;
+  timeout?: number;
+  retryAttempts?: number;
+  retryDelay?: number;
 }
