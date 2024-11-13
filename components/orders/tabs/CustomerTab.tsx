@@ -1,7 +1,7 @@
 import React from "react";
-import { FormData, Client } from "@/types";
+import { FormData, Client } from "@/types/truckmate";
 import { useQuery } from "@tanstack/react-query";
-import { fetchCustomers } from "@/services/truckMateService";
+import { fetchClients } from "@/services/truckMateService";
 
 interface CustomerTabProps {
   formData: FormData;
@@ -11,7 +11,7 @@ interface CustomerTabProps {
 export function CustomerTab({ formData, setFormData }: CustomerTabProps) {
   const { data: customers, isLoading } = useQuery({
     queryKey: ["customers"],
-    queryFn: fetchCustomers,
+    queryFn: fetchClients,
   });
 
   const handleCustomerChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

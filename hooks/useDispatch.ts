@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchTrips } from "@/services/truckMateService";
-import { Trip } from "@/types";
+import { Trip } from "@/types/truckmate";
 import { useState } from "react";
 
 interface FilteredTrips {

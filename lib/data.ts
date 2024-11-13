@@ -1,4 +1,10 @@
-import { WeeklyData, CountItem, RevenueItem, Trip, Order } from "@/types";
+import {
+  WeeklyData,
+  CountItem,
+  RevenueItem,
+  Trip,
+  Order,
+} from "@/types/truckmate";
 import { fetchOrders, fetchTrips } from "@/services/truckMateService";
 
 // Type guards

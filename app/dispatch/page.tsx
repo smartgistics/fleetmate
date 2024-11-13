@@ -8,7 +8,7 @@ import {
   Draggable,
   DropResult,
 } from "@hello-pangea/dnd";
-import { Trip } from "@/types";
+import { Trip } from "@/types/truckmate";
 import Tabs from "@/components/Tabs";
 import { useDispatch } from "@/hooks/useDispatch";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";

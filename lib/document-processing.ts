@@ -1,4 +1,4 @@
-import type { FormData } from "@/types";
+import type { FormData } from "@/types/truckmate";
 
 type StringFields = Extract<keyof FormData, string>;
 type ExtractableFields = Exclude<

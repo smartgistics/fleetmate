@@ -1,3 +1,5 @@
+import { PaginatedTruckMateResponse } from "./common";
+
 export interface Trip {
   tripId: number;
   orderId: number;
@@ -111,4 +113,8 @@ export interface TripStop {
   // References
   orderNumber?: string;
   referenceNumbers?: string[];
+}
+
+export interface TripsResponse extends PaginatedTruckMateResponse {
+  trips: Trip[];
 }

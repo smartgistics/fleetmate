@@ -1,5 +1,5 @@
 import React from "react";
-import { FormData, ServiceLevel, Commodity } from "@/types";
+import { FormData, ServiceLevel, Commodity } from "@/types/truckmate";
 import { useQuery } from "@tanstack/react-query";
 import { fetchCommodities } from "@/services/truckMateService";
 

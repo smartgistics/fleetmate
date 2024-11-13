@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Trip } from "@/types";
+import { Trip } from "@/types/truckmate";
 
 interface NewTripModalProps {
   isOpen: boolean;

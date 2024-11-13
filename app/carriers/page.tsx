@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Vendor } from "@/types";
+import { Vendor } from "@/types/truckmate";
 import { useQuery } from "@tanstack/react-query";
 import { fetchVendors } from "@/services/truckMateService";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";

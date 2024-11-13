@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Client } from "@/types";
+import { Client } from "@/types/truckmate";
 
 interface CustomerDetailsModalProps {
   isOpen: boolean;

@@ -1,6 +1,6 @@
 "use client";
 
-import { DashboardCardProps } from "@/types";
+import { DashboardCardProps } from "@/types/truckmate";
 import { useDashboard } from "@/hooks/useDashboard";
 import { RevenueChart } from "./RevenueChart";
 
@@ -39,6 +39,23 @@ export function Dashboard() {
     return (
       <div className='w-full h-[500px] bg-gray-200 flex justify-center items-center'>
         <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900' />
+      </div>
+    );
+  }
+
+  const hasData = Object.values(dashboardData).some(
+    (value) => Array.isArray(value) && value.length > 0
+  );
+
+  if (!hasData) {
+    return (
+      <div className='p-6'>
+        <div className='mb-6'>
+          <h1 className='text-2xl font-bold text-gray-900'>Dashboard</h1>
+          <p className='mt-1 text-sm text-gray-500'>
+            No data available at the moment
+          </p>
+        </div>
       </div>
     );
   }

@@ -1,4 +1,4 @@
-import { Order } from "@/types";
+import { Order } from "@/types/truckmate";
 
 interface OrderDetailsModalProps {
   isOpen: boolean;

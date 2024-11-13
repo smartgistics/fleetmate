@@ -1,63 +1,49 @@
 "use client";
 
 import { useState } from "react";
-import { Trip } from "@/types";
+import { Trip } from "@/types/truckmate";
 import { TripDetailsModal } from "@/components/trips/TripDetailsModal";
 import { NewTripModal } from "@/components/trips/NewTripModal";
 import { useTrips } from "@/hooks/useTruckMate";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
+import { Pagination } from "@/components/ui/pagination";
+
+const DEFAULT_LIMIT = 20;
 
 export default function Trips() {
-  const { trips, isLoading, error } = useTrips();
   const [isNewTripModalOpen, setIsNewTripModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<keyof Trip>("tripId");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const [selectedCarrier, setSelectedCarrier] = useState("all");
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
 
-  // Get unique carriers for filter dropdown
-  const uniqueCarriers = Array.isArray(trips)
-    ? [
-        ...new Set(
-          trips
-            .map((trip) => trip.carriers?.[0]?.carrierId)
-            .filter((carrier): carrier is string => carrier !== undefined)
-        ),
-      ]
-    : [];
+  const { trips, isLoading, error, total, params, updateParams } = useTrips({
+    limit: DEFAULT_LIMIT,
+    offset: 0,
+    orderBy: `${sortField} ${sortDirection}`,
+    status: "!CANCELLED,!VOID",
+  });
 
   // Handle sorting
   const handleSort = (field: keyof Trip) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("asc");
-    }
+    const newDirection =
+      sortField === field && sortDirection === "asc" ? "desc" : "asc";
+    setSortField(field);
+    setSortDirection(newDirection);
+    updateParams({ orderBy: `${field} ${newDirection}` });
   };
 
-  // Filter and sort trips
-  const filteredTrips = Array.isArray(trips)
-    ? trips
-        .filter((trip) => {
-          const matchesSearch = Object.values(trip)
-            .join(" ")
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase());
-          const matchesCarrier =
-            selectedCarrier === "all" ||
-            trip.carriers?.[0]?.carrierId === selectedCarrier;
-          return matchesSearch && matchesCarrier;
-        })
-        .sort((a, b) => {
-          if (sortDirection === "asc") {
-            return (a[sortField] ?? "") > (b[sortField] ?? "") ? 1 : -1;
-          }
-          return (a[sortField] ?? "") < (b[sortField] ?? "") ? 1 : -1;
-        })
-    : [];
+  // Handle search
+  const handleSearch = (term: string) => {
+    setSearchTerm(term);
+    updateParams({ search: term, offset: 0 }); // Reset to first record on new search
+  };
+
+  // Handle pagination
+  const handleOffsetChange = (newOffset: number) => {
+    updateParams({ offset: newOffset });
+  };
 
   const handleTripUpdate = (updatedTrip: Trip) => {
     console.log("Trip updated:", updatedTrip);
@@ -66,7 +52,7 @@ export default function Trips() {
 
   if (isLoading) {
     return (
-      <div className='w-full h-[500px] bg-gray-200 flex justify-center items-center'>
+      <div className='w-full h-[500px] flex justify-center items-center'>
         <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900' />
       </div>
     );
@@ -78,16 +64,20 @@ export default function Trips() {
         <Alert variant='destructive'>
           <ExclamationTriangleIcon className='h-4 w-4' />
           <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error.toString()}</AlertDescription>
+          <AlertDescription>{error}</AlertDescription>
         </Alert>
       </div>
     );
   }
 
+  // Calculate current page from offset and limit
+  const currentPage =
+    Math.floor((params.offset || 0) / (params.limit || DEFAULT_LIMIT)) + 1;
+
   return (
-    <div className='p-6 text-gray-900'>
+    <div className='p-6'>
       <div className='flex justify-between items-center mb-6'>
-        <h1 className='text-2xl font-bold text-gray-900'>Trips</h1>
+        <h1 className='text-2xl font-bold'>Trips</h1>
         <button
           className='bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700'
           onClick={() => setIsNewTripModalOpen(true)}
@@ -96,101 +86,68 @@ export default function Trips() {
         </button>
       </div>
 
-      {/* Filters */}
-      <div className='mb-4 flex gap-4'>
+      <div className='mb-4'>
         <input
           type='text'
           placeholder='Search trips...'
-          className='flex-1 px-4 py-2 border rounded text-gray-900 placeholder-gray-500'
+          className='w-full px-4 py-2 border rounded'
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => handleSearch(e.target.value)}
         />
-        <select
-          className='border rounded px-4 py-2 text-gray-900'
-          value={selectedCarrier}
-          onChange={(e) => setSelectedCarrier(e.target.value)}
-        >
-          <option value='all'>All Carriers</option>
-          {uniqueCarriers.map((carrier) => (
-            <option key={carrier} value={carrier}>
-              {carrier}
-            </option>
-          ))}
-        </select>
       </div>
 
-      {/* Table */}
-      <div className='overflow-x-auto'>
-        <table className='min-w-full bg-white border rounded-lg'>
+      <div className='overflow-x-auto bg-white rounded-lg shadow'>
+        <table className='min-w-full'>
           <thead>
-            <tr className='bg-gray-100 text-gray-900'>
-              <th
-                className='px-6 py-3 border-b cursor-pointer hover:bg-gray-200'
-                onClick={() => handleSort("tripId")}
-              >
-                ID{" "}
-                {sortField === "tripId" &&
-                  (sortDirection === "asc" ? "↑" : "↓")}
-              </th>
-              <th className='px-6 py-3 border-b'>Carrier</th>
-              <th
-                className='px-6 py-3 border-b cursor-pointer hover:bg-gray-200'
-                onClick={() => handleSort("customer")}
-              >
-                Customer{" "}
-                {sortField === "customer" &&
-                  (sortDirection === "asc" ? "↑" : "↓")}
-              </th>
-              <th
-                className='px-6 py-3 border-b cursor-pointer hover:bg-gray-200'
-                onClick={() => handleSort("status")}
-              >
-                Status{" "}
-                {sortField === "status" &&
-                  (sortDirection === "asc" ? "↑" : "↓")}
-              </th>
-              <th
-                className='px-6 py-3 border-b cursor-pointer hover:bg-gray-200'
-                onClick={() => handleSort("revenue")}
-              >
-                Revenue{" "}
-                {sortField === "revenue" &&
-                  (sortDirection === "asc" ? "↑" : "↓")}
-              </th>
-              <th
-                className='px-6 py-3 border-b cursor-pointer hover:bg-gray-200'
-                onClick={() => handleSort("scheduledStartDate")}
-              >
-                Start Date{" "}
-                {sortField === "scheduledStartDate" &&
-                  (sortDirection === "asc" ? "↑" : "↓")}
-              </th>
+            <tr className='bg-gray-100'>
+              {[
+                { key: "tripId", label: "Trip ID" },
+                { key: "customer", label: "Customer" },
+                { key: "status", label: "Status" },
+                { key: "deliveryDate", label: "Delivery Date" },
+                { key: "revenue", label: "Revenue" },
+              ].map(({ key, label }) => (
+                <th
+                  key={key}
+                  onClick={() => handleSort(key as keyof Trip)}
+                  className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer'
+                >
+                  {label}
+                  {sortField === key && (sortDirection === "asc" ? " ↑" : " ↓")}
+                </th>
+              ))}
             </tr>
           </thead>
-          <tbody className='text-gray-900'>
-            {filteredTrips.map((trip) => (
+          <tbody className='divide-y divide-gray-200'>
+            {trips.map((trip) => (
               <tr
                 key={trip.tripId}
-                className='hover:bg-gray-50 cursor-pointer'
                 onClick={() => setSelectedTrip(trip)}
+                className='hover:bg-gray-50 cursor-pointer'
               >
-                <td className='px-6 py-4 border-b'>{trip.tripId}</td>
-                <td className='px-6 py-4 border-b'>
-                  {trip.carriers?.[0]?.name || "Unassigned"}
-                </td>
-                <td className='px-6 py-4 border-b'>{trip.customer}</td>
-                <td className='px-6 py-4 border-b'>{trip.status}</td>
-                <td className='px-6 py-4 border-b'>
-                  ${trip.revenue.toLocaleString()}
-                </td>
-                <td className='px-6 py-4 border-b'>
-                  {trip.scheduledStartDate}
-                </td>
+                <td className='px-6 py-4'>{trip.tripId}</td>
+                <td className='px-6 py-4'>{trip.customer}</td>
+                <td className='px-6 py-4'>{trip.status}</td>
+                <td className='px-6 py-4'>{trip.deliveryDate}</td>
+                <td className='px-6 py-4'>${trip.revenue.toLocaleString()}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {total > (params.limit || DEFAULT_LIMIT) && (
+        <div className='mt-4'>
+          <Pagination
+            currentPage={currentPage}
+            pageSize={params.limit || DEFAULT_LIMIT}
+            total={total}
+            onPageChange={(page) =>
+              handleOffsetChange((page - 1) * (params.limit || DEFAULT_LIMIT))
+            }
+          />
+        </div>
+      )}
 
       <NewTripModal
         isOpen={isNewTripModalOpen}

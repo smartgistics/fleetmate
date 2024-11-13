@@ -1,18 +1,4 @@
-import { ServiceLevel, Commodity } from "./common";
-
-// Base interfaces for common patterns
-interface BaseResponse {
-  success: boolean;
-  message?: string;
-  errorCode?: string;
-}
-
-interface PaginatedResponse<T> extends BaseResponse {
-  data: T[];
-  total: number;
-  page: number;
-  pageSize: number;
-}
+import { ServiceLevel, Commodity, PaginatedTruckMateResponse } from "./common";
 
 // Client/Account related types
 export interface Client {
@@ -141,43 +127,22 @@ export interface ChargeCode {
   accessorialCode?: string;
 }
 
-// Eligible Carrier Response
-export interface EligibleCarrierResponse extends BaseResponse {
-  carriers: {
-    carrierId: string;
-    isEligible: boolean;
-    reason?: string;
-  }[];
-}
-
 // Response types
-export interface ClientResponse extends PaginatedResponse<Client> {
+export interface ClientsResponse extends PaginatedTruckMateResponse {
   clients: Client[];
 }
-export interface ServiceLevelResponse extends PaginatedResponse<ServiceLevel> {
+export interface ServiceLevelsResponse extends PaginatedTruckMateResponse {
   serviceLevels: ServiceLevel[];
 }
-export interface CommodityResponse extends PaginatedResponse<Commodity> {
+export interface CommoditiesResponse extends PaginatedTruckMateResponse {
   commodities: Commodity[];
 }
-export interface ChargeCodeResponse extends PaginatedResponse<ChargeCode> {
+export interface ChargeCodesResponse extends PaginatedTruckMateResponse {
   chargeCodes: ChargeCode[];
 }
-export interface DriverResponse extends PaginatedResponse<Driver> {
+export interface DriversResponse extends PaginatedTruckMateResponse {
   drivers: Driver[];
 }
-export interface VendorResponse extends PaginatedResponse<Vendor> {
+export interface VendorsResponse extends PaginatedTruckMateResponse {
   vendors: Vendor[];
-}
-
-// Query parameter types
-export interface MasterDataQueryParams {
-  page?: number;
-  pageSize?: number;
-  search?: string;
-  sortBy?: string;
-  sortOrder?: "asc" | "desc";
-  active?: boolean;
-  expand?: string[];
-  filter?: string;
 }

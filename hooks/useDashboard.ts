@@ -1,6 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { fetchOrders, fetchTrips } from "@/services/truckMateService";
-import { Order, Trip, WeeklyData, CountItem, RevenueItem } from "@/types";
+import {
+  Order,
+  Trip,
+  WeeklyData,
+  CountItem,
+  RevenueItem,
+} from "@/types/truckmate";
 
 // Type guards
 const isOrder = (item: Order | Trip): item is Order => {
@@ -108,14 +115,24 @@ const getWeeklyRevenue = (items: (Order | Trip)[]): WeeklyData[] => {
 };
 
 export function useDashboard() {
-  const { data: orders = [], isLoading: isLoadingOrders } = useQuery({
+  const {
+    data: orders = [],
+    isLoading: isLoadingOrders,
+    error: ordersError,
+  } = useQuery({
     queryKey: ["orders"],
     queryFn: fetchOrders,
+    staleTime: 1000 * 60 * 5,
   });
 
-  const { data: trips = [], isLoading: isLoadingTrips } = useQuery({
+  const {
+    data: trips = [],
+    isLoading: isLoadingTrips,
+    error: tripsError,
+  } = useQuery({
     queryKey: ["trips"],
     queryFn: fetchTrips,
+    staleTime: 1000 * 60 * 5,
   });
 
   const isLoading = isLoadingOrders || isLoadingTrips;
@@ -127,6 +144,38 @@ export function useDashboard() {
     topDestinations: getTopItems(trips, "deliveryLocation"),
     weeklyRevenue: getWeeklyRevenue([...orders, ...trips]),
   };
+
+  // Debugging Logs
+  useEffect(() => {
+    if (orders.length > 0) {
+      console.log("Orders fetched successfully:", orders);
+    } else {
+      console.log("No orders fetched");
+    }
+  }, [orders]);
+
+  useEffect(() => {
+    if (trips.length > 0) {
+      console.log("Trips fetched successfully:", trips);
+    } else {
+      console.log("No trips fetched");
+    }
+  }, [trips]);
+
+  useEffect(() => {
+    if (ordersError) {
+      console.error("Error fetching orders:", ordersError);
+    }
+    if (tripsError) {
+      console.error("Error fetching trips:", tripsError);
+    }
+  }, [ordersError, tripsError]);
+
+  console.log("Dashboard Data:", {
+    ordersCount: orders.length,
+    tripsCount: trips.length,
+    dashboardData,
+  });
 
   return {
     dashboardData,

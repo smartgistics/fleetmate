@@ -1,3 +1,5 @@
+import { PaginatedTruckMateResponse } from "./common";
+
 export interface Order {
   orderId: number;
   billTo: string;
@@ -46,4 +48,8 @@ export interface Order {
   temperatureUnits: string;
   distance: number;
   distanceUnits: string;
+}
+
+export interface OrdersResponse extends PaginatedTruckMateResponse {
+  orders: Order[];
 }

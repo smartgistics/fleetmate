@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FormData, Charge } from "@/types";
+import { FormData, Charge } from "@/types/truckmate";
 
 interface FinancialsTabProps {
   formData: FormData;

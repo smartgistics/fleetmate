@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { SearchResult } from "@/types";
+import type { SearchResult } from "@/types/truckmate";
 
 export function GlobalSearch() {
   const [searchTerm, setSearchTerm] = useState("");

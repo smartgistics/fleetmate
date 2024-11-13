@@ -7,7 +7,7 @@ import { createWorker } from "tesseract.js";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
-import type { FormData } from "@/types";
+import type { FormData } from "@/types/truckmate";
 import { mapExcelToFormData } from "@/lib/document-processing";
 
 interface FileUploaderProps {

@@ -1,4 +1,4 @@
-import { Trip } from "@/types";
+import { Trip } from "@/types/truckmate";
 
 interface TripDetailsModalProps {
   isOpen: boolean;

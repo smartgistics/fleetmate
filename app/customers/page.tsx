@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Client } from "@/types";
-import { useQuery } from "@tanstack/react-query";
-import { fetchCustomers } from "@/services/truckMateService";
+import { Client } from "@/types/truckmate";
+import { useCustomers } from "@/hooks/useTruckMate";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import CustomerDetailsModal from "@/components/CustomerDetailsModal";
+import { Pagination } from "@/components/ui/pagination";
+
+const DEFAULT_LIMIT = 20;
 
 export default function Customers() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -14,44 +16,36 @@ export default function Customers() {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [selectedCustomer, setSelectedCustomer] = useState<Client | null>(null);
 
-  const {
-    data: customers = [],
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["customers"],
-    queryFn: fetchCustomers,
-  });
+  const { customers, isLoading, error, total, params, updateParams } =
+    useCustomers({
+      limit: DEFAULT_LIMIT,
+      offset: 0,
+      orderBy: `${sortField} ${sortDirection}`,
+    });
 
+  // Handle sorting
   const handleSort = (field: keyof Client) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("asc");
-    }
+    const newDirection =
+      sortField === field && sortDirection === "asc" ? "desc" : "asc";
+    setSortField(field);
+    setSortDirection(newDirection);
+    updateParams({ orderBy: `${field} ${newDirection}` });
   };
 
-  // Filter and sort customers
-  const filteredCustomers = Array.isArray(customers)
-    ? customers
-        .filter((customer) =>
-          Object.values(customer)
-            .join(" ")
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase())
-        )
-        .sort((a, b) => {
-          if (sortDirection === "asc") {
-            return (a[sortField] ?? "") > (b[sortField] ?? "") ? 1 : -1;
-          }
-          return (a[sortField] ?? "") < (b[sortField] ?? "") ? 1 : -1;
-        })
-    : [];
+  // Handle search
+  const handleSearch = (term: string) => {
+    setSearchTerm(term);
+    updateParams({ search: term, offset: 0 }); // Reset to first record on new search
+  };
+
+  // Handle pagination
+  const handleOffsetChange = (newOffset: number) => {
+    updateParams({ offset: newOffset });
+  };
 
   if (isLoading) {
     return (
-      <div className='w-full h-[500px] bg-gray-200 flex justify-center items-center'>
+      <div className='w-full h-[500px] flex justify-center items-center'>
         <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900' />
       </div>
     );
@@ -63,107 +57,90 @@ export default function Customers() {
         <Alert variant='destructive'>
           <ExclamationTriangleIcon className='h-4 w-4' />
           <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error.toString()}</AlertDescription>
+          <AlertDescription>{error}</AlertDescription>
         </Alert>
       </div>
     );
   }
 
+  // Calculate current page from offset and limit
+  const currentPage =
+    Math.floor((params.offset || 0) / (params.limit || DEFAULT_LIMIT)) + 1;
+
   return (
     <div className='p-6 text-gray-900'>
       <div className='flex justify-between items-center mb-6'>
-        <h1 className='text-2xl font-bold text-gray-900'>Customers</h1>
+        <h1 className='text-2xl font-bold'>Customers</h1>
         <button className='bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700'>
           Add Customer
         </button>
       </div>
 
-      {/* Search */}
       <div className='mb-4'>
         <input
           type='text'
           placeholder='Search customers...'
-          className='w-full px-4 py-2 border rounded text-gray-900 placeholder-gray-500'
+          className='w-full px-4 py-2 border rounded'
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => handleSearch(e.target.value)}
         />
       </div>
 
-      {/* Table */}
-      <div className='overflow-x-auto'>
-        <table className='min-w-full bg-white border rounded-lg'>
+      <div className='overflow-x-auto shadow'>
+        <table className='min-w-full bg-white rounded-lg border'>
           <thead>
-            <tr className='bg-gray-100 text-gray-900'>
-              <th
-                className='px-6 py-3 border-b cursor-pointer hover:bg-gray-200'
-                onClick={() => handleSort("name")}
-              >
-                Customer Name{" "}
-                {sortField === "name" && (sortDirection === "asc" ? "↑" : "↓")}
-              </th>
-              <th
-                className='px-6 py-3 border-b cursor-pointer hover:bg-gray-200'
-                onClick={() => handleSort("type")}
-              >
-                Type{" "}
-                {sortField === "type" && (sortDirection === "asc" ? "↑" : "↓")}
-              </th>
-              <th
-                className='px-6 py-3 border-b cursor-pointer hover:bg-gray-200'
-                onClick={() => handleSort("status")}
-              >
-                Status{" "}
-                {sortField === "status" &&
-                  (sortDirection === "asc" ? "↑" : "↓")}
-              </th>
-              <th
-                className='px-6 py-3 border-b cursor-pointer hover:bg-gray-200'
-                onClick={() => handleSort("creditStatus")}
-              >
-                Credit Status{" "}
-                {sortField === "creditStatus" &&
-                  (sortDirection === "asc" ? "↑" : "↓")}
-              </th>
-              <th
-                className='px-6 py-3 border-b cursor-pointer hover:bg-gray-200'
-                onClick={() => handleSort("accountNumber")}
-              >
-                Account Number{" "}
-                {sortField === "accountNumber" &&
-                  (sortDirection === "asc" ? "↑" : "↓")}
-              </th>
-              <th
-                className='px-6 py-3 border-b cursor-pointer hover:bg-gray-200'
-                onClick={() => handleSort("paymentTerms")}
-              >
-                Payment Terms{" "}
-                {sortField === "paymentTerms" &&
-                  (sortDirection === "asc" ? "↑" : "↓")}
-              </th>
+            <tr className='bg-gray-100'>
+              {[
+                { key: "name", label: "Customer Name" },
+                { key: "type", label: "Type" },
+                { key: "status", label: "Status" },
+                { key: "creditStatus", label: "Credit Status" },
+                { key: "accountNumber", label: "Account Number" },
+                { key: "paymentTerms", label: "Payment Terms" },
+              ].map(({ key, label }) => (
+                <th
+                  key={key}
+                  onClick={() => handleSort(key as keyof Client)}
+                  className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer'
+                >
+                  {label}
+                  {sortField === key && (sortDirection === "asc" ? " ↑" : " ↓")}
+                </th>
+              ))}
             </tr>
           </thead>
-          <tbody className='text-gray-900'>
-            {filteredCustomers.map((customer) => (
+          <tbody className='divide-y divide-gray-200'>
+            {customers.map((customer) => (
               <tr
                 key={customer.id}
-                className='hover:bg-gray-50 cursor-pointer'
                 onClick={() => setSelectedCustomer(customer)}
+                className='hover:bg-gray-50 cursor-pointer'
               >
-                <td className='px-6 py-4 border-b font-medium'>
-                  {customer.name}
-                </td>
-                <td className='px-6 py-4 border-b'>{customer.type}</td>
-                <td className='px-6 py-4 border-b'>{customer.status}</td>
-                <td className='px-6 py-4 border-b'>{customer.creditStatus}</td>
-                <td className='px-6 py-4 border-b'>{customer.accountNumber}</td>
-                <td className='px-6 py-4 border-b'>{customer.paymentTerms}</td>
+                <td className='px-6 py-4 font-medium'>{customer.name}</td>
+                <td className='px-6 py-4'>{customer.type}</td>
+                <td className='px-6 py-4'>{customer.status}</td>
+                <td className='px-6 py-4'>{customer.creditStatus}</td>
+                <td className='px-6 py-4'>{customer.accountNumber}</td>
+                <td className='px-6 py-4'>{customer.paymentTerms}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      {/* Details Modal */}
+      {total > (params.limit || DEFAULT_LIMIT) && (
+        <div className='mt-4'>
+          <Pagination
+            currentPage={currentPage}
+            pageSize={params.limit || DEFAULT_LIMIT}
+            total={total}
+            onPageChange={(page) =>
+              handleOffsetChange((page - 1) * (params.limit || DEFAULT_LIMIT))
+            }
+          />
+        </div>
+      )}
+
       {selectedCustomer && (
         <CustomerDetailsModal
           isOpen={!!selectedCustomer}

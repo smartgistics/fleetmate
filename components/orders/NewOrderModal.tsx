@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { FormData } from "@/types";
+import { FormData } from "@/types/truckmate";
 import { OrderModalTabs } from "./modal/OrderModalTabs";
 import { OrderModalFooter } from "./modal/OrderModalFooter";
 import { CustomerTab } from "./tabs/CustomerTab";

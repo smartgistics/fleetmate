@@ -10,7 +10,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { RevenueChartProps } from "@/types";
+import { RevenueChartProps } from "@/types/truckmate";
 
 const formatDate = (dateString: string): string => {
   const date = new Date(dateString);

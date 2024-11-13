@@ -10,7 +10,7 @@ import {
   DropResult,
 } from "@hello-pangea/dnd";
 import Tabs from "@/components/Tabs";
-import type { Order, Trip } from "@/types";
+import type { Order, Trip } from "@/types/truckmate";
 import { useOrders } from "@/hooks/useTruckMate";
 import { useDispatch } from "@/hooks/useDispatch";
 import { Card } from "@/components/ui/card";

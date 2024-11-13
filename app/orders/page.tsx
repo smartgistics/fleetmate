@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Order } from "@/types";
+import { Order } from "@/types/truckmate";
 import { OrderDetailsModal } from "@/components/orders/OrderDetailsModal";
 import { NewOrderModal } from "@/components/orders/NewOrderModal";
 import { useOrders } from "@/hooks/useTruckMate";
@@ -10,41 +10,42 @@ import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import { OrdersFilters } from "@/components/orders/filters/OrdersFilters";
 import { OrdersTableHeader } from "@/components/orders/table/OrdersTableHeader";
 import { OrdersTableRow } from "@/components/orders/table/OrdersTableRow";
+import { Pagination } from "@/components/ui/pagination";
+
+const DEFAULT_LIMIT = 20;
 
 export default function Orders() {
-  const { orders, isLoading, error } = useOrders();
   const [isNewOrderModalOpen, setIsNewOrderModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<keyof Order>("orderId");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
+  const { orders, isLoading, error, total, params, updateParams } = useOrders({
+    limit: DEFAULT_LIMIT,
+    offset: 0,
+    orderBy: `${sortField} ${sortDirection}`,
+  });
+
   // Handle sorting
   const handleSort = (field: keyof Order) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("asc");
-    }
+    const newDirection =
+      sortField === field && sortDirection === "asc" ? "desc" : "asc";
+    setSortField(field);
+    setSortDirection(newDirection);
+    updateParams({ orderBy: `${field} ${newDirection}` });
   };
 
-  // Filter and sort orders
-  const filteredOrders = Array.isArray(orders)
-    ? orders
-        .filter((order) =>
-          Object.values(order)
-            .join(" ")
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase())
-        )
-        .sort((a, b) => {
-          if (sortDirection === "asc") {
-            return (a[sortField] ?? "") > (b[sortField] ?? "") ? 1 : -1;
-          }
-          return (a[sortField] ?? "") < (b[sortField] ?? "") ? 1 : -1;
-        })
-    : [];
+  // Handle search
+  const handleSearch = (term: string) => {
+    setSearchTerm(term);
+    updateParams({ search: term, offset: 0 }); // Reset to first page on new search
+  };
+
+  // Handle pagination
+  const handleOffsetChange = (newOffset: number) => {
+    updateParams({ offset: newOffset });
+  };
 
   const handleOrderUpdate = (updatedOrder: Order) => {
     console.log("Order updated:", updatedOrder);
@@ -53,7 +54,7 @@ export default function Orders() {
 
   if (isLoading) {
     return (
-      <div className='w-full h-[500px] bg-gray-200 flex justify-center items-center'>
+      <div className='w-full h-[500px] flex justify-center items-center'>
         <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900' />
       </div>
     );
@@ -65,16 +66,20 @@ export default function Orders() {
         <Alert variant='destructive'>
           <ExclamationTriangleIcon className='h-4 w-4' />
           <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error.toString()}</AlertDescription>
+          <AlertDescription>{error}</AlertDescription>
         </Alert>
       </div>
     );
   }
 
+  // Calculate current page from offset and limit
+  const currentPage =
+    Math.floor((params.offset || 0) / (params.limit || DEFAULT_LIMIT)) + 1;
+
   return (
     <div className='p-6 text-gray-900'>
       <div className='flex justify-between items-center mb-6'>
-        <h1 className='text-2xl font-bold text-gray-900'>Orders</h1>
+        <h1 className='text-2xl font-bold'>Orders</h1>
         <button
           className='bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700'
           onClick={() => setIsNewOrderModalOpen(true)}
@@ -83,10 +88,10 @@ export default function Orders() {
         </button>
       </div>
 
-      <OrdersFilters searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+      <OrdersFilters searchTerm={searchTerm} setSearchTerm={handleSearch} />
 
-      <div className='overflow-x-auto'>
-        <table className='min-w-full bg-white border rounded-lg'>
+      <div className='overflow-x-auto shadow'>
+        <table className='min-w-full bg-white rounded-lg border'>
           <thead>
             <OrdersTableHeader
               sortField={sortField}
@@ -95,9 +100,9 @@ export default function Orders() {
             />
           </thead>
           <tbody className='text-gray-900'>
-            {filteredOrders.map((order) => (
+            {orders.map((order) => (
               <OrdersTableRow
-                key={`order-${order.orderId}`}
+                key={order.orderId}
                 order={order}
                 onClick={() => setSelectedOrder(order)}
               />
@@ -105,6 +110,19 @@ export default function Orders() {
           </tbody>
         </table>
       </div>
+
+      {total > (params.limit || DEFAULT_LIMIT) && (
+        <div className='mt-4'>
+          <Pagination
+            currentPage={currentPage}
+            pageSize={params.limit || DEFAULT_LIMIT}
+            total={total}
+            onPageChange={(page) =>
+              handleOffsetChange((page - 1) * (params.limit || DEFAULT_LIMIT))
+            }
+          />
+        </div>
+      )}
 
       {isNewOrderModalOpen && (
         <NewOrderModal

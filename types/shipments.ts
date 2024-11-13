@@ -10,4 +10,4 @@ export interface Shipment {
   dispatch_status: string;
   planner: string;
   planning_status: string;
-} 
+}
