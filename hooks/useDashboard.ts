@@ -35,7 +35,7 @@ const getTopItems = (
     let value: string;
 
     if (key === "carriers") {
-      value = item.carriers?.[0]?.carrierId || "Unknown";
+      value = item.carriers?.[0]?.name || "Unknown";
     } else if (key === "originZone" || key === "destinationZone") {
       value = String(item[key] || "Unknown");
     } else {
@@ -58,7 +58,7 @@ const getItemValue = (item: Order | Trip, key: ValidKeys): string => {
     if (key in item) return String(item[key as keyof Order]);
   }
   if (isTrip(item)) {
-    if (key === "carriers") return item.carriers?.[0]?.carrierId || "Unknown";
+    if (key === "carriers") return item.carriers?.[0]?.name || "Unknown";
     if (key in item) return String(item[key as keyof Trip]);
   }
   return "Unknown";

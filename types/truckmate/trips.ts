@@ -1,5 +1,5 @@
-import { Carrier } from "./carriers";
 import { PaginatedTruckMateResponse, TruckMateQueryParams } from "./common";
+import { Vendor } from "./masterdata";
 
 export interface Trip {
   tripNumber: number;
@@ -36,7 +36,7 @@ export interface Trip {
   isActive?: boolean;
   eTA?: string; // Estimated Time of Arrival
   eTD?: string; // Estimated Time of Departure
-  carriers?: Carrier[];
+  carriers?: Vendor[];
 }
 
 export interface TripStop {

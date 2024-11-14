@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { Vendor } from "@/types/truckmate";
-import { useQuery } from "@tanstack/react-query";
-import { fetchVendors } from "@/services/truckMateService";
+import { useVendors } from "@/hooks/useVendors";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 
-type SortableFields = keyof Vendor;
+type SortableFields = keyof Pick<
+  Vendor,
+  "vendorId" | "name" | "isActive" | "insurance" | "liability" | "vendorSince"
+>;
 
 export default function Carriers() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -15,14 +17,7 @@ export default function Carriers() {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [selectedCarrier, setSelectedCarrier] = useState<Vendor | null>(null);
 
-  const {
-    data: carriers = [],
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["vendors"],
-    queryFn: () => fetchVendors("linehaulCarrier"), // Filter for carriers only
-  });
+  const { vendors: carriers, isLoading, error } = useVendors("linehaulCarrier");
 
   // Handle sorting
   const handleSort = (field: SortableFields) => {
@@ -37,21 +32,27 @@ export default function Carriers() {
   // Filter and sort carriers
   const filteredCarriers = carriers
     .filter((carrier) =>
-      Object.values(carrier)
+      Object.values({
+        name: carrier.name,
+        vendorId: carrier.vendorId,
+        city: carrier.city,
+        province: carrier.province,
+      })
         .join(" ")
         .toLowerCase()
         .includes(searchTerm.toLowerCase())
     )
     .sort((a, b) => {
-      if (sortDirection === "asc") {
-        return (a[sortField] ?? "") > (b[sortField] ?? "") ? 1 : -1;
-      }
-      return (a[sortField] ?? "") < (b[sortField] ?? "") ? 1 : -1;
+      const aValue = a[sortField]?.toString() || "";
+      const bValue = b[sortField]?.toString() || "";
+      return sortDirection === "asc"
+        ? aValue.localeCompare(bValue)
+        : bValue.localeCompare(aValue);
     });
 
   if (isLoading) {
     return (
-      <div className='w-full h-[500px] bg-gray-200 flex justify-center items-center'>
+      <div className='w-full h-[500px] flex justify-center items-center'>
         <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900' />
       </div>
     );
@@ -63,16 +64,18 @@ export default function Carriers() {
         <Alert variant='destructive'>
           <ExclamationTriangleIcon className='h-4 w-4' />
           <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error.toString()}</AlertDescription>
+          <AlertDescription>
+            {error instanceof Error ? error.message : "Failed to load carriers"}
+          </AlertDescription>
         </Alert>
       </div>
     );
   }
 
   return (
-    <div className='p-6 text-gray-900'>
+    <div className='p-6'>
       <div className='flex justify-between items-center mb-6'>
-        <h1 className='text-2xl font-bold text-gray-900'>Carriers</h1>
+        <h1 className='text-2xl font-bold'>Carriers</h1>
         <button className='bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700'>
           Add Carrier
         </button>
@@ -83,7 +86,7 @@ export default function Carriers() {
         <input
           type='text'
           placeholder='Search carriers...'
-          className='w-full px-4 py-2 border rounded text-gray-900 placeholder-gray-500'
+          className='w-full px-4 py-2 border rounded'
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
@@ -93,7 +96,7 @@ export default function Carriers() {
       <div className='overflow-x-auto'>
         <table className='min-w-full bg-white border rounded-lg'>
           <thead>
-            <tr className='bg-gray-100 text-gray-900'>
+            <tr className='bg-gray-100'>
               <th
                 className='px-6 py-3 border-b cursor-pointer hover:bg-gray-200'
                 onClick={() => handleSort("vendorId")}
@@ -111,18 +114,10 @@ export default function Carriers() {
               </th>
               <th
                 className='px-6 py-3 border-b cursor-pointer hover:bg-gray-200'
-                onClick={() => handleSort("status")}
+                onClick={() => handleSort("isActive")}
               >
                 Status{" "}
-                {sortField === "status" &&
-                  (sortDirection === "asc" ? "↑" : "↓")}
-              </th>
-              <th
-                className='px-6 py-3 border-b cursor-pointer hover:bg-gray-200'
-                onClick={() => handleSort("dotNumber")}
-              >
-                DOT Number{" "}
-                {sortField === "dotNumber" &&
+                {sortField === "isActive" &&
                   (sortDirection === "asc" ? "↑" : "↓")}
               </th>
               <th
@@ -135,6 +130,14 @@ export default function Carriers() {
               </th>
               <th
                 className='px-6 py-3 border-b cursor-pointer hover:bg-gray-200'
+                onClick={() => handleSort("liability")}
+              >
+                Liability{" "}
+                {sortField === "liability" &&
+                  (sortDirection === "asc" ? "↑" : "↓")}
+              </th>
+              <th
+                className='px-6 py-3 border-b cursor-pointer hover:bg-gray-200'
                 onClick={() => handleSort("vendorSince")}
               >
                 Vendor Since{" "}
@@ -143,7 +146,7 @@ export default function Carriers() {
               </th>
             </tr>
           </thead>
-          <tbody className='text-gray-900'>
+          <tbody>
             {filteredCarriers.map((carrier) => (
               <tr
                 key={carrier.vendorId}
@@ -154,9 +157,11 @@ export default function Carriers() {
                 <td className='px-6 py-4 border-b font-medium'>
                   {carrier.name}
                 </td>
-                <td className='px-6 py-4 border-b'>{carrier.status}</td>
-                <td className='px-6 py-4 border-b'>{carrier.dotNumber}</td>
+                <td className='px-6 py-4 border-b'>
+                  {carrier.isActive === "True" ? "Active" : "Inactive"}
+                </td>
                 <td className='px-6 py-4 border-b'>{carrier.insurance}</td>
+                <td className='px-6 py-4 border-b'>{carrier.liability}</td>
                 <td className='px-6 py-4 border-b'>{carrier.vendorSince}</td>
               </tr>
             ))}
@@ -184,36 +189,45 @@ export default function Carriers() {
               </div>
               <div>
                 <label className='font-medium'>Status</label>
-                <p>{selectedCarrier.status}</p>
-              </div>
-              <div>
-                <label className='font-medium'>DOT Number</label>
-                <p>{selectedCarrier.dotNumber}</p>
+                <p>
+                  {selectedCarrier.isActive === "True" ? "Active" : "Inactive"}
+                </p>
               </div>
               <div>
                 <label className='font-medium'>Insurance</label>
                 <p>{selectedCarrier.insurance}</p>
               </div>
               <div>
+                <label className='font-medium'>Liability</label>
+                <p>{selectedCarrier.liability}</p>
+              </div>
+              <div>
                 <label className='font-medium'>Contact</label>
                 <p>{selectedCarrier.contact}</p>
               </div>
               <div>
-                <label className='font-medium'>Email</label>
-                <p>{selectedCarrier.email}</p>
+                <label className='font-medium'>Business Phone</label>
+                <p>
+                  {selectedCarrier.businessPhone}
+                  {selectedCarrier.businessPhoneExt &&
+                    ` ext. ${selectedCarrier.businessPhoneExt}`}
+                </p>
               </div>
               <div>
-                <label className='font-medium'>Phone</label>
-                <p>{selectedCarrier.businessPhone}</p>
+                <label className='font-medium'>Fax</label>
+                <p>{selectedCarrier.faxPhone}</p>
               </div>
               <div>
                 <label className='font-medium'>Address</label>
                 <p>
                   {selectedCarrier.address1}
-                  {selectedCarrier.address2 && `, ${selectedCarrier.address2}`}
+                  {selectedCarrier.address2 && <br />}
+                  {selectedCarrier.address2}
                   <br />
                   {selectedCarrier.city}, {selectedCarrier.province}{" "}
                   {selectedCarrier.postalCode}
+                  <br />
+                  {selectedCarrier.country}
                 </p>
               </div>
             </div>

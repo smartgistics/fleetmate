@@ -9,6 +9,7 @@ import {
   VendorsResponse,
   Client,
   TripsQueryParams,
+  Vendor,
 } from "@/types/truckmate";
 
 const TRUCKMATE_API_URL = process.env.TRUCKMATE_API_URL;
@@ -292,6 +293,7 @@ export const fetchClients = async (
 };
 
 export const fetchVendors = async (
+  vendorType?: Vendor["vendorType"],
   params: TruckMateQueryParams = {}
 ): Promise<VendorsResponse> => {
   if (!TM_MASTERDATA_API_URL) {
@@ -300,11 +302,15 @@ export const fetchVendors = async (
 
   const queryParams = new URLSearchParams();
 
+  // Add vendorType filter if provided
+  if (vendorType) {
+    queryParams.set("$filter", `vendorType eq '${vendorType}'`);
+  }
+
   if (params.limit !== undefined)
     queryParams.set("limit", params.limit.toString());
   if (params.offset !== undefined)
     queryParams.set("offset", params.offset.toString());
-  if (params.filter) queryParams.set("$filter", params.filter);
   if (params.select) queryParams.set("$select", params.select.join(","));
   if (params.orderBy) queryParams.set("$orderBy", params.orderBy);
   if (params.expand) queryParams.set("expand", params.expand.join(","));

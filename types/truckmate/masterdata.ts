@@ -111,7 +111,6 @@ export interface Driver {
 // Vendor/Carrier types
 export interface Vendor {
   vendorId: string;
-  name: string;
   vendorType:
     | "agentCarrier"
     | "agentSales"
@@ -126,9 +125,7 @@ export interface Vendor {
     | "rental"
     | "supplier"
     | "vendor";
-  status: string;
-
-  // Contact Info
+  name: string;
   address1: string;
   address2?: string;
   city: string;
@@ -138,26 +135,36 @@ export interface Vendor {
   businessPhone?: string;
   businessPhoneExt?: string;
   faxPhone?: string;
-  contact?: string;
-  email?: string;
-
-  // Business Details
-  defaultZone?: string;
   vendorSince?: string;
+  contact?: string;
+  defaultZone?: string;
+  isInactive?: "True" | "False";
   insurance?: string;
   liability?: string;
-  cargo?: string;
-  workComp?: string;
-  iccNumber?: string;
-  w9?: string;
-  federalId?: string;
-  dotNumber?: string;
-
-  // Operational Settings
-  webEnabled?: boolean;
-  isInactive?: boolean;
-  defaultTerminal?: string;
-  rateMode?: string;
+  previousCode?: string;
+  shortDescription?: string;
+  longDescription?: string;
+  isActive?: "True" | "False" | "";
+  webEnabled?: "True" | "False" | "";
+  user1?: string;
+  user2?: string;
+  user3?: string;
+  user4?: string;
+  user5?: string;
+  user6?: string;
+  user7?: string;
+  user8?: string;
+  user9?: string;
+  user10?: string;
+  tariffClasses?: VendorTariffClass[];
+  rateSheetLinks?: RateSheetLink[];
+  contacts?: Contact[];
+  discounts?: Discount[];
+  d83s?: D83[];
+  aChargeSplits?: AChargeSplit[];
+  aChargeCodes?: AChargeCode[];
+  customDefs?: CustomDef[];
+  travelModes?: TravelMode[];
 }
 
 // Charge Code types
@@ -189,4 +196,158 @@ export interface DriversResponse extends PaginatedTruckMateResponse {
 }
 export interface VendorsResponse extends PaginatedTruckMateResponse {
   vendors: Vendor[];
+}
+
+// Vendor related interfaces
+interface VendorTariffClass {
+  tariffClassId: number;
+  vendorId: string;
+  description?: string;
+  effectiveFrom?: string; // DateTime: yyyy-MM-ddThh:mm:ss
+  effectiveTo?: string; // DateTime: yyyy-MM-ddThh:mm:ss
+  multiServiceLevels?: VendorMultiServiceLevel[];
+}
+
+interface VendorMultiServiceLevel {
+  multiServiceLevelId: number;
+  tariffClassId: number;
+  serviceLevel: string; // Max length 10
+  remarks?: string; // Max length 100
+  isDefault?: boolean;
+}
+
+interface RateSheetLink {
+  rateSheetLinkId: number;
+  vendorId: string;
+  rateSheetId: number;
+  effectiveFrom?: string; // DateTime: yyyy-MM-ddThh:mm:ss
+  effectiveTo?: string; // DateTime: yyyy-MM-ddThh:mm:ss
+  description?: string; // Max length 40
+}
+
+interface Contact {
+  contactId: number;
+  vendorId: string;
+  name: string; // Max length 40
+  title?: string; // Max length 20
+  phone?: string; // Max length 20
+  phoneExt?: string; // Max length 5
+  cell?: string; // Max length 20
+  fax?: string; // Max length 20
+  email?: string; // Max length 128
+  comment?: string; // Max length 240
+  contactType?: string; // Max length 20
+}
+
+interface Discount {
+  discountId: number;
+  vendorId: string;
+  description?: string; // Max length 40
+  effectiveFrom?: string; // DateTime: yyyy-MM-ddThh:mm:ss
+  effectiveTo?: string; // DateTime: yyyy-MM-ddThh:mm:ss
+  discountPercentage?: number;
+  minimumAmount?: number;
+  customSQL?: string; // Max length 131072
+}
+
+interface D83 {
+  d83Id: number;
+  vendorId: string;
+  splitPlusPercentage?: "True" | "False" | "";
+  exceedMinimum?: "True" | "False" | "";
+  addOnPercentage?: number;
+  carrierDiscount?: number;
+  effectiveFrom?: string; // DateTime: yyyy-MM-ddThh:mm:ss
+  effectiveTo?: string; // DateTime: yyyy-MM-ddThh:mm:ss
+  carrierMaximum?: number;
+  carrierMinimum?: number;
+  description?: string; // Max length 40
+  destinationEndingZip?: string; // Max length 10
+  destinationStartingZip?: string; // Max length 10
+  endZone?: string; // Max length 10
+  originEndingZip?: string; // Max length 10
+  originStartingZip?: string; // Max length 10
+  sequence?: number;
+}
+
+interface AChargeSplit {
+  aChargeSplitId: number;
+  vendorId: string;
+  aChargeCodeId: string; // Max length 10
+  splitPercentage?: number;
+  effectiveFrom?: string; // DateTime: yyyy-MM-ddThh:mm:ss
+  effectiveTo?: string; // DateTime: yyyy-MM-ddThh:mm:ss
+  description?: string; // Max length 40
+}
+
+interface AChargeCode {
+  aChargeCodeId: string; // Max length 10
+  vendorId: string;
+  description?: string; // Max length 40
+  effectiveFrom?: string; // DateTime: yyyy-MM-ddThh:mm:ss
+  effectiveTo?: string; // DateTime: yyyy-MM-ddThh:mm:ss
+  carrierMovementType?:
+    | "advance"
+    | "any"
+    | "beyond"
+    | "crossdock"
+    | "linehaul"
+    | "other";
+  passType?: "none" | "percentage" | "quantity";
+  thresholdAmount?: number;
+  excludeLegs?: "True" | "False";
+  aChargeDetails?: AChargeDetail[];
+  valuations?: AChargeValuation[];
+  restrictBillTypes?: RestrictBillType[];
+}
+
+interface AChargeDetail {
+  aChargeDetailId: number;
+  aChargeCodeId: string;
+  factor: number;
+  effectiveFrom?: string; // DateTime: yyyy-MM-ddThh:mm:ss
+  effectiveTo?: string; // DateTime: yyyy-MM-ddThh:mm:ss
+  multiVendors?: MultiVendor[];
+  multiServiceLevels?: AChargeDetailMultiServiceLevel[];
+}
+
+interface AChargeValuation {
+  valuationId: number;
+  aChargeCodeId: string;
+  valuation: string; // Max length 10
+}
+
+interface RestrictBillType {
+  restrictBillTypeId: number;
+  aChargeCodeId: string;
+  billType: string; // Max length 10
+}
+
+interface MultiVendor {
+  multiVendorId: number;
+  aChargeDetailId: number;
+  vendorId: string; // Max length 10
+}
+
+interface AChargeDetailMultiServiceLevel {
+  multiServiceLevelId: number;
+  aChargeDetailId: number;
+  aChargeCodeId: string; // Max length 10
+  serviceLevel: string; // Max length 10
+}
+
+interface CustomDef {
+  customDefId: number;
+  customLabel: string;
+  customValue: string | number;
+  customType?: string;
+  sequence?: number;
+}
+
+interface TravelMode {
+  vendorId: string;
+  travelMode: string; // Max length 10
+  remarks?: string; // Max length 100
+  matrixId?: number;
+  isDefault?: boolean;
 }
