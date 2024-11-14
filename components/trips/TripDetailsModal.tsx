@@ -38,7 +38,7 @@ export function TripDetailsModal({
                   Carrier
                 </label>
                 <p className='mt-1'>
-                  {trip.carriers?.[0]?.name || "Unassigned"}
+                  {trip.carriers?.[0]?.vendor?.name || "Unassigned"}
                 </p>
               </div>
               <div>
