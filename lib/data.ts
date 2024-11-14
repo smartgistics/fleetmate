@@ -4,7 +4,7 @@ import { fetchOrders, fetchTrips } from "@/services/truckMateService";
 
 // Type guards
 const isOrder = (item: Order | Trip): item is Order => {
-  return "billTo" in item && "totalCharges" in item;
+  return "billToCode" in item && "totalCharges" in item;
 };
 
 const isTrip = (item: Order | Trip): item is Trip => {

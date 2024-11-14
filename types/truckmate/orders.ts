@@ -1,4 +1,5 @@
 import { PaginatedTruckMateResponse } from "./common";
+import { Client } from "./masterdata";
 
 export interface Order {
   orderId: number;
@@ -32,6 +33,9 @@ export interface Order {
   cashCollect: string;
   codAmount: number | null;
   currencyCode: string;
+
+  // Expanded Data (from API expansion)
+  billToCustomer?: Client;
 
   // Measurements
   weight: number;

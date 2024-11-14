@@ -64,7 +64,7 @@ export function OperationsColumn({
                       </div>
                     </div>
                     <div className='truncate text-[11px] text-gray-800'>
-                      {isOrder(item) ? item.billTo : "Customer Name"}
+                      {isOrder(item) ? item.billToCode : "Customer Name"}
                     </div>
                     <div className='text-[11px] font-medium text-gray-800'>
                       {isOrder(item)

@@ -13,7 +13,7 @@ export function OrdersTableHeader({
 }: OrdersTableHeaderProps) {
   const headers = [
     { key: "orderId", label: "Order ID" },
-    { key: "billTo", label: "Bill To" },
+    { key: "billToCode", label: "Bill To" },
     { key: "billType", label: "Bill Type" },
     { key: "status", label: "Status" },
     { key: "serviceLevel", label: "Service Level" },

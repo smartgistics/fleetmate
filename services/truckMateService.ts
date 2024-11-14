@@ -65,10 +65,7 @@ const fetchWithAuth = async <T>(
     const data = await response.json();
 
     if (!response.ok) {
-      handleTruckMateError(response.status, data?.message);
-      throw new Error(
-        data?.message || `HTTP error! status: ${response.status}`
-      );
+      console.error("API Error:", data);
     }
 
     return data as T;
@@ -440,50 +437,4 @@ export const createClient = async (
 
     throw new Error(errorMessage);
   }
-};
-
-// Update error handler with more specific error messages
-const handleTruckMateError = (status: number, errorMessage?: string) => {
-  const errorDetails = {
-    status,
-    message: errorMessage,
-    timestamp: new Date().toISOString(),
-  };
-
-  let logMessage = "";
-
-  switch (status) {
-    case 400:
-      logMessage =
-        "Bad Request - Invalid input parameters. Check required fields and data types.";
-      break;
-    case 401:
-      logMessage = "Authentication failed - Invalid or expired API key.";
-      break;
-    case 403:
-      logMessage =
-        "Authorization failed - Your API key doesn't have permission for this operation.";
-      break;
-    case 404:
-      logMessage =
-        "Resource not found - The requested endpoint or resource doesn't exist.";
-      break;
-    case 420:
-      logMessage =
-        "License not available - Your TruckMate license doesn't include this feature.";
-      break;
-    case 429:
-      logMessage =
-        "Too many requests - Please implement rate limiting or reduce request frequency.";
-      break;
-    case 500:
-      logMessage =
-        "Internal server error - The server encountered an unexpected condition. Check request payload.";
-      break;
-    default:
-      logMessage = `API Error (${status}): ${errorMessage || "Unknown error"}`;
-  }
-
-  console.error(logMessage, errorDetails);
-  return logMessage;
 };

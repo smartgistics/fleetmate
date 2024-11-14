@@ -1,6 +1,18 @@
 import { PaginatedTruckMateResponse, TruckMateQueryParams } from "./common";
 import { Vendor } from "./masterdata";
 
+// Add interfaces for expanded data
+interface CarrierWithVendor {
+  vendorId: string;
+  vendor?: Vendor; // From expansion
+}
+
+interface ZoneDetails {
+  code: string;
+  description: string;
+  type: string;
+}
+
 export interface Trip {
   tripNumber: number;
   description?: string;
@@ -36,7 +48,11 @@ export interface Trip {
   isActive?: boolean;
   eTA?: string; // Estimated Time of Arrival
   eTD?: string; // Estimated Time of Departure
-  carriers?: Vendor[];
+
+  // Expanded Data
+  carriers?: CarrierWithVendor[];
+  origZoneDetails?: ZoneDetails; // From expansion
+  destZoneDetails?: ZoneDetails; // From expansion
 }
 
 export interface TripStop {

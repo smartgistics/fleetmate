@@ -31,7 +31,7 @@ export function OrderDetailsModal({
                 <label className='block text-sm font-medium text-gray-700'>
                   Bill To
                 </label>
-                <p className='mt-1'>{order.billTo}</p>
+                <p className='mt-1'>{order.billToCode}</p>
               </div>
               <div>
                 <label className='block text-sm font-medium text-gray-700'>
