@@ -62,7 +62,10 @@ export const useTrips = (initialParams: TruckMateQueryParams = {}) => {
     const loadTrips = async () => {
       try {
         setIsLoading(true);
-        const response = await fetchTrips(params);
+        const response = await fetchTrips({
+          ...params,
+          codeBehavior: "assignment",
+        });
         setTrips(response.trips);
         setTotal(response.count);
       } catch (err) {
@@ -129,7 +132,7 @@ export const useCustomers = (initialParams: TruckMateQueryParams = {}) => {
       setParams((prev) => ({
         ...prev,
         ...newParams,
-        offset: newParams.search !== undefined ? 0 : prev.offset,
+        offset: newParams.filter !== undefined ? 0 : prev.offset,
       }));
     },
     [params]

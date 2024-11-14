@@ -1,13 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { fetchOrders, fetchTrips } from "@/services/truckMateService";
 import {
   Order,
   Trip,
-  WeeklyData,
-  CountItem,
-  RevenueItem,
+  OrdersResponse,
+  TripsResponse,
+  TruckMateQueryParams,
 } from "@/types/truckmate";
+import { WeeklyData, CountItem, RevenueItem } from "@/types/dashboard";
 
 // Type guards
 const isOrder = (item: Order | Trip): item is Order => {
@@ -35,7 +36,7 @@ const getTopItems = (
 
     if (key === "carriers") {
       value = item.carriers?.[0]?.carrierId || "Unknown";
-    } else if (key === "pickupLocation" || key === "deliveryLocation") {
+    } else if (key === "originZone" || key === "destinationZone") {
       value = String(item[key] || "Unknown");
     } else {
       value = String(item[key] || "Unknown");
@@ -64,8 +65,8 @@ const getItemValue = (item: Order | Trip, key: ValidKeys): string => {
 };
 
 const getItemRevenue = (item: Order | Trip): number => {
-  if (isOrder(item)) return item.totalCharges;
-  if (isTrip(item)) return item.revenue;
+  if (isOrder(item)) return item.totalCharges || 0;
+  if (isTrip(item)) return 1000; // TODO: Implement trip revenue
   return 0;
 };
 
@@ -90,7 +91,7 @@ const getTopItemsByRevenue = (
 const getWeeklyRevenue = (items: (Order | Trip)[]): WeeklyData[] => {
   const weeklyData = items.reduce<Record<string, WeeklyData>>((acc, item) => {
     const date = new Date(
-      isOrder(item) ? item.createdTime : item.createdDateTime
+      isOrder(item) ? item.createdTime : new Date(item.eTD || "")
     );
     const weekStart = new Date(date.setDate(date.getDate() - date.getDay()));
     const weekKey = weekStart.toISOString().split("T")[0];
@@ -115,52 +116,73 @@ const getWeeklyRevenue = (items: (Order | Trip)[]): WeeklyData[] => {
 };
 
 export function useDashboard() {
+  const queryParams: TruckMateQueryParams = {
+    limit: 100,
+    orderBy: "createdDateTime desc",
+    select: [
+      "orderId",
+      "billTo",
+      "totalCharges",
+      "createdTime",
+      "status",
+      "serviceLevel",
+    ],
+  };
+
   const {
-    data: orders = [],
+    data: ordersResponse,
     isLoading: isLoadingOrders,
     error: ordersError,
-  } = useQuery({
-    queryKey: ["orders"],
-    queryFn: fetchOrders,
+  } = useQuery<OrdersResponse>({
+    queryKey: ["orders", queryParams],
+    queryFn: () => fetchOrders(queryParams),
     staleTime: 1000 * 60 * 5,
   });
 
   const {
-    data: trips = [],
+    data: tripsResponse,
     isLoading: isLoadingTrips,
     error: tripsError,
-  } = useQuery({
-    queryKey: ["trips"],
-    queryFn: fetchTrips,
+  } = useQuery<TripsResponse>({
+    queryKey: ["trips", queryParams],
+    queryFn: () => fetchTrips({ ...queryParams, codeBehavior: "assignment" }),
     staleTime: 1000 * 60 * 5,
   });
 
   const isLoading = isLoadingOrders || isLoadingTrips;
+  const orders = useMemo(() => ordersResponse?.orders || [], [ordersResponse]);
+  const trips = useMemo(() => tripsResponse?.trips || [], [tripsResponse]);
 
   const dashboardData = {
     topCustomers: getTopItemsByRevenue(orders, "billTo"),
     topCarriers: getTopItemsByRevenue(trips, "carriers"),
-    topOrigins: getTopItems(trips, "pickupLocation"),
-    topDestinations: getTopItems(trips, "deliveryLocation"),
+    topOrigins: getTopItems(trips, "originZone"),
+    topDestinations: getTopItems(trips, "destinationZone"),
     weeklyRevenue: getWeeklyRevenue([...orders, ...trips]),
   };
 
   // Debugging Logs
   useEffect(() => {
     if (orders.length > 0) {
-      console.log("Orders fetched successfully:", orders);
+      console.log("Orders fetched successfully:", {
+        count: ordersResponse?.count,
+        orders: orders.length,
+      });
     } else {
       console.log("No orders fetched");
     }
-  }, [orders]);
+  }, [orders, ordersResponse?.count]);
 
   useEffect(() => {
     if (trips.length > 0) {
-      console.log("Trips fetched successfully:", trips);
+      console.log("Trips fetched successfully:", {
+        count: tripsResponse?.count,
+        trips: trips.length,
+      });
     } else {
       console.log("No trips fetched");
     }
-  }, [trips]);
+  }, [trips, tripsResponse?.count]);
 
   useEffect(() => {
     if (ordersError) {
@@ -171,14 +193,11 @@ export function useDashboard() {
     }
   }, [ordersError, tripsError]);
 
-  console.log("Dashboard Data:", {
-    ordersCount: orders.length,
-    tripsCount: trips.length,
-    dashboardData,
-  });
-
   return {
     dashboardData,
     isLoading,
+    error: ordersError || tripsError,
+    ordersCount: ordersResponse?.count || 0,
+    tripsCount: tripsResponse?.count || 0,
   };
 }

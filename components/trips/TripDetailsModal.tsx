@@ -24,7 +24,7 @@ export function TripDetailsModal({
         <div className='inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full'>
           <div className='bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4'>
             <h3 className='text-lg font-medium text-gray-900'>
-              Trip #{trip.tripId}
+              Trip #{trip.tripNumber}
             </h3>
             <div className='mt-4 space-y-4'>
               <div>
@@ -45,27 +45,26 @@ export function TripDetailsModal({
                 <label className='block text-sm font-medium text-gray-700'>
                   Customer
                 </label>
-                <p className='mt-1'>{trip.customer}</p>
+                <p className='mt-1'>Customer Name</p>
               </div>
               <div>
                 <label className='block text-sm font-medium text-gray-700'>
                   Revenue
                 </label>
-                <p className='mt-1'>${trip.revenue?.toLocaleString()}</p>
+                <p className='mt-1'>$0</p>
               </div>
               <div>
                 <label className='block text-sm font-medium text-gray-700'>
                   Equipment
                 </label>
-                <p className='mt-1'>{trip.equipmentType}</p>
+                <p className='mt-1'>Equipment Type</p>
               </div>
               <div>
                 <label className='block text-sm font-medium text-gray-700'>
                   Schedule
                 </label>
                 <p className='mt-1'>
-                  {trip.scheduledStartDate} {trip.scheduledStartTime} -{" "}
-                  {trip.scheduledEndDate} {trip.scheduledEndTime}
+                  {trip.eTD} - {trip.eTA}
                 </p>
               </div>
             </div>

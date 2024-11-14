@@ -8,6 +8,7 @@ import {
   CommoditiesResponse,
   VendorsResponse,
   Client,
+  TripsQueryParams,
 } from "@/types/truckmate";
 
 const TRUCKMATE_API_URL = process.env.TRUCKMATE_API_URL;
@@ -100,17 +101,10 @@ export const fetchOrders = async (
     queryParams.set("offset", params.offset.toString());
   if (params.limit !== undefined)
     queryParams.set("limit", params.limit.toString());
-  if (params.orderBy) queryParams.set("orderBy", params.orderBy);
-  if (params.filter) queryParams.set("filter", params.filter);
-  if (params.select) queryParams.set("select", params.select.join(","));
+  if (params.filter) queryParams.set("$filter", params.filter);
+  if (params.select) queryParams.set("$select", params.select.join(","));
+  if (params.orderBy) queryParams.set("$orderBy", params.orderBy);
   if (params.expand) queryParams.set("expand", params.expand.join(","));
-  if (params.search) queryParams.set("search", params.search);
-  if (params.fromDate) queryParams.set("fromDate", params.fromDate);
-  if (params.toDate) queryParams.set("toDate", params.toDate);
-  if (params.type) queryParams.set("type", params.type);
-  if (params.code) queryParams.set("code", params.code);
-  if (params.active !== undefined)
-    queryParams.set("active", params.active.toString());
 
   const url = `${TRUCKMATE_API_URL}/orders?${queryParams.toString()}`;
   console.log("Fetching orders from", url);
@@ -121,8 +115,8 @@ export const fetchOrders = async (
       href: response.href,
       offset: response.offset,
       limit: response.limit,
-      sort: response.sort,
       filter: response.filter,
+      sort: response.sort,
       select: response.select,
       count: response.count,
       orders: Array.isArray(response.orders) ? response.orders : [],
@@ -133,8 +127,8 @@ export const fetchOrders = async (
       href: url,
       offset: params.offset || 0,
       limit: params.limit || DEFAULT_LIMIT,
-      sort: "",
       filter: "",
+      sort: "",
       select: "",
       count: 0,
       orders: [],
@@ -143,7 +137,7 @@ export const fetchOrders = async (
 };
 
 export const fetchTrips = async (
-  params: TruckMateQueryParams = {}
+  params: TripsQueryParams = {}
 ): Promise<TripsResponse> => {
   if (!TRUCKMATE_API_URL) {
     console.warn("TRUCKMATE_API_URL is not configured");
@@ -151,8 +145,8 @@ export const fetchTrips = async (
       href: "",
       offset: 0,
       limit: DEFAULT_LIMIT,
-      sort: "",
       filter: "",
+      sort: "",
       select: "",
       count: 0,
       trips: [],
@@ -162,27 +156,15 @@ export const fetchTrips = async (
   const queryParams = new URLSearchParams();
 
   // Add only defined parameters
-  if (params.offset !== undefined)
-    queryParams.set("offset", params.offset.toString());
   if (params.limit !== undefined)
     queryParams.set("limit", params.limit.toString());
-  if (params.orderBy) queryParams.set("orderBy", params.orderBy);
-  if (params.filter) queryParams.set("filter", params.filter);
-  if (params.status) queryParams.set("status", params.status);
-  if (params.select) queryParams.set("select", params.select.join(","));
+  if (params.offset !== undefined)
+    queryParams.set("offset", params.offset.toString());
+  if (params.filter) queryParams.set("$filter", params.filter);
+  if (params.select) queryParams.set("$select", params.select.join(","));
+  if (params.orderBy) queryParams.set("$orderBy", params.orderBy);
   if (params.expand) queryParams.set("expand", params.expand.join(","));
-  if (params.search) queryParams.set("search", params.search);
-  if (params.fromDate) queryParams.set("fromDate", params.fromDate);
-  if (params.toDate) queryParams.set("toDate", params.toDate);
-  if (params.type) queryParams.set("type", params.type);
-  if (params.code) queryParams.set("code", params.code);
-  if (params.active !== undefined)
-    queryParams.set("active", params.active.toString());
-
-  // Add default status filter for trips if not provided
-  if (!params.status) {
-    queryParams.set("status", "!CANCELLED,!VOID");
-  }
+  if (params.codeBehavior) queryParams.set("codeBehavior", params.codeBehavior);
 
   const url = `${TRUCKMATE_API_URL}/trips?${queryParams.toString()}`;
   console.log("Fetching trips from", url);
@@ -223,17 +205,14 @@ export const fetchCommodities = async (
 
   const queryParams = new URLSearchParams();
 
-  if (params.offset !== undefined)
-    queryParams.set("offset", params.offset.toString());
   if (params.limit !== undefined)
     queryParams.set("limit", params.limit.toString());
-  if (params.orderBy) queryParams.set("orderBy", params.orderBy);
-  if (params.filter) queryParams.set("filter", params.filter);
-  if (params.select) queryParams.set("select", params.select.join(","));
+  if (params.offset !== undefined)
+    queryParams.set("offset", params.offset.toString());
+  if (params.filter) queryParams.set("$filter", params.filter);
+  if (params.select) queryParams.set("$select", params.select.join(","));
+  if (params.orderBy) queryParams.set("$orderBy", params.orderBy);
   if (params.expand) queryParams.set("expand", params.expand.join(","));
-  if (params.search) queryParams.set("search", params.search);
-  if (params.active !== undefined)
-    queryParams.set("active", params.active.toString());
 
   const url = `${TM_MASTERDATA_API_URL}/commodities?${queryParams.toString()}`;
   console.log("Fetching commodities from", url);
@@ -276,52 +255,24 @@ export const fetchClients = async (
 
   const queryParams = new URLSearchParams();
 
-  // Add standard parameters
-  if (params.offset !== undefined)
-    queryParams.set("offset", params.offset.toString());
   if (params.limit !== undefined)
     queryParams.set("limit", params.limit.toString());
-  if (params.orderBy) queryParams.set("orderBy", params.orderBy);
-  if (params.select) queryParams.set("select", params.select.join(","));
+  if (params.offset !== undefined)
+    queryParams.set("offset", params.offset.toString());
+  if (params.filter) queryParams.set("$filter", params.filter);
+  if (params.select) queryParams.set("$select", params.select.join(","));
+  if (params.orderBy) queryParams.set("$orderBy", params.orderBy);
   if (params.expand) queryParams.set("expand", params.expand.join(","));
-
-  // Build filter expression
-  const filters: string[] = [];
-
-  // Handle search term by converting it to a filter
-  if (params.search) {
-    const searchTerm = params.search.trim();
-    filters.push(
-      `(name like '%${searchTerm}%' or accountNumber like '%${searchTerm}%')`
-    );
-  }
-
-  // Add additional filters
-  if (params.active !== undefined) {
-    filters.push(`isActive eq ${params.active}`);
-  }
-  if (params.type) {
-    filters.push(`type eq '${params.type}'`);
-  }
-  if (params.filter) {
-    filters.push(`(${params.filter})`);
-  }
-
-  // Combine all filters with AND operator
-  if (filters.length > 0) {
-    queryParams.set("$filter", filters.join(" and "));
-  }
 
   const url = `${TM_MASTERDATA_API_URL}/clients?${queryParams.toString()}`;
   console.log("Fetching customers with URL:", url);
-  console.log("Applied filters:", filters);
 
   try {
     const response = await fetchWithAuth<ClientsResponse>(url);
     console.log("API Response:", {
       count: response.count,
       clientsCount: response.clients?.length,
-      filter: queryParams.get("filter"),
+      filter: queryParams.get("$filter"),
       url: url,
     });
     return response;
@@ -349,18 +300,14 @@ export const fetchVendors = async (
 
   const queryParams = new URLSearchParams();
 
-  if (params.offset !== undefined)
-    queryParams.set("offset", params.offset.toString());
   if (params.limit !== undefined)
     queryParams.set("limit", params.limit.toString());
-  if (params.orderBy) queryParams.set("orderBy", params.orderBy);
-  if (params.filter) queryParams.set("filter", params.filter);
-  if (params.select) queryParams.set("select", params.select.join(","));
+  if (params.offset !== undefined)
+    queryParams.set("offset", params.offset.toString());
+  if (params.filter) queryParams.set("$filter", params.filter);
+  if (params.select) queryParams.set("$select", params.select.join(","));
+  if (params.orderBy) queryParams.set("$orderBy", params.orderBy);
   if (params.expand) queryParams.set("expand", params.expand.join(","));
-  if (params.search) queryParams.set("search", params.search);
-  if (params.type) queryParams.set("type", params.type);
-  if (params.active !== undefined)
-    queryParams.set("active", params.active.toString());
 
   const url = `${TM_MASTERDATA_API_URL}/vendors?${queryParams.toString()}`;
   console.log("Fetching vendors from", url);

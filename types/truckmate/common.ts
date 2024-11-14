@@ -1,28 +1,18 @@
 // Query Parameters (matching TruckMate API exactly)
 export interface TruckMateQueryParams {
   // Pagination
-  offset?: number; // Starting record number
   limit?: number; // Default is 20 records
-
-  // Sorting
-  orderBy?: string; // Format: "field asc|desc"
-
-  // Filtering
+  offset?: number; // Starting record number
   filter?: string; // Filter criteria
-  status?: string; // Status filter (e.g. "!CANCELLED,!VOID" for trips)
-
-  // Field Selection
   select?: string[]; // Fields to include in response
+  orderBy?: string; // Format: "field asc|desc"
   expand?: string[]; // Related entities to expand
-
-  // Search
-  search?: string; // Text search across fields
 
   // Additional filters
   fromDate?: string; // Filter by date range
   toDate?: string;
   type?: string; // Filter by record type
-  code?: string; // Filter by code
+  codeBehavior?: string; //
   active?: boolean; // Filter by active status
 }
 
@@ -74,8 +64,8 @@ export interface PaginatedTruckMateResponse {
   href: string;
   offset: number;
   limit: number;
-  sort: string;
   filter: string;
+  sort: string;
   select: string;
   count: number;
 }

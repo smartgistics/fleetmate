@@ -103,7 +103,7 @@ export default function Customers() {
       debounce((term: string) => {
         console.log("Performing search with term:", term);
         updateParams({
-          search: term,
+          filter: term,
           offset: 0,
         });
       }, 500),

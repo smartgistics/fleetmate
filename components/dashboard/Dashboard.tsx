@@ -1,6 +1,6 @@
 "use client";
 
-import { DashboardCardProps } from "@/types/truckmate";
+import { DashboardCardProps } from "@/types/dashboard";
 import { useDashboard } from "@/hooks/useDashboard";
 import { RevenueChart } from "./RevenueChart";
 

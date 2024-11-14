@@ -14,7 +14,7 @@ const DEFAULT_LIMIT = 20;
 export default function Trips() {
   const [isNewTripModalOpen, setIsNewTripModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortField, setSortField] = useState<keyof Trip>("tripId");
+  const [sortField, setSortField] = useState<keyof Trip>("tripNumber");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
 
@@ -22,7 +22,7 @@ export default function Trips() {
     limit: DEFAULT_LIMIT,
     offset: 0,
     orderBy: `${sortField} ${sortDirection}`,
-    status: "!CANCELLED,!VOID",
+    filter: "status ne CANCL",
   });
 
   // Handle sorting
@@ -37,7 +37,7 @@ export default function Trips() {
   // Handle search
   const handleSearch = (term: string) => {
     setSearchTerm(term);
-    updateParams({ search: term, offset: 0 }); // Reset to first record on new search
+    updateParams({ filter: term, offset: 0 }); // Reset to first record on new search
   };
 
   // Handle pagination
@@ -101,10 +101,10 @@ export default function Trips() {
           <thead>
             <tr className='bg-gray-100'>
               {[
-                { key: "tripId", label: "Trip ID" },
+                { key: "tripNumber", label: "Trip Number" },
                 { key: "customer", label: "Customer" },
                 { key: "status", label: "Status" },
-                { key: "deliveryDate", label: "Delivery Date" },
+                { key: "eTD", label: "Delivery Date" },
                 { key: "revenue", label: "Revenue" },
               ].map(({ key, label }) => (
                 <th
@@ -121,15 +121,15 @@ export default function Trips() {
           <tbody className='divide-y divide-gray-200'>
             {trips.map((trip) => (
               <tr
-                key={trip.tripId}
+                key={trip.tripNumber}
                 onClick={() => setSelectedTrip(trip)}
                 className='hover:bg-gray-50 cursor-pointer'
               >
-                <td className='px-6 py-4'>{trip.tripId}</td>
-                <td className='px-6 py-4'>{trip.customer}</td>
+                <td className='px-6 py-4'>{trip.tripNumber}</td>
+                <td className='px-6 py-4'>Customer Name</td>
                 <td className='px-6 py-4'>{trip.status}</td>
-                <td className='px-6 py-4'>{trip.deliveryDate}</td>
-                <td className='px-6 py-4'>${trip.revenue.toLocaleString()}</td>
+                <td className='px-6 py-4'>{trip.eTD}</td>
+                <td className='px-6 py-4'>$1000</td>
               </tr>
             ))}
           </tbody>

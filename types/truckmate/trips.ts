@@ -1,120 +1,90 @@
-import { PaginatedTruckMateResponse } from "./common";
+import { Carrier } from "./carriers";
+import { PaginatedTruckMateResponse, TruckMateQueryParams } from "./common";
 
 export interface Trip {
-  tripId: number;
-  orderId: number;
+  tripNumber: number;
+  description?: string;
   status: string;
-  customer: string;
-  deliveryLocation: string;
-  deliveryDate: string;
-  deliveryTime: string;
-  dispatchStatus: string;
-  equipmentType: string;
-  planner: string;
-  pickupDate?: string;
-  pickupLocation?: string;
-  pickupTime?: string;
-  rate?: number;
-  carriers?: {
-    carrierId: string;
-    name: string;
-  }[];
-
-  // Planning Info
-  planningStatus: string;
-
-  // Equipment
-  powerUnit?: string;
-  trailer?: string;
-
-  // Route Details
-  originTerminal: string;
-  destinationTerminal: string;
-  totalDistance: number;
-  distanceUnits: string;
-  estimatedDuration: number;
-  durationUnits: string;
-
-  // Schedule
-  scheduledStartDate: string;
-  scheduledStartTime: string;
-  scheduledEndDate: string;
-  scheduledEndTime: string;
-  actualStartDate?: string;
-  actualStartTime?: string;
-  actualEndDate?: string;
-  actualEndTime?: string;
-
-  // Personnel
-  driver1: string;
+  statusDesc?: string;
+  originZone?: string;
+  origZoneDesc?: string;
+  destinationZone?: string;
+  destZoneDesc?: string;
+  currentZone?: string;
+  currentZoneDesc?: string;
+  legCount?: number;
+  activeLeg?: number;
+  manifest?: string;
+  user1?: string;
+  user2?: string;
+  user3?: string;
+  user4?: string;
+  user5?: string;
+  user6?: string;
+  user7?: string;
+  user8?: string;
+  user9?: string;
+  user10?: string;
+  driver?: string;
   driver2?: string;
-  driver1Status?: string;
-  driver2Status?: string;
-
-  // Stops
-  stops: TripStop[];
-
-  // Financial
-  revenue: number;
-  cost: number;
-  currencyCode: string;
-
-  // Tracking
-  currentLocation?: {
-    latitude: number;
-    longitude: number;
-    timestamp: string;
-    speed?: number;
-    heading?: number;
-  };
-
-  // Metadata
-  createdBy: string;
-  createdDateTime: string;
-  modifiedBy: string;
-  modifiedDateTime: string;
+  powerUnit?: string;
+  miscEquip?: string;
+  miscEquip2?: string;
+  trailer?: string;
+  trailer2?: string;
+  trailer3?: string;
+  isActive?: boolean;
+  eTA?: string; // Estimated Time of Arrival
+  eTD?: string; // Estimated Time of Departure
+  carriers?: Carrier[];
 }
 
 export interface TripStop {
-  stopId: number;
-  tripId: number;
-  sequenceNumber: number;
-  stopType: "pickup" | "delivery" | "fuel" | "rest" | "other";
+  type: string;
+  resourceType:
+    | "driver"
+    | "powerUnit"
+    | "miscEquip"
+    | "trailer"
+    | "freight"
+    | "chassis"
+    | "container"
+    | "interliner"
+    | "";
+  resourceId: string | number;
+  action: "drop" | "pick" | "";
+  attemptedFreight: "False" | "True" | null;
+}
 
-  // Location
-  location: {
-    name: string;
-    address: string;
-    city: string;
-    state: string;
-    zip: string;
-    country: string;
-    latitude?: number;
-    longitude?: number;
-  };
-
-  // Schedule
-  scheduledDate: string;
-  scheduledTime: string;
-  actualDate?: string;
-  actualTime?: string;
-  estimatedDuration: number;
-  durationUnits: string;
-
-  // Status
-  status: string;
-  statusReason?: string;
-
-  // Instructions
-  specialInstructions?: string;
-  contactName?: string;
-  contactPhone?: string;
-
-  // References
-  orderNumber?: string;
-  referenceNumbers?: string[];
+export interface TripStatusChange {
+  changed: string;
+  statusCode: string;
+  statComment?: string;
+  updatedBy?: string;
+  tripNumber: number;
+  legId?: number;
+  zone?: string;
+  insDate: string;
 }
 
 export interface TripsResponse extends PaginatedTruckMateResponse {
   trips: Trip[];
+}
+
+export interface TripsQueryParams extends TruckMateQueryParams {
+  codeBehavior?:
+    | "arriveDock"
+    | "departDock"
+    | "departShipper"
+    | "arriveConsignee"
+    | "assignment"
+    | "complete"
+    | "dispatch"
+    | "departConsignee"
+    | "late"
+    | "other"
+    | "arriveShipper"
+    | "spotting"
+    | "terminal"
+    | "cancel";
 }

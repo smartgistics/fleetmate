@@ -3,18 +3,12 @@
 import React, { useState } from "react";
 import { OrderDetailsModal } from "@/components/orders/OrderDetailsModal";
 import { TripDetailsModal } from "@/components/trips/TripDetailsModal";
-import {
-  DragDropContext,
-  Droppable,
-  Draggable,
-  DropResult,
-} from "@hello-pangea/dnd";
+import { DragDropContext, DropResult } from "@hello-pangea/dnd";
 import Tabs from "@/components/Tabs";
 import type { Order, Trip } from "@/types/truckmate";
 import { useOrders } from "@/hooks/useTruckMate";
 import { useDispatch } from "@/hooks/useDispatch";
-import { Card } from "@/components/ui/card";
-
+import { OperationsColumn } from "@/components/operations/OperationsColumn";
 interface StatusColors {
   NOT_STARTED: string;
   CAUTION: string;
@@ -28,89 +22,6 @@ const STATUS_COLORS: StatusColors = {
   ON_TRACK: "bg-green-200",
   DELAYED: "bg-red-200",
 };
-
-interface OperationsColumnProps {
-  title: string;
-  items: (Order | Trip)[];
-  statusColor: string;
-  onItemClick: (item: Order | Trip) => void;
-}
-
-function OperationsColumn({
-  title,
-  items,
-  statusColor,
-  onItemClick,
-}: OperationsColumnProps) {
-  const isOrder = (item: Order | Trip): item is Order => {
-    return "orderId" in item;
-  };
-
-  return (
-    <Droppable droppableId={title}>
-      {(provided, snapshot) => (
-        <div
-          ref={provided.innerRef}
-          {...provided.droppableProps}
-          className={`flex-1 min-w-[200px] border-r border-gray-300 last:border-r-0 px-2 
-            ${snapshot.isDraggingOver ? "bg-gray-50" : ""}`}
-        >
-          <h3 className='font-bold mb-2 text-center bg-gray-100 py-1 text-sm text-gray-900'>
-            {title}
-          </h3>
-          <div className='space-y-1'>
-            {items.map((item, index) => (
-              <Draggable
-                key={
-                  isOrder(item)
-                    ? `order-${item.orderId}`
-                    : `trip-${item.tripId}`
-                }
-                draggableId={
-                  isOrder(item)
-                    ? item.orderId.toString()
-                    : item.tripId.toString()
-                }
-                index={index}
-              >
-                {(provided, snapshot) => (
-                  <Card
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    className={`p-2 rounded text-xs ${statusColor} text-gray-900
-                      hover:opacity-80 hover:shadow-md transition-all duration-200
-                      ${snapshot.isDragging ? "shadow-lg" : ""}`}
-                    onClick={() => onItemClick(item)}
-                  >
-                    <div className='flex items-center justify-between mb-1'>
-                      <div className='font-semibold truncate pr-1'>
-                        {isOrder(item)
-                          ? `Order #${item.orderId}`
-                          : `${item.pickupLocation} → ${item.deliveryLocation}`}
-                      </div>
-                    </div>
-                    <div className='truncate text-[11px] text-gray-800'>
-                      {isOrder(item) ? item.billTo : item.customer}
-                    </div>
-                    <div className='text-[11px] font-medium text-gray-800'>
-                      {isOrder(item)
-                        ? `$${item.totalCharges?.toLocaleString()}`
-                        : new Date(
-                            item.scheduledStartDate
-                          ).toLocaleDateString()}
-                    </div>
-                  </Card>
-                )}
-              </Draggable>
-            ))}
-            {provided.placeholder}
-          </div>
-        </div>
-      )}
-    </Droppable>
-  );
-}
 
 export default function OperationsPage() {
   const [activeTab, setActiveTab] = useState("dispatch");
@@ -157,9 +68,27 @@ export default function OperationsPage() {
               onItemClick={handleItemClick}
             />
             <OperationsColumn
-              title='In Transit'
-              items={trips.puTracking}
+              title='Dispatched'
+              items={trips.dispatched}
               statusColor={STATUS_COLORS.ON_TRACK}
+              onItemClick={handleItemClick}
+            />
+            <OperationsColumn
+              title='Arrived @ Shipper'
+              items={trips.arrivedAtShipper}
+              statusColor={STATUS_COLORS.CAUTION}
+              onItemClick={handleItemClick}
+            />
+            <OperationsColumn
+              title='In Transit'
+              items={trips.inTransit}
+              statusColor={STATUS_COLORS.CAUTION}
+              onItemClick={handleItemClick}
+            />
+            <OperationsColumn
+              title='Arrived @ Consignee'
+              items={trips.delivering}
+              statusColor={STATUS_COLORS.CAUTION}
               onItemClick={handleItemClick}
             />
           </>

@@ -39,7 +39,7 @@ export default function Orders() {
   // Handle search
   const handleSearch = (term: string) => {
     setSearchTerm(term);
-    updateParams({ search: term, offset: 0 }); // Reset to first page on new search
+    updateParams({ filter: term, offset: 0 }); // Reset to first page on new search
   };
 
   // Handle pagination
