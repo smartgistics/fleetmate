@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Client } from "@/types/truckmate";
 import { useCustomers } from "@/hooks/useTruckMate";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -97,23 +97,30 @@ export default function Customers() {
     updateParams({ orderBy: `${field} ${newDirection}` });
   };
 
-  // Debounced search handler
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const debouncedSearch = useCallback(
-    debounce((term: string) => {
-      updateParams({ search: term, offset: 0 });
-    }, 500), // Wait 500ms after last keystroke before searching
-    [] // Empty dependency array since we don't need to recreate this function
+  // Debounced search handler with proper cleanup
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((term: string) => {
+        console.log("Performing search with term:", term);
+        updateParams({
+          search: term,
+          offset: 0,
+        });
+      }, 500),
+    [updateParams]
   );
 
   // Handle search input
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value;
-    setSearchTerm(term); // Update the input value immediately
-    debouncedSearch(term); // Debounce the API call
+    setSearchTerm(term);
+    if (term.length === 0 || term.length >= 3) {
+      // Only search if term is empty (reset) or at least 3 characters
+      debouncedSearch(term);
+    }
   };
 
-  // Clean up the debounced function on component unmount
+  // Clean up debounced function
   useEffect(() => {
     return () => {
       debouncedSearch.cancel();
@@ -203,30 +210,37 @@ export default function Customers() {
         </button>
       </div>
 
-      {/* Search Section with updated onChange handler */}
+      {/* Search Section */}
       <div className='mb-6'>
         <div className='relative'>
           <input
             type='text'
-            placeholder='Search customers...'
+            placeholder='Disabled for now...'
+            // placeholder='Search customers (min 3 characters)...'
             className='w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
             value={searchTerm}
             onChange={handleSearch}
+            minLength={3}
+            disabled={true}
           />
           <div className='absolute inset-y-0 right-0 flex items-center pr-3'>
-            <svg
-              className='h-5 w-5 text-gray-400'
-              fill='none'
-              viewBox='0 0 24 24'
-              stroke='currentColor'
-            >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth={2}
-                d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
-              />
-            </svg>
+            {isLoading ? (
+              <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900' />
+            ) : (
+              <svg
+                className='h-5 w-5 text-gray-400'
+                fill='none'
+                viewBox='0 0 24 24'
+                stroke='currentColor'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
+                />
+              </svg>
+            )}
           </div>
         </div>
       </div>

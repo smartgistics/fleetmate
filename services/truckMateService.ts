@@ -276,34 +276,55 @@ export const fetchClients = async (
 
   const queryParams = new URLSearchParams();
 
-  // Add only defined parameters
+  // Add standard parameters
   if (params.offset !== undefined)
     queryParams.set("offset", params.offset.toString());
   if (params.limit !== undefined)
     queryParams.set("limit", params.limit.toString());
   if (params.orderBy) queryParams.set("orderBy", params.orderBy);
-  if (params.filter) queryParams.set("filter", params.filter);
   if (params.select) queryParams.set("select", params.select.join(","));
   if (params.expand) queryParams.set("expand", params.expand.join(","));
-  if (params.search) queryParams.set("search", params.search);
-  if (params.active !== undefined)
-    queryParams.set("active", params.active.toString());
+
+  // Build filter expression
+  const filters: string[] = [];
+
+  // Handle search term by converting it to a filter
+  if (params.search) {
+    const searchTerm = params.search.trim();
+    filters.push(
+      `(name like '%${searchTerm}%' or accountNumber like '%${searchTerm}%')`
+    );
+  }
+
+  // Add additional filters
+  if (params.active !== undefined) {
+    filters.push(`isActive eq ${params.active}`);
+  }
+  if (params.type) {
+    filters.push(`type eq '${params.type}'`);
+  }
+  if (params.filter) {
+    filters.push(`(${params.filter})`);
+  }
+
+  // Combine all filters with AND operator
+  if (filters.length > 0) {
+    queryParams.set("$filter", filters.join(" and "));
+  }
 
   const url = `${TM_MASTERDATA_API_URL}/clients?${queryParams.toString()}`;
-  console.log("Fetching customers from", url);
+  console.log("Fetching customers with URL:", url);
+  console.log("Applied filters:", filters);
 
   try {
     const response = await fetchWithAuth<ClientsResponse>(url);
-    return {
-      href: response.href,
-      offset: response.offset,
-      limit: response.limit,
-      sort: response.sort,
-      filter: response.filter,
-      select: response.select,
+    console.log("API Response:", {
       count: response.count,
-      clients: Array.isArray(response.clients) ? response.clients : [],
-    };
+      clientsCount: response.clients?.length,
+      filter: queryParams.get("filter"),
+      url: url,
+    });
+    return response;
   } catch (error) {
     console.error("Failed to fetch customers:", error);
     return {

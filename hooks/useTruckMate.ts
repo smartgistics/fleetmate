@@ -99,21 +99,41 @@ export const useCustomers = (initialParams: TruckMateQueryParams = {}) => {
   const loadCustomers = useCallback(async () => {
     try {
       setIsLoading(true);
+      console.log("Loading customers with params:", params);
       const response = await fetchClients(params);
+      console.log("Customers loaded:", {
+        count: response.count,
+        received: response.clients.length,
+        filter: response.filter,
+      });
       setCustomers(response.clients);
       setTotal(response.count);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to fetch customers"
       );
+      console.error("Error loading customers:", err);
     } finally {
       setIsLoading(false);
     }
   }, [params]);
 
   useEffect(() => {
+    console.log("Params changed, reloading customers:", params);
     void loadCustomers();
-  }, [loadCustomers]);
+  }, [loadCustomers, params]);
+
+  const updateParams = useCallback(
+    (newParams: Partial<TruckMateQueryParams>) => {
+      console.log("Updating params:", { current: params, new: newParams });
+      setParams((prev) => ({
+        ...prev,
+        ...newParams,
+        offset: newParams.search !== undefined ? 0 : prev.offset,
+      }));
+    },
+    [params]
+  );
 
   const createCustomer = async (customerData: Partial<Client>) => {
     try {
@@ -137,7 +157,7 @@ export const useCustomers = (initialParams: TruckMateQueryParams = {}) => {
     error,
     total,
     params,
-    updateParams: setParams,
+    updateParams,
     createCustomer,
   };
 };
