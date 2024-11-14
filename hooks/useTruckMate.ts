@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   fetchOrders,
   fetchTrips,
   fetchClients,
+  createClient,
 } from "@/services/truckMateService";
 import { Order, Trip, TruckMateQueryParams, Client } from "@/types/truckmate";
 
@@ -95,26 +96,40 @@ export const useCustomers = (initialParams: TruckMateQueryParams = {}) => {
   });
   const [total, setTotal] = useState(0);
 
-  useEffect(() => {
-    const loadCustomers = async () => {
-      try {
-        setIsLoading(true);
-        const response = await fetchClients(params);
-        console.log(`${response.count} customers fetched`);
-        console.log("First customer", JSON.stringify(response.clients[0]));
-        setCustomers(response.clients);
-        setTotal(response.count);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to fetch customers"
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    void loadCustomers();
+  const loadCustomers = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetchClients(params);
+      setCustomers(response.clients);
+      setTotal(response.count);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to fetch customers"
+      );
+    } finally {
+      setIsLoading(false);
+    }
   }, [params]);
+
+  useEffect(() => {
+    void loadCustomers();
+  }, [loadCustomers]);
+
+  const createCustomer = async (customerData: Partial<Client>) => {
+    try {
+      setIsLoading(true);
+      await createClient(customerData);
+      // Reload the customers list after creating a new one
+      await loadCustomers();
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to create customer"
+      );
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return {
     customers,
@@ -123,5 +138,6 @@ export const useCustomers = (initialParams: TruckMateQueryParams = {}) => {
     total,
     params,
     updateParams: setParams,
+    createCustomer,
   };
 };

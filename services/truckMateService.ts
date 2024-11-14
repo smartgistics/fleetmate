@@ -7,6 +7,7 @@ import {
   ClientsResponse,
   CommoditiesResponse,
   VendorsResponse,
+  Client,
 } from "@/types/truckmate";
 
 const TRUCKMATE_API_URL = process.env.TRUCKMATE_API_URL;
@@ -370,7 +371,104 @@ export const fetchVendors = async (
   }
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const createClient = async (
+  clientData: Partial<Client>
+): Promise<Client> => {
+  if (!TM_MASTERDATA_API_URL) {
+    throw new Error("TM_MASTERDATA_API_URL is not configured");
+  }
+
+  const url = `${TM_MASTERDATA_API_URL}/clients`;
+
+  // Format the request body according to API spec
+  const requestBody = {
+    clientId: clientData.accountNumber, // Required field
+    name: clientData.name, // Required field
+    type: clientData.type || "Regular", // Required field with default
+    status: clientData.status || "Active", // Required field with default
+    address1: clientData.address?.street1,
+    address2: clientData.address?.street2,
+    city: clientData.address?.city,
+    province: clientData.address?.state,
+    country: clientData.address?.country || "USA",
+    postalCode: clientData.address?.zip,
+    businessPhone: clientData.contact?.phone,
+    businessPhoneExt: "",
+    faxPhone: clientData.contact?.fax,
+    businessCell: "",
+    openTime: "",
+    closeTime: "",
+    comments: "",
+    preferredDriver: "",
+    customerSince: new Date().toISOString().split("T")[0],
+    altContact: clientData.contact?.name,
+    altBusinessPhone: "",
+    altBusinessPhoneExt: "",
+    altFaxPhone: "",
+    altBusinessCell: "",
+    taxId: clientData.taxId,
+    webEnabled: clientData.webEnabled ?? true,
+    isActive: clientData.isActive ?? true,
+  };
+
+  // Validate required fields before making request
+  if (!requestBody.clientId) {
+    throw new Error("Account Number (clientId) is required");
+  }
+  if (!requestBody.name) {
+    throw new Error("Customer Name is required");
+  }
+
+  console.log("Creating new customer:", {
+    url,
+    requestBody,
+    headers: {
+      "Content-Type": "application/json",
+      "X-API-Version": "1.0",
+      Authorization: "Bearer [REDACTED]",
+    },
+  });
+
+  try {
+    const response = await fetchWithAuth<{ client: Client }>(url, {
+      method: "POST",
+      body: JSON.stringify(requestBody), // Remove array wrapper as per API spec
+    });
+
+    console.log("Customer creation response:", response);
+    return response.client;
+  } catch (error) {
+    // Enhanced error handling
+    let errorMessage = "Failed to create customer: ";
+
+    if (error instanceof Error) {
+      console.error("Customer creation error details:", {
+        message: error.message,
+        stack: error.stack,
+        requestBody,
+        url,
+      });
+
+      // Parse specific error cases
+      if (error.message.includes("400")) {
+        errorMessage +=
+          "Invalid input parameters. Please check all required fields.";
+      } else if (error.message.includes("500")) {
+        errorMessage +=
+          "Internal server error. The server encountered an unexpected condition.";
+      } else {
+        errorMessage += error.message;
+      }
+    } else {
+      console.error("Unknown error during customer creation:", error);
+      errorMessage += "An unexpected error occurred";
+    }
+
+    throw new Error(errorMessage);
+  }
+};
+
+// Update error handler with more specific error messages
 const handleTruckMateError = (status: number, errorMessage?: string) => {
   const errorDetails = {
     status,
@@ -378,35 +476,40 @@ const handleTruckMateError = (status: number, errorMessage?: string) => {
     timestamp: new Date().toISOString(),
   };
 
+  let logMessage = "";
+
   switch (status) {
     case 400:
-      console.error("Bad Request - Invalid input parameters:", errorDetails);
+      logMessage =
+        "Bad Request - Invalid input parameters. Check required fields and data types.";
       break;
     case 401:
-      console.error("Authentication failed - check API key:", errorDetails);
+      logMessage = "Authentication failed - Invalid or expired API key.";
       break;
     case 403:
-      console.error(
-        "Authorization failed - insufficient permissions:",
-        errorDetails
-      );
+      logMessage =
+        "Authorization failed - Your API key doesn't have permission for this operation.";
       break;
     case 404:
-      console.error("Resource not found:", errorDetails);
+      logMessage =
+        "Resource not found - The requested endpoint or resource doesn't exist.";
       break;
     case 420:
-      console.error("License not available:", errorDetails);
+      logMessage =
+        "License not available - Your TruckMate license doesn't include this feature.";
       break;
     case 429:
-      console.error(
-        "Too many requests - implement rate limiting:",
-        errorDetails
-      );
+      logMessage =
+        "Too many requests - Please implement rate limiting or reduce request frequency.";
       break;
     case 500:
-      console.error("Internal server error:", errorDetails);
+      logMessage =
+        "Internal server error - The server encountered an unexpected condition. Check request payload.";
       break;
     default:
-      console.error("API Error:", errorDetails);
+      logMessage = `API Error (${status}): ${errorMessage || "Unknown error"}`;
   }
+
+  console.error(logMessage, errorDetails);
+  return logMessage;
 };

@@ -11,6 +11,50 @@ export interface Client {
   creditLimit?: number;
   creditStatus?: string;
   paymentTerms?: string;
+
+  // Contact Information
+  contact?: {
+    name: string;
+    phone?: string;
+    email?: string;
+    fax?: string;
+  };
+
+  // Address
+  address?: {
+    street1: string;
+    street2?: string;
+    city: string;
+    state: string;
+    zip: string;
+    country: string;
+  };
+
+  // Business Details
+  defaultServiceLevel?: string;
+  defaultEquipmentType?: string;
+  defaultTerminal?: string;
+  defaultZone?: string;
+
+  // Financial Details
+  currency?: string;
+  creditTerms?: string;
+  creditHold?: boolean;
+
+  // Preferences
+  temperatureRequirements?: {
+    required: boolean;
+    minTemp?: number;
+    maxTemp?: number;
+    tempUnits?: string;
+  };
+
+  // Metadata
+  createdDate?: string;
+  modifiedDate?: string;
+  lastActivityDate?: string;
+  webEnabled?: boolean;
+  isActive?: boolean;
 }
 
 // Driver types

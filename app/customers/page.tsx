@@ -1,14 +1,60 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Client } from "@/types/truckmate";
 import { useCustomers } from "@/hooks/useTruckMate";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
-import CustomerDetailsModal from "@/components/CustomerDetailsModal";
+import CustomerDetailsModal from "@/components/customers/CustomerDetailsModal";
 import { Pagination } from "@/components/ui/pagination";
+import { NewCustomerModal } from "@/components/customers/NewCustomerModal";
+import { debounce } from "lodash";
 
 const DEFAULT_LIMIT = 20;
+
+// Define mobile view fields with type-safe access paths
+type MobileField = {
+  key: keyof Client | "contact.name" | "address.city";
+  label: string;
+  render: (customer: Client) => React.ReactNode;
+};
+
+const MOBILE_FIELDS: MobileField[] = [
+  {
+    key: "name",
+    label: "Name",
+    render: (customer) => customer.name,
+  },
+  {
+    key: "accountNumber",
+    label: "Account #",
+    render: (customer) => customer.accountNumber || "-",
+  },
+  {
+    key: "status",
+    label: "Status",
+    render: (customer) => customer.status,
+  },
+  {
+    key: "type",
+    label: "Type",
+    render: (customer) => customer.type,
+  },
+  {
+    key: "creditStatus",
+    label: "Credit",
+    render: (customer) => (
+      <span className={customer.creditHold ? "text-red-600" : "text-green-600"}>
+        {customer.creditStatus || "-"}
+      </span>
+    ),
+  },
+  {
+    key: "contact.name",
+    label: "Contact",
+    render: (customer) => customer.contact?.name || "-",
+  },
+];
 
 export default function Customers() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -16,12 +62,31 @@ export default function Customers() {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [selectedCustomer, setSelectedCustomer] = useState<Client | null>(null);
 
-  const { customers, isLoading, error, total, params, updateParams } =
-    useCustomers({
-      limit: DEFAULT_LIMIT,
-      offset: 0,
-      orderBy: `${sortField} ${sortDirection}`,
-    });
+  const {
+    customers,
+    isLoading,
+    error,
+    total,
+    params,
+    updateParams,
+    createCustomer,
+  } = useCustomers({
+    limit: DEFAULT_LIMIT,
+    offset: 0,
+    orderBy: `${sortField} ${sortDirection}`,
+  });
+
+  const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false);
+
+  const handleCreateCustomer = async (customerData: Partial<Client>) => {
+    try {
+      await createCustomer(customerData);
+      setIsNewCustomerModalOpen(false);
+    } catch (err) {
+      console.error("Failed to create customer:", err);
+      // You might want to show an error toast here
+    }
+  };
 
   // Handle sorting
   const handleSort = (field: keyof Client) => {
@@ -32,16 +97,75 @@ export default function Customers() {
     updateParams({ orderBy: `${field} ${newDirection}` });
   };
 
-  // Handle search
-  const handleSearch = (term: string) => {
-    setSearchTerm(term);
-    updateParams({ search: term, offset: 0 }); // Reset to first record on new search
+  // Debounced search handler
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedSearch = useCallback(
+    debounce((term: string) => {
+      updateParams({ search: term, offset: 0 });
+    }, 500), // Wait 500ms after last keystroke before searching
+    [] // Empty dependency array since we don't need to recreate this function
+  );
+
+  // Handle search input
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const term = e.target.value;
+    setSearchTerm(term); // Update the input value immediately
+    debouncedSearch(term); // Debounce the API call
   };
+
+  // Clean up the debounced function on component unmount
+  useEffect(() => {
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [debouncedSearch]);
 
   // Handle pagination
   const handleOffsetChange = (newOffset: number) => {
     updateParams({ offset: newOffset });
   };
+
+  const renderMobileCard = (customer: Client, index: number) => (
+    <div
+      key={customer.id || `customer-${index}`}
+      onClick={() => setSelectedCustomer(customer)}
+      className='bg-white rounded-lg shadow mb-4 p-4 cursor-pointer hover:bg-gray-50'
+    >
+      <div className='flex justify-between items-start mb-2'>
+        <div className='flex-1'>
+          <h3 className='font-medium text-gray-900'>{customer.name}</h3>
+          <p className='text-sm text-gray-500'>
+            {customer.accountNumber || "-"}
+          </p>
+        </div>
+        <span
+          className={`px-2 py-1 rounded-full text-xs ${
+            customer.status === "Active"
+              ? "bg-green-100 text-green-800"
+              : "bg-gray-100 text-gray-800"
+          }`}
+        >
+          {customer.status}
+        </span>
+      </div>
+
+      <div className='mt-2 grid grid-cols-2 gap-x-4 gap-y-2'>
+        {MOBILE_FIELDS.slice(2).map(({ key, label, render }) => (
+          <div key={key} className='flex flex-col'>
+            <span className='text-xs text-gray-500'>{label}</span>
+            <span className='text-sm text-gray-900'>{render(customer)}</span>
+          </div>
+        ))}
+      </div>
+
+      {customer.contact?.name && (
+        <div className='mt-3 pt-3 border-t border-gray-100'>
+          <span className='text-xs text-gray-500'>Contact</span>
+          <p className='text-sm text-gray-900'>{customer.contact.name}</p>
+        </div>
+      )}
+    </div>
+  );
 
   if (isLoading) {
     return (
@@ -63,73 +187,102 @@ export default function Customers() {
     );
   }
 
-  // Calculate current page from offset and limit
   const currentPage =
     Math.floor((params.offset || 0) / (params.limit || DEFAULT_LIMIT)) + 1;
 
   return (
-    <div className='p-6 text-gray-900'>
-      <div className='flex justify-between items-center mb-6'>
+    <div className='p-4 sm:p-6 text-gray-900'>
+      {/* Header Section */}
+      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4'>
         <h1 className='text-2xl font-bold'>Customers</h1>
-        <button className='bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700'>
+        <button
+          className='w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors'
+          onClick={() => setIsNewCustomerModalOpen(true)}
+        >
           Add Customer
         </button>
       </div>
 
-      <div className='mb-4'>
-        <input
-          type='text'
-          placeholder='Search customers...'
-          className='w-full px-4 py-2 border rounded'
-          value={searchTerm}
-          onChange={(e) => handleSearch(e.target.value)}
-        />
+      {/* Search Section with updated onChange handler */}
+      <div className='mb-6'>
+        <div className='relative'>
+          <input
+            type='text'
+            placeholder='Search customers...'
+            className='w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+            value={searchTerm}
+            onChange={handleSearch}
+          />
+          <div className='absolute inset-y-0 right-0 flex items-center pr-3'>
+            <svg
+              className='h-5 w-5 text-gray-400'
+              fill='none'
+              viewBox='0 0 24 24'
+              stroke='currentColor'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
+              />
+            </svg>
+          </div>
+        </div>
       </div>
 
-      <div className='overflow-x-auto shadow'>
-        <table className='min-w-full bg-white rounded-lg border'>
+      {/* Mobile View */}
+      <div className='sm:hidden space-y-4'>
+        {customers?.map((customer, index) => renderMobileCard(customer, index))}
+      </div>
+
+      {/* Desktop View */}
+      <div className='hidden sm:block overflow-x-auto rounded-lg shadow'>
+        <table className='min-w-full bg-white'>
           <thead>
-            <tr className='bg-gray-100'>
-              {[
-                { key: "name", label: "Customer Name" },
-                { key: "type", label: "Type" },
-                { key: "status", label: "Status" },
-                { key: "creditStatus", label: "Credit Status" },
-                { key: "accountNumber", label: "Account Number" },
-                { key: "paymentTerms", label: "Payment Terms" },
-              ].map(({ key, label }) => (
+            <tr className='bg-gray-50'>
+              {MOBILE_FIELDS.map(({ key, label }) => (
                 <th
-                  key={key}
+                  key={`header-${key}`}
                   onClick={() => handleSort(key as keyof Client)}
-                  className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer'
+                  className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors'
                 >
-                  {label}
-                  {sortField === key && (sortDirection === "asc" ? " ↑" : " ↓")}
+                  <div className='flex items-center space-x-1'>
+                    <span>{label}</span>
+                    {sortField === key && (
+                      <span className='text-blue-500'>
+                        {sortDirection === "asc" ? " ↑" : " ↓"}
+                      </span>
+                    )}
+                  </div>
                 </th>
               ))}
             </tr>
           </thead>
           <tbody className='divide-y divide-gray-200'>
-            {customers.map((customer) => (
+            {customers?.map((customer, index) => (
               <tr
-                key={customer.id}
+                key={customer.id || `customer-row-${index}`}
                 onClick={() => setSelectedCustomer(customer)}
                 className='hover:bg-gray-50 cursor-pointer'
               >
-                <td className='px-6 py-4 font-medium'>{customer.name}</td>
-                <td className='px-6 py-4'>{customer.type}</td>
-                <td className='px-6 py-4'>{customer.status}</td>
-                <td className='px-6 py-4'>{customer.creditStatus}</td>
-                <td className='px-6 py-4'>{customer.accountNumber}</td>
-                <td className='px-6 py-4'>{customer.paymentTerms}</td>
+                {MOBILE_FIELDS.map(({ key, render }) => (
+                  <td
+                    key={`${customer.id || index}-${key}`}
+                    className='px-6 py-4'
+                  >
+                    {render(customer)}
+                  </td>
+                ))}
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
+      {/* Pagination - Adjust for mobile */}
       {total > (params.limit || DEFAULT_LIMIT) && (
-        <div className='mt-4'>
+        <div className='mt-6'>
           <Pagination
             currentPage={currentPage}
             pageSize={params.limit || DEFAULT_LIMIT}
@@ -141,6 +294,7 @@ export default function Customers() {
         </div>
       )}
 
+      {/* Modals */}
       {selectedCustomer && (
         <CustomerDetailsModal
           isOpen={!!selectedCustomer}
@@ -148,6 +302,12 @@ export default function Customers() {
           customer={selectedCustomer}
         />
       )}
+
+      <NewCustomerModal
+        isOpen={isNewCustomerModalOpen}
+        onClose={() => setIsNewCustomerModalOpen(false)}
+        onSubmit={handleCreateCustomer}
+      />
     </div>
   );
 }
