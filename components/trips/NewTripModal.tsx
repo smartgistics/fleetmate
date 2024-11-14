@@ -9,12 +9,10 @@ interface NewTripModalProps {
 export function NewTripModal({ isOpen, onClose }: NewTripModalProps) {
   const [formData, setFormData] = useState<Partial<Trip>>({
     status: "PENDING",
-    equipmentType: "",
-    customer: "",
-    pickupLocation: "",
-    deliveryLocation: "",
-    pickupDate: "",
-    deliveryDate: "",
+    originZone: "",
+    destinationZone: "",
+    origZoneDesc: "",
+    destZoneDesc: "",
   });
 
   if (!isOpen) return null;
@@ -41,29 +39,29 @@ export function NewTripModal({ isOpen, onClose }: NewTripModalProps) {
               <div className='space-y-4'>
                 <div>
                   <label className='block text-sm font-medium text-gray-700'>
-                    Customer
+                    Origin
                   </label>
                   <input
                     type='text'
                     className='mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2'
-                    value={formData.customer}
+                    value={formData.originZone}
                     onChange={(e) =>
-                      setFormData({ ...formData, customer: e.target.value })
+                      setFormData({ ...formData, originZone: e.target.value })
                     }
                   />
                 </div>
                 <div>
                   <label className='block text-sm font-medium text-gray-700'>
-                    Equipment Type
+                    Destination
                   </label>
                   <input
                     type='text'
                     className='mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2'
-                    value={formData.equipmentType}
+                    value={formData.destinationZone}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        equipmentType: e.target.value,
+                        destinationZone: e.target.value,
                       })
                     }
                   />

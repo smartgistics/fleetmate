@@ -1,10 +1,5 @@
-import {
-  WeeklyData,
-  CountItem,
-  RevenueItem,
-  Trip,
-  Order,
-} from "@/types/truckmate";
+import { WeeklyData, CountItem, RevenueItem } from "@/types/dashboard";
+import { Trip, Order } from "@/types/truckmate";
 import { fetchOrders, fetchTrips } from "@/services/truckMateService";
 
 // Type guards
@@ -25,12 +20,12 @@ type ValidKeys = CommonKeys | OrderOnlyKeys | TripOnlyKeys;
 export async function getWeeklyRevenue(): Promise<WeeklyData[]> {
   try {
     const [orders, trips] = await Promise.all([fetchOrders(), fetchTrips()]);
-    const allItems = [...orders, ...trips];
+    const allItems = [...orders.orders, ...trips.trips];
 
     const weeklyData = allItems.reduce<Record<string, WeeklyData>>(
       (acc, item) => {
         const date = new Date(
-          isOrder(item) ? item.createdTime : item.createdDateTime
+          isOrder(item) ? item.createdTime : new Date(item.eTA || "")
         );
         const weekStart = new Date(
           date.setDate(date.getDate() - date.getDay())
@@ -45,9 +40,7 @@ export async function getWeeklyRevenue(): Promise<WeeklyData[]> {
           };
         }
 
-        acc[weekKey].revenue += isOrder(item)
-          ? item.totalCharges
-          : item.revenue;
+        acc[weekKey].revenue += isOrder(item) ? item.totalCharges : 0;
         acc[weekKey].shipments += 1;
 
         return acc;
@@ -71,12 +64,12 @@ export async function getTopItems(
   try {
     const trips = await fetchTrips();
 
-    const counts = trips.reduce<Record<string, number>>((acc, trip) => {
+    const counts = trips.trips.reduce<Record<string, number>>((acc, trip) => {
       let value: string;
 
       if (key === "carriers") {
-        value = trip.carriers?.[0]?.carrierId || "Unknown";
-      } else if (key === "pickupLocation" || key === "deliveryLocation") {
+        value = trip.carriers?.[0]?.vendorId || "Unknown";
+      } else if (key === "originZone" || key === "destinationZone") {
         value = String(trip[key] || "Unknown");
       } else {
         value = String(trip[key] || "Unknown");
@@ -102,7 +95,7 @@ export async function getTopItemsByRevenue(
 ): Promise<RevenueItem[]> {
   try {
     const [orders, trips] = await Promise.all([fetchOrders(), fetchTrips()]);
-    const allItems = [...orders, ...trips];
+    const allItems = [...orders.orders, ...trips.trips];
 
     const revenue = allItems.reduce<Record<string, number>>((acc, item) => {
       let value: string;
@@ -111,7 +104,7 @@ export async function getTopItemsByRevenue(
         value = String(item[key as keyof Order] || "Unknown");
       } else if (isTrip(item)) {
         if (key === "carriers") {
-          value = item.carriers?.[0]?.carrierId || "Unknown";
+          value = item.carriers?.[0]?.vendorId || "Unknown";
         } else {
           value = String(item[key as keyof Trip] || "Unknown");
         }
@@ -119,7 +112,7 @@ export async function getTopItemsByRevenue(
         value = "Unknown";
       }
 
-      const amount = isOrder(item) ? item.totalCharges : item.revenue;
+      const amount = isOrder(item) ? item.totalCharges : 0;
       acc[value] = (acc[value] || 0) + amount;
       return acc;
     }, {});

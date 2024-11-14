@@ -11,11 +11,11 @@ interface CustomerTabProps {
 export function CustomerTab({ formData, setFormData }: CustomerTabProps) {
   const { data: customers, isLoading } = useQuery({
     queryKey: ["customers"],
-    queryFn: fetchClients,
+    queryFn: () => fetchClients(),
   });
 
   const handleCustomerChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedCustomer = customers?.find(
+    const selectedCustomer = customers?.clients.find(
       (c: Client) => c.id === e.target.value
     );
 
@@ -43,7 +43,7 @@ export function CustomerTab({ formData, setFormData }: CustomerTabProps) {
           disabled={isLoading}
         >
           <option value=''>Select a customer</option>
-          {customers?.map((customer) => (
+          {customers?.clients.map((customer) => (
             <option key={customer.id} value={customer.id}>
               {customer.name}
             </option>

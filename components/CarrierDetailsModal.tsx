@@ -68,12 +68,6 @@ export function CarrierDetailsModal({
           </div>
           <div>
             <label className='block text-sm font-medium text-gray-500'>
-              Email
-            </label>
-            <p className='mt-1 text-sm text-gray-900'>{carrier.email}</p>
-          </div>
-          <div>
-            <label className='block text-sm font-medium text-gray-500'>
               Primary Contact
             </label>
             <p className='mt-1 text-sm text-gray-900'>{carrier.contact}</p>
@@ -115,15 +109,13 @@ export function CarrierDetailsModal({
             <label className='block text-sm font-medium text-gray-500'>
               Default Terminal
             </label>
-            <p className='mt-1 text-sm text-gray-900'>
-              {carrier.defaultTerminal}
-            </p>
+            <p className='mt-1 text-sm text-gray-900'>Term 1</p>
           </div>
           <div>
             <label className='block text-sm font-medium text-gray-500'>
               Rate Mode
             </label>
-            <p className='mt-1 text-sm text-gray-900'>{carrier.rateMode}</p>
+            <p className='mt-1 text-sm text-gray-900'>TBD</p>
           </div>
           <div>
             <label className='block text-sm font-medium text-gray-500'>
@@ -148,25 +140,25 @@ export function CarrierDetailsModal({
             <label className='block text-sm font-medium text-gray-500'>
               DOT Number
             </label>
-            <p className='mt-1 text-sm text-gray-900'>{carrier.dotNumber}</p>
+            <p className='mt-1 text-sm text-gray-900'>TBD</p>
           </div>
           <div>
             <label className='block text-sm font-medium text-gray-500'>
               ICC Number
             </label>
-            <p className='mt-1 text-sm text-gray-900'>{carrier.iccNumber}</p>
+            <p className='mt-1 text-sm text-gray-900'>TBD</p>
           </div>
           <div>
             <label className='block text-sm font-medium text-gray-500'>
               Federal ID
             </label>
-            <p className='mt-1 text-sm text-gray-900'>{carrier.federalId}</p>
+            <p className='mt-1 text-sm text-gray-900'>TBD</p>
           </div>
           <div>
             <label className='block text-sm font-medium text-gray-500'>
               W9 Status
             </label>
-            <p className='mt-1 text-sm text-gray-900'>{carrier.w9}</p>
+            <p className='mt-1 text-sm text-gray-900'>TBD</p>
           </div>
         </div>
       </div>
@@ -193,13 +185,13 @@ export function CarrierDetailsModal({
             <label className='block text-sm font-medium text-gray-500'>
               Cargo Coverage
             </label>
-            <p className='mt-1 text-sm text-gray-900'>{carrier.cargo}</p>
+            <p className='mt-1 text-sm text-gray-900'>TBD</p>
           </div>
           <div>
             <label className='block text-sm font-medium text-gray-500'>
               Workers Comp
             </label>
-            <p className='mt-1 text-sm text-gray-900'>{carrier.workComp}</p>
+            <p className='mt-1 text-sm text-gray-900'>TBD</p>
           </div>
         </div>
       </div>
@@ -225,7 +217,8 @@ export function CarrierDetailsModal({
                       {carrier.name}
                     </h2>
                     <p className='text-sm text-gray-500'>
-                      {carrier.vendorType} - {carrier.status}
+                      {carrier.vendorType} -{" "}
+                      {carrier.isActive ? "Active" : "Inactive"}
                     </p>
                   </div>
                   <div className='h-7 flex items-center'>

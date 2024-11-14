@@ -14,7 +14,7 @@ export function OrderDetailsTab({
 }: OrderDetailsTabProps) {
   const { data: commodities } = useQuery({
     queryKey: ["commodities"],
-    queryFn: fetchCommodities,
+    queryFn: () => fetchCommodities(),
   });
 
   const serviceLevels: ServiceLevel[] = [
@@ -70,7 +70,7 @@ export function OrderDetailsTab({
           Commodities
         </label>
         <div className='mt-2 space-y-4'>
-          {commodities?.map((commodity) => (
+          {commodities?.commodities.map((commodity) => (
             <div
               key={commodity.code}
               className='flex items-center justify-between p-2 border rounded'
