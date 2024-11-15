@@ -3,10 +3,13 @@ import { withAuth } from "next-auth/middleware";
 export default withAuth({
   callbacks: {
     authorized: ({ token, req }) => {
-      // Allow auth-related pages
+      // Allow auth-related pages and static assets
       if (
         req.nextUrl.pathname.startsWith("/auth/") ||
-        req.nextUrl.pathname === "/"
+        req.nextUrl.pathname === "/" ||
+        req.nextUrl.pathname.startsWith("/videos/") ||
+        req.nextUrl.pathname.startsWith("/hero-images/") ||
+        req.nextUrl.pathname === "/public/"
       ) {
         return true;
       }
@@ -17,5 +20,8 @@ export default withAuth({
 });
 
 export const config = {
-  matcher: ["/((?!api/auth|_next|public|favicon.ico).*)"],
+  matcher: [
+    // Match all paths except:
+    "/((?!api/auth|_next|videos|hero-images|public|favicon.ico).*)",
+  ],
 };

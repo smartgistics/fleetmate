@@ -8,7 +8,7 @@ export default function HomePage() {
       {/* Hero Section */}
       <div className='relative h-screen'>
         <Image
-          src='/hero-images/hero3.jpg'
+          src='/hero-images/homepage-hero.jpg'
           alt='Fleet Management'
           fill
           className='object-cover'

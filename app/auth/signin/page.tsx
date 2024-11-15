@@ -13,8 +13,15 @@ export default function SignIn() {
         loop
         muted
         playsInline
+        preload='auto'
         className='absolute inset-0 w-full h-full object-cover'
-        poster='/hero-images/hero4.jpg'
+        poster='/hero-images/signin-hero.jpg'
+        style={{
+          backfaceVisibility: "hidden",
+          transform: "translateZ(0)",
+          objectFit: "cover",
+          willChange: "transform",
+        }}
       >
         <source src='/videos/signin-background.mp4' type='video/mp4' />
         Your browser does not support the video tag.

@@ -20,7 +20,7 @@ export default function SignOutPage() {
         muted
         playsInline
         className='absolute inset-0 w-full h-full object-cover'
-        poster='/hero-images/hero2.jpg'
+        poster='/hero-images/signout-hero.jpg'
       >
         <source src='/videos/signout-background.mp4' type='video/mp4' />
         Your browser does not support the video tag.
