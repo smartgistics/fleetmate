@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Client } from "@/types/truckmate";
+import { formatPhoneNumber } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 interface CustomerDetailsModalProps {
   isOpen: boolean;
@@ -30,24 +32,24 @@ export default function CustomerDetailsModal({
           Details
         </button>
         <button
-          onClick={() => setActiveTab("credit")}
+          onClick={() => setActiveTab("contact")}
           className={`${
-            activeTab === "credit"
+            activeTab === "contact"
               ? "border-blue-500 text-blue-600"
               : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
           } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
         >
-          Credit Info
+          Contact Info
         </button>
         <button
-          onClick={() => setActiveTab("terms")}
+          onClick={() => setActiveTab("preferences")}
           className={`${
-            activeTab === "terms"
+            activeTab === "preferences"
               ? "border-blue-500 text-blue-600"
               : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
           } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
         >
-          Payment Terms
+          Preferences
         </button>
       </nav>
     </div>
@@ -65,9 +67,26 @@ export default function CustomerDetailsModal({
             <label className='block text-sm font-medium text-gray-500'>
               Account Number
             </label>
+            <p className='mt-1 text-sm text-gray-900'>{customer.clientId}</p>
+          </div>
+          <div>
+            <label className='block text-sm font-medium text-gray-500'>
+              Customer Since
+            </label>
             <p className='mt-1 text-sm text-gray-900'>
-              {customer.accountNumber}
+              {new Date(customer.customerSince || "").toLocaleDateString()}
             </p>
+          </div>
+          <div>
+            <label className='block text-sm font-medium text-gray-500'>
+              Status
+            </label>
+            <Badge
+              variant={customer.status === "Active" ? "default" : "secondary"}
+              className='mt-1'
+            >
+              {customer.status}
+            </Badge>
           </div>
           <div>
             <label className='block text-sm font-medium text-gray-500'>
@@ -75,68 +94,140 @@ export default function CustomerDetailsModal({
             </label>
             <p className='mt-1 text-sm text-gray-900'>{customer.type}</p>
           </div>
-          <div>
-            <label className='block text-sm font-medium text-gray-500'>
-              Status
-            </label>
-            <p className='mt-1 text-sm text-gray-900'>{customer.status}</p>
-          </div>
-          <div>
-            <label className='block text-sm font-medium text-gray-500'>
-              Tax ID
-            </label>
-            <p className='mt-1 text-sm text-gray-900'>{customer.taxId}</p>
-          </div>
         </div>
       </div>
+
+      {/* Comments Section */}
+      {customer.comments && (
+        <div>
+          <h3 className='text-lg font-medium text-gray-900 mb-2'>Comments</h3>
+          <p className='text-sm text-gray-600 whitespace-pre-wrap'>
+            {customer.comments}
+          </p>
+        </div>
+      )}
     </div>
   );
 
-  const renderCreditContent = () => (
+  const renderContactContent = () => (
     <div className='space-y-6'>
-      {/* Credit Information */}
+      {/* Address Information */}
       <div>
         <h3 className='text-lg font-medium text-gray-900 mb-4'>
-          Credit Information
+          Address Information
+        </h3>
+        <div className='space-y-2'>
+          <p className='text-sm text-gray-900'>
+            {customer.address1}
+            {customer.address2 && (
+              <span>
+                <br />
+                {customer.address2}
+              </span>
+            )}
+          </p>
+          <p className='text-sm text-gray-900'>
+            {customer.city}, {customer.province} {customer.postalCode}
+          </p>
+          <p className='text-sm text-gray-900'>{customer.country}</p>
+        </div>
+      </div>
+
+      {/* Contact Information */}
+      <div>
+        <h3 className='text-lg font-medium text-gray-900 mb-4'>
+          Contact Information
         </h3>
         <div className='grid grid-cols-2 gap-4'>
           <div>
             <label className='block text-sm font-medium text-gray-500'>
-              Credit Status
+              Business Phone
             </label>
             <p className='mt-1 text-sm text-gray-900'>
-              {customer.creditStatus}
+              {formatPhoneNumber(customer.businessPhone)}
+              {customer.businessPhoneExt &&
+                ` ext. ${customer.businessPhoneExt}`}
             </p>
           </div>
-          <div>
-            <label className='block text-sm font-medium text-gray-500'>
-              Credit Limit
-            </label>
-            <p className='mt-1 text-sm text-gray-900'>
-              ${customer.creditLimit?.toLocaleString()}
-            </p>
-          </div>
+          {customer.faxPhone && (
+            <div>
+              <label className='block text-sm font-medium text-gray-500'>
+                Fax
+              </label>
+              <p className='mt-1 text-sm text-gray-900'>
+                {formatPhoneNumber(customer.faxPhone)}
+              </p>
+            </div>
+          )}
+          {customer.altContact && (
+            <div>
+              <label className='block text-sm font-medium text-gray-500'>
+                Alternate Contact
+              </label>
+              <p className='mt-1 text-sm text-gray-900'>
+                {customer.altContact}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 
-  const renderTermsContent = () => (
+  const renderPreferencesContent = () => (
     <div className='space-y-6'>
-      {/* Payment Terms */}
+      {/* Business Hours */}
       <div>
         <h3 className='text-lg font-medium text-gray-900 mb-4'>
-          Payment Terms
+          Business Hours
         </h3>
-        <div className='space-y-4'>
+        <div className='grid grid-cols-2 gap-4'>
           <div>
             <label className='block text-sm font-medium text-gray-500'>
-              Payment Terms
+              Open Time
             </label>
             <p className='mt-1 text-sm text-gray-900'>
-              {customer.paymentTerms}
+              {customer.openTime || "Not specified"}
             </p>
           </div>
+          <div>
+            <label className='block text-sm font-medium text-gray-500'>
+              Close Time
+            </label>
+            <p className='mt-1 text-sm text-gray-900'>
+              {customer.closeTime || "Not specified"}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Additional Preferences */}
+      <div>
+        <h3 className='text-lg font-medium text-gray-900 mb-4'>
+          Additional Information
+        </h3>
+        <div className='grid grid-cols-2 gap-4'>
+          <div>
+            <label className='block text-sm font-medium text-gray-500'>
+              Web Access
+            </label>
+            <Badge
+              variant={customer.webEnabled ? "default" : "secondary"}
+              className='mt-1'
+            >
+              {customer.webEnabled ? "Enabled" : "Disabled"}
+            </Badge>
+          </div>
+          {customer.preferredDriver && (
+            <div>
+              <label className='block text-sm font-medium text-gray-500'>
+                Preferred Driver
+              </label>
+              <p className='mt-1 text-sm text-gray-900'>
+                {customer.preferredDriver}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -148,7 +239,7 @@ export default function CustomerDetailsModal({
         <div
           className='absolute inset-0 bg-gray-500 bg-opacity-75 transition-opacity'
           onClick={onClose}
-        ></div>
+        />
 
         <section className='absolute inset-y-0 right-0 pl-10 max-w-full flex'>
           <div className='relative w-screen max-w-md'>
@@ -161,30 +252,28 @@ export default function CustomerDetailsModal({
                       {customer.name}
                     </h2>
                     <p className='text-sm text-gray-500'>
-                      {customer.type} - {customer.status}
+                      Account #{customer.clientId}
                     </p>
                   </div>
-                  <div className='h-7 flex items-center'>
-                    <button
-                      onClick={onClose}
-                      className='text-gray-400 hover:text-gray-500'
+                  <button
+                    onClick={onClose}
+                    className='text-gray-400 hover:text-gray-500'
+                  >
+                    <span className='sr-only'>Close panel</span>
+                    <svg
+                      className='h-6 w-6'
+                      fill='none'
+                      viewBox='0 0 24 24'
+                      stroke='currentColor'
                     >
-                      <span className='sr-only'>Close panel</span>
-                      <svg
-                        className='h-6 w-6'
-                        fill='none'
-                        viewBox='0 0 24 24'
-                        stroke='currentColor'
-                      >
-                        <path
-                          strokeLinecap='round'
-                          strokeLinejoin='round'
-                          strokeWidth='2'
-                          d='M6 18L18 6M6 6l12 12'
-                        />
-                      </svg>
-                    </button>
-                  </div>
+                      <path
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth='2'
+                        d='M6 18L18 6M6 6l12 12'
+                      />
+                    </svg>
+                  </button>
                 </div>
               </div>
 
@@ -194,26 +283,8 @@ export default function CustomerDetailsModal({
                   {renderTabs()}
                   <div className='py-4'>
                     {activeTab === "details" && renderDetailsContent()}
-                    {activeTab === "credit" && renderCreditContent()}
-                    {activeTab === "terms" && renderTermsContent()}
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className='px-4 py-6 sm:px-6 border-t border-gray-200 mt-6'>
-                  <div className='flex space-x-3'>
-                    <button
-                      type='button'
-                      className='flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700'
-                    >
-                      Edit Customer
-                    </button>
-                    <button
-                      type='button'
-                      className='flex-1 px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-600 rounded-md hover:bg-red-50'
-                    >
-                      Deactivate Customer
-                    </button>
+                    {activeTab === "contact" && renderContactContent()}
+                    {activeTab === "preferences" && renderPreferencesContent()}
                   </div>
                 </div>
               </div>
