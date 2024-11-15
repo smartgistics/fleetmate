@@ -15,12 +15,22 @@ export function useVendors(
     error,
   } = useQuery({
     queryKey: ["vendors", vendorType, params],
-    queryFn: () => fetchVendors(vendorType, params),
+    queryFn: () => {
+      console.log("Fetching vendors with params:", params);
+      return fetchVendors(vendorType, params);
+    },
   });
 
   const updateParams = (newParams: Partial<TruckMateQueryParams>) => {
+    console.log("Updating params:", { current: params, new: newParams });
     setParams((prev) => ({ ...prev, ...newParams }));
   };
+
+  console.log("useVendors response:", {
+    total: response?.count,
+    currentPage: Math.floor((params.offset || 0) / (params.limit || 20)) + 1,
+    vendors: response?.vendors?.length,
+  });
 
   return {
     vendors: response?.vendors ?? [],

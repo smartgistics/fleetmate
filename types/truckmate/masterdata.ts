@@ -2,59 +2,42 @@ import { ServiceLevel, Commodity, PaginatedTruckMateResponse } from "./common";
 
 // Client/Account related types
 export interface Client {
-  id: string;
+  clientId: string;
   name: string;
+  address1: string;
+  address2?: string;
+  city: string;
+  province: string;
+  country: string;
+  postalCode: string;
+  businessPhone?: string;
+  businessPhoneExt?: string;
+  faxPhone?: string;
+  businessCell?: string;
+  openTime?: string;
+  closeTime?: string;
+  comments?: string;
+  preferredDriver?: string;
+  customerSince?: string;
+  altContact?: string;
+  altBusinessPhone?: string;
+  altBusinessPhoneExt?: string;
+  altFaxPhone?: string;
+  altBusinessCell?: string;
   status: string;
   type: string;
-  accountNumber?: string;
   taxId?: string;
-  creditLimit?: number;
-  creditStatus?: string;
-  paymentTerms?: string;
-
-  // Contact Information
-  contact?: {
-    name: string;
-    phone?: string;
-    email?: string;
-    fax?: string;
-  };
-
-  // Address
-  address?: {
-    street1: string;
-    street2?: string;
-    city: string;
-    state: string;
-    zip: string;
-    country: string;
-  };
-
-  // Business Details
-  defaultServiceLevel?: string;
-  defaultEquipmentType?: string;
-  defaultTerminal?: string;
-  defaultZone?: string;
-
-  // Financial Details
-  currency?: string;
-  creditTerms?: string;
-  creditHold?: boolean;
-
-  // Preferences
-  temperatureRequirements?: {
-    required: boolean;
-    minTemp?: number;
-    maxTemp?: number;
-    tempUnits?: string;
-  };
-
-  // Metadata
-  createdDate?: string;
-  modifiedDate?: string;
-  lastActivityDate?: string;
   webEnabled?: boolean;
-  isActive?: boolean;
+  user1?: string;
+  user2?: string;
+  user3?: string;
+  user4?: string;
+  user5?: string;
+  user6?: string;
+  user7?: string;
+  user8?: string;
+  user9?: string;
+  user10?: string;
 }
 
 // Driver types

@@ -95,6 +95,23 @@ export const useCustomers = (initialParams: TruckMateQueryParams = {}) => {
   const [params, setParams] = useState<TruckMateQueryParams>({
     limit: DEFAULT_LIMIT,
     offset: 0,
+    select: [
+      "clientId",
+      "name",
+      "status",
+      "businessPhone",
+      "address1",
+      "address2",
+      "city",
+      "province",
+      "country",
+      "postalCode",
+      "businessPhoneExt",
+      "faxPhone",
+      "comments",
+      "customerSince",
+      "webEnabled",
+    ],
     ...initialParams,
   });
   const [total, setTotal] = useState(0);
@@ -102,19 +119,25 @@ export const useCustomers = (initialParams: TruckMateQueryParams = {}) => {
   const loadCustomers = useCallback(async () => {
     try {
       setIsLoading(true);
-      console.log("Loading customers with params:", params);
-      const response = await fetchClients(params);
-      console.log("Customers loaded:", {
-        count: response.count,
-        received: response.clients.length,
-        filter: response.filter,
-      });
+
+      const apiParams: TruckMateQueryParams = {
+        ...params,
+        filter: params.filter,
+        select: params.select,
+        orderBy: params.orderBy,
+        limit: params.limit,
+        offset: params.offset,
+        expand: params.expand,
+      };
+
+      const response = await fetchClients(apiParams);
+
       setCustomers(response.clients);
       setTotal(response.count);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to fetch customers"
-      );
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch customers";
+      setError(errorMessage);
       console.error("Error loading customers:", err);
     } finally {
       setIsLoading(false);
@@ -122,17 +145,24 @@ export const useCustomers = (initialParams: TruckMateQueryParams = {}) => {
   }, [params]);
 
   useEffect(() => {
-    console.log("Params changed, reloading customers:", params);
     void loadCustomers();
-  }, [loadCustomers, params]);
+  }, [loadCustomers]);
 
   const updateParams = useCallback(
     (newParams: Partial<TruckMateQueryParams>) => {
-      console.log("Updating params:", { current: params, new: newParams });
+      console.log("Updating params:", {
+        current: params,
+        new: newParams,
+        resultingOffset: newParams.offset,
+      });
+
       setParams((prev) => ({
         ...prev,
         ...newParams,
-        offset: newParams.filter !== undefined ? 0 : prev.offset,
+        offset:
+          newParams.filter !== undefined ? 0 : newParams.offset ?? prev.offset,
+        select: prev.select,
+        expand: prev.expand,
       }));
     },
     [params]
@@ -142,7 +172,6 @@ export const useCustomers = (initialParams: TruckMateQueryParams = {}) => {
     try {
       setIsLoading(true);
       await createClient(customerData);
-      // Reload the customers list after creating a new one
       await loadCustomers();
     } catch (err) {
       setError(

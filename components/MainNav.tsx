@@ -6,13 +6,23 @@ import { navigationItems } from "@/config/navigation";
 
 interface MainNavProps {
   collapsed?: boolean;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
 
-export function MainNav({ collapsed = false }: MainNavProps) {
+export function MainNav({
+  collapsed = false,
+  onMouseEnter,
+  onMouseLeave,
+}: MainNavProps) {
   const pathname = usePathname();
 
   return (
-    <nav className='mt-5 flex-1 px-2'>
+    <nav
+      className='mt-5 flex-1 px-2'
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
       {navigationItems.map((item) => {
         const isActive = pathname === item.path;
 
@@ -49,7 +59,7 @@ export function MainNav({ collapsed = false }: MainNavProps) {
               className={`
                 transition-all duration-300 ease-in-out
                 ${collapsed ? "w-0 opacity-0" : "w-auto opacity-100"}
-                overflow-hidden
+                overflow-hidden whitespace-nowrap
               `}
             >
               {item.label}

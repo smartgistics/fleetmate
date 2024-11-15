@@ -253,6 +253,7 @@ export const fetchClients = async (
 
   const queryParams = new URLSearchParams();
 
+  // Add only defined parameters with correct $ prefix for OData
   if (params.limit !== undefined)
     queryParams.set("limit", params.limit.toString());
   if (params.offset !== undefined)
@@ -273,19 +274,29 @@ export const fetchClients = async (
       filter: queryParams.get("$filter"),
       url: url,
     });
-    return response;
+
+    return {
+      href: response.href,
+      offset: response.offset || params.offset || 0,
+      limit: response.limit || params.limit || DEFAULT_LIMIT,
+      sort: response.sort || "",
+      filter: response.filter || "",
+      select: response.select || "",
+      count: response.count || 0,
+      clients: Array.isArray(response.clients)
+        ? response.clients.map((client) => ({
+            ...client,
+            // Ensure required fields are present
+            clientId: client.clientId || "",
+            name: client.name || "",
+            status: client.status || "Active",
+            type: client.type || "Regular",
+          }))
+        : [],
+    };
   } catch (error) {
     console.error("Failed to fetch customers:", error);
-    return {
-      href: url,
-      offset: params.offset || 0,
-      limit: params.limit || DEFAULT_LIMIT,
-      sort: "",
-      filter: "",
-      select: "",
-      count: 0,
-      clients: [],
-    };
+    throw error;
   }
 };
 
@@ -300,17 +311,33 @@ export const fetchVendors = async (
   const queryParams = new URLSearchParams();
 
   // Add vendorType filter if provided
+  const filters = [];
   if (vendorType) {
-    queryParams.set("$filter", `vendorType eq '${vendorType}'`);
+    filters.push(`vendorType eq '${vendorType}'`);
+  }
+  if (params.filter) {
+    filters.push(`(${params.filter})`);
+  }
+  if (filters.length > 0) {
+    queryParams.set("$filter", filters.join(" and "));
   }
 
-  if (params.limit !== undefined)
-    queryParams.set("limit", params.limit.toString());
-  if (params.offset !== undefined)
-    queryParams.set("offset", params.offset.toString());
-  if (params.select) queryParams.set("$select", params.select.join(","));
-  if (params.orderBy) queryParams.set("$orderBy", params.orderBy);
-  if (params.expand) queryParams.set("expand", params.expand.join(","));
+  // Add pagination parameters
+  if (params.limit !== undefined) {
+    queryParams.set("$top", params.limit.toString());
+  }
+  if (params.offset !== undefined) {
+    queryParams.set("$skip", params.offset.toString());
+  }
+  if (params.orderBy) {
+    queryParams.set("$orderBy", params.orderBy);
+  }
+  if (params.select) {
+    queryParams.set("$select", params.select.join(","));
+  }
+  if (params.expand) {
+    queryParams.set("$expand", params.expand.join(","));
+  }
 
   const url = `${TM_MASTERDATA_API_URL}/vendors?${queryParams.toString()}`;
   console.log("Fetching vendors from", url);
@@ -319,8 +346,8 @@ export const fetchVendors = async (
     const response = await fetchWithAuth<VendorsResponse>(url);
     return {
       href: response.href,
-      offset: response.offset,
-      limit: response.limit,
+      offset: params.offset || 0,
+      limit: params.limit || DEFAULT_LIMIT,
       sort: response.sort,
       filter: response.filter,
       select: response.select,
@@ -353,38 +380,48 @@ export const createClient = async (
 
   // Format the request body according to API spec
   const requestBody = {
-    clientId: clientData.accountNumber, // Required field
+    clientId: clientData.clientId, // Required field
     name: clientData.name, // Required field
     type: clientData.type || "Regular", // Required field with default
     status: clientData.status || "Active", // Required field with default
-    address1: clientData.address?.street1,
-    address2: clientData.address?.street2,
-    city: clientData.address?.city,
-    province: clientData.address?.state,
-    country: clientData.address?.country || "USA",
-    postalCode: clientData.address?.zip,
-    businessPhone: clientData.contact?.phone,
-    businessPhoneExt: "",
-    faxPhone: clientData.contact?.fax,
-    businessCell: "",
-    openTime: "",
-    closeTime: "",
-    comments: "",
-    preferredDriver: "",
-    customerSince: new Date().toISOString().split("T")[0],
-    altContact: clientData.contact?.name,
-    altBusinessPhone: "",
-    altBusinessPhoneExt: "",
-    altFaxPhone: "",
-    altBusinessCell: "",
+    address1: clientData.address1,
+    address2: clientData.address2,
+    city: clientData.city,
+    province: clientData.province,
+    country: clientData.country || "USA",
+    postalCode: clientData.postalCode,
+    businessPhone: clientData.businessPhone,
+    businessPhoneExt: clientData.businessPhoneExt || "",
+    faxPhone: clientData.faxPhone,
+    businessCell: clientData.businessCell || "",
+    openTime: clientData.openTime || "",
+    closeTime: clientData.closeTime || "",
+    comments: clientData.comments || "",
+    preferredDriver: clientData.preferredDriver || "",
+    customerSince:
+      clientData.customerSince || new Date().toISOString().split("T")[0],
+    altContact: clientData.altContact,
+    altBusinessPhone: clientData.altBusinessPhone || "",
+    altBusinessPhoneExt: clientData.altBusinessPhoneExt || "",
+    altFaxPhone: clientData.altFaxPhone || "",
+    altBusinessCell: clientData.altBusinessCell || "",
     taxId: clientData.taxId,
     webEnabled: clientData.webEnabled ?? true,
-    isActive: clientData.isActive ?? true,
+    user1: clientData.user1,
+    user2: clientData.user2,
+    user3: clientData.user3,
+    user4: clientData.user4,
+    user5: clientData.user5,
+    user6: clientData.user6,
+    user7: clientData.user7,
+    user8: clientData.user8,
+    user9: clientData.user9,
+    user10: clientData.user10,
   };
 
   // Validate required fields before making request
   if (!requestBody.clientId) {
-    throw new Error("Account Number (clientId) is required");
+    throw new Error("Client ID is required");
   }
   if (!requestBody.name) {
     throw new Error("Customer Name is required");
@@ -403,13 +440,12 @@ export const createClient = async (
   try {
     const response = await fetchWithAuth<{ client: Client }>(url, {
       method: "POST",
-      body: JSON.stringify(requestBody), // Remove array wrapper as per API spec
+      body: JSON.stringify(requestBody),
     });
 
     console.log("Customer creation response:", response);
     return response.client;
   } catch (error) {
-    // Enhanced error handling
     let errorMessage = "Failed to create customer: ";
 
     if (error instanceof Error) {
@@ -420,7 +456,6 @@ export const createClient = async (
         url,
       });
 
-      // Parse specific error cases
       if (error.message.includes("400")) {
         errorMessage +=
           "Invalid input parameters. Please check all required fields.";

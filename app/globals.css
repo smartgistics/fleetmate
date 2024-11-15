@@ -5,6 +5,8 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --sidebar-width: 12rem;
+  --sidebar-collapsed-width: 3rem;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -18,4 +20,39 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Add smooth transition styles */
+.main-content {
+  position: relative;
+  min-height: 100vh;
+  width: calc(100% - var(--sidebar-collapsed-width));
+  margin-left: var(--sidebar-collapsed-width);
+  transition: all 300ms ease-in-out;
+}
+
+.main-content.pinned {
+  width: calc(100% - var(--sidebar-width));
+  margin-left: var(--sidebar-width);
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 50;
+  width: var(--sidebar-width);
+  transform: translateX(
+    calc(var(--sidebar-collapsed-width) - var(--sidebar-width))
+  );
+  transition: transform 300ms ease-in-out;
+}
+
+.sidebar.expanded {
+  transform: translateX(0);
+}
+
+.sidebar.pinned {
+  transform: translateX(0);
 }
