@@ -16,15 +16,24 @@ export function CustomerTab({ formData, setFormData }: CustomerTabProps) {
 
   const handleCustomerChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedCustomer = customers?.clients.find(
-      (c: Client) => c.id === e.target.value
+      (c: Client) => c.clientId === e.target.value
     );
 
     if (selectedCustomer) {
       setFormData({
         ...formData,
         customer: selectedCustomer.name,
-        customerId: selectedCustomer.id,
-        creditStatus: selectedCustomer.creditStatus || "",
+        customerId: selectedCustomer.clientId,
+        customerContact: selectedCustomer.altContact || "",
+        contactPhone: selectedCustomer.businessPhone || "",
+        billingAddress: [
+          selectedCustomer.address1,
+          selectedCustomer.address2,
+          `${selectedCustomer.city}, ${selectedCustomer.province} ${selectedCustomer.postalCode}`,
+          selectedCustomer.country,
+        ]
+          .filter(Boolean)
+          .join("\n"),
       });
     }
   };
@@ -44,7 +53,7 @@ export function CustomerTab({ formData, setFormData }: CustomerTabProps) {
         >
           <option value=''>Select a customer</option>
           {customers?.clients.map((customer) => (
-            <option key={customer.id} value={customer.id}>
+            <option key={customer.clientId} value={customer.clientId}>
               {customer.name}
             </option>
           ))}

@@ -16,6 +16,22 @@ export const useOrders = (initialParams: TruckMateQueryParams = {}) => {
   const [params, setParams] = useState<TruckMateQueryParams>({
     limit: DEFAULT_LIMIT,
     offset: 0,
+    // select: [
+    //   "orderId",
+    //   "billTo",
+    //   "billType",
+    //   "commodity",
+    //   "createdBy",
+    //   "createdTime",
+    //   "status",
+    //   "serviceLevel",
+    //   "currentStatusBehaviour",
+    //   "totalCharges",
+    //   "billToCode",
+    //   "billDate",
+    //   "actualDelivery",
+    //   "actualPickup",
+    // ],
     ...initialParams,
   });
   const [total, setTotal] = useState(0);

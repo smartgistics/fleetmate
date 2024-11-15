@@ -1,5 +1,11 @@
 import React, { useState } from "react";
 import { Client } from "@/types/truckmate";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Select } from "@/components/ui/select";
 
 interface NewCustomerModalProps {
   isOpen: boolean;
@@ -7,30 +13,33 @@ interface NewCustomerModalProps {
   onSubmit: (customer: Partial<Client>) => Promise<void>;
 }
 
-type ContactField = keyof NonNullable<Client["contact"]>;
-type AddressField = keyof NonNullable<Client["address"]>;
-
 const DEFAULT_CUSTOMER: Partial<Client> = {
+  clientId: "",
+  name: "",
   status: "Active",
   type: "Regular",
-  creditStatus: "Good",
-  defaultServiceLevel: "STD",
+  address1: "",
+  address2: "",
+  city: "",
+  province: "",
+  country: "USA",
+  postalCode: "",
+  businessPhone: "",
+  businessPhoneExt: "",
+  faxPhone: "",
+  businessCell: "",
+  openTime: "",
+  closeTime: "",
+  comments: "",
+  preferredDriver: "",
+  customerSince: new Date().toISOString().split("T")[0],
+  altContact: "",
+  altBusinessPhone: "",
+  altBusinessPhoneExt: "",
+  altFaxPhone: "",
+  altBusinessCell: "",
+  taxId: "",
   webEnabled: true,
-  isActive: true,
-  contact: {
-    name: "",
-    phone: "",
-    email: "",
-    fax: "",
-  },
-  address: {
-    street1: "",
-    street2: "",
-    city: "",
-    state: "",
-    zip: "",
-    country: "USA",
-  },
 };
 
 export function NewCustomerModal({
@@ -40,131 +49,106 @@ export function NewCustomerModal({
 }: NewCustomerModalProps) {
   const [formData, setFormData] = useState<Partial<Client>>(DEFAULT_CUSTOMER);
   const [activeTab, setActiveTab] = useState("details");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSubmit(formData);
-    onClose();
+    try {
+      setIsSubmitting(true);
+      await onSubmit(formData);
+      onClose();
+    } catch (error) {
+      console.error("Error creating customer:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderTabs = () => (
     <div className='border-b border-gray-200 mb-6'>
       <nav className='-mb-px flex space-x-8'>
-        <button
-          type='button'
-          onClick={() => setActiveTab("details")}
-          className={`${
-            activeTab === "details"
-              ? "border-blue-500 text-blue-600"
-              : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-          } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
-        >
-          Details
-        </button>
-        <button
-          type='button'
-          onClick={() => setActiveTab("contact")}
-          className={`${
-            activeTab === "contact"
-              ? "border-blue-500 text-blue-600"
-              : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-          } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
-        >
-          Contact
-        </button>
-        <button
-          type='button'
-          onClick={() => setActiveTab("preferences")}
-          className={`${
-            activeTab === "preferences"
-              ? "border-blue-500 text-blue-600"
-              : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-          } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
-        >
-          Preferences
-        </button>
+        {[
+          { id: "details", label: "Basic Info" },
+          { id: "contact", label: "Contact Details" },
+          { id: "preferences", label: "Preferences" },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            type='button'
+            onClick={() => setActiveTab(tab.id)}
+            className={`${
+              activeTab === tab.id
+                ? "border-blue-500 text-blue-600"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </nav>
     </div>
   );
 
-  const updateContact = (field: ContactField, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      contact: {
-        name: prev.contact?.name ?? "",
-        phone: prev.contact?.phone ?? "",
-        email: prev.contact?.email ?? "",
-        fax: prev.contact?.fax ?? "",
-        [field]: value,
-      },
-    }));
-  };
-
-  const updateAddress = (field: AddressField, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      address: {
-        street1: prev.address?.street1 ?? "",
-        street2: prev.address?.street2 ?? "",
-        city: prev.address?.city ?? "",
-        state: prev.address?.state ?? "",
-        zip: prev.address?.zip ?? "",
-        country: prev.address?.country ?? "USA",
-        [field]: value,
-      },
-    }));
-  };
-
   const renderDetailsForm = () => (
     <div className='space-y-4'>
-      <div>
-        <label className='block text-sm font-medium text-gray-700'>
-          Name *
-        </label>
-        <input
-          type='text'
-          required
-          className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-          value={formData.name || ""}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-        />
+      <div className='grid grid-cols-2 gap-4'>
+        <div className='space-y-2'>
+          <Label htmlFor='clientId'>Account Number *</Label>
+          <Input
+            id='clientId'
+            required
+            value={formData.clientId}
+            onChange={(e) =>
+              setFormData({ ...formData, clientId: e.target.value })
+            }
+          />
+        </div>
+        <div className='space-y-2'>
+          <Label htmlFor='name'>Company Name *</Label>
+          <Input
+            id='name'
+            required
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          />
+        </div>
       </div>
-      <div>
-        <label className='block text-sm font-medium text-gray-700'>
-          Account Number
-        </label>
-        <input
-          type='text'
-          className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-          value={formData.accountNumber || ""}
+
+      <div className='grid grid-cols-2 gap-4'>
+        <div className='space-y-2'>
+          <Label htmlFor='type'>Customer Type</Label>
+          <Select
+            value={formData.type}
+            onValueChange={(value) => setFormData({ ...formData, type: value })}
+          >
+            <option value='Regular'>Regular</option>
+            <option value='VIP'>VIP</option>
+            <option value='Contract'>Contract</option>
+          </Select>
+        </div>
+        <div className='space-y-2'>
+          <Label htmlFor='taxId'>Tax ID</Label>
+          <Input
+            id='taxId'
+            value={formData.taxId}
+            onChange={(e) =>
+              setFormData({ ...formData, taxId: e.target.value })
+            }
+          />
+        </div>
+      </div>
+
+      <div className='space-y-2'>
+        <Label htmlFor='comments'>Comments</Label>
+        <Textarea
+          id='comments'
+          value={formData.comments}
           onChange={(e) =>
-            setFormData({ ...formData, accountNumber: e.target.value })
+            setFormData({ ...formData, comments: e.target.value })
           }
-        />
-      </div>
-      <div>
-        <label className='block text-sm font-medium text-gray-700'>Type</label>
-        <select
-          className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-          value={formData.type || "Regular"}
-          onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-        >
-          <option value='Regular'>Regular</option>
-          <option value='VIP'>VIP</option>
-          <option value='Contract'>Contract</option>
-        </select>
-      </div>
-      <div>
-        <label className='block text-sm font-medium text-gray-700'>
-          Tax ID
-        </label>
-        <input
-          type='text'
-          className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-          value={formData.taxId || ""}
-          onChange={(e) => setFormData({ ...formData, taxId: e.target.value })}
+          rows={3}
         />
       </div>
     </div>
@@ -172,67 +156,97 @@ export function NewCustomerModal({
 
   const renderContactForm = () => (
     <div className='space-y-4'>
-      <div>
-        <label className='block text-sm font-medium text-gray-700'>
-          Contact Name
-        </label>
-        <input
-          type='text'
-          className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-          value={formData.contact?.name || ""}
-          onChange={(e) => updateContact("name", e.target.value)}
+      <div className='space-y-2'>
+        <Label>Primary Address</Label>
+        <Input
+          placeholder='Street Address'
+          value={formData.address1}
+          onChange={(e) =>
+            setFormData({ ...formData, address1: e.target.value })
+          }
         />
-      </div>
-      <div>
-        <label className='block text-sm font-medium text-gray-700'>Phone</label>
-        <input
-          type='tel'
-          className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-          value={formData.contact?.phone || ""}
-          onChange={(e) => updateContact("phone", e.target.value)}
+        <Input
+          placeholder='Suite, Floor, etc. (optional)'
+          value={formData.address2}
+          onChange={(e) =>
+            setFormData({ ...formData, address2: e.target.value })
+          }
         />
-      </div>
-      <div>
-        <label className='block text-sm font-medium text-gray-700'>Email</label>
-        <input
-          type='email'
-          className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-          value={formData.contact?.email || ""}
-          onChange={(e) => updateContact("email", e.target.value)}
-        />
-      </div>
-      <div>
-        <label className='block text-sm font-medium text-gray-700'>
-          Address
-        </label>
-        <input
-          type='text'
-          placeholder='Street'
-          className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-          value={formData.address?.street1 || ""}
-          onChange={(e) => updateAddress("street1", e.target.value)}
-        />
-        <input
-          type='text'
-          placeholder='City'
-          className='mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-          value={formData.address?.city || ""}
-          onChange={(e) => updateAddress("city", e.target.value)}
-        />
-        <div className='grid grid-cols-2 gap-2 mt-2'>
-          <input
-            type='text'
-            placeholder='State'
-            className='block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-            value={formData.address?.state || ""}
-            onChange={(e) => updateAddress("state", e.target.value)}
+        <div className='grid grid-cols-2 gap-4'>
+          <Input
+            placeholder='City'
+            value={formData.city}
+            onChange={(e) => setFormData({ ...formData, city: e.target.value })}
           />
-          <input
-            type='text'
-            placeholder='ZIP'
-            className='block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-            value={formData.address?.zip || ""}
-            onChange={(e) => updateAddress("zip", e.target.value)}
+          <Input
+            placeholder='State/Province'
+            value={formData.province}
+            onChange={(e) =>
+              setFormData({ ...formData, province: e.target.value })
+            }
+          />
+        </div>
+        <div className='grid grid-cols-2 gap-4'>
+          <Input
+            placeholder='Postal Code'
+            value={formData.postalCode}
+            onChange={(e) =>
+              setFormData({ ...formData, postalCode: e.target.value })
+            }
+          />
+          <Select
+            value={formData.country}
+            onValueChange={(value) =>
+              setFormData({ ...formData, country: value })
+            }
+          >
+            <option value='USA'>United States</option>
+            <option value='CAN'>Canada</option>
+          </Select>
+        </div>
+      </div>
+
+      <div className='grid grid-cols-2 gap-4'>
+        <div className='space-y-2'>
+          <Label>Business Phone</Label>
+          <Input
+            type='tel'
+            value={formData.businessPhone}
+            onChange={(e) =>
+              setFormData({ ...formData, businessPhone: e.target.value })
+            }
+          />
+        </div>
+        <div className='space-y-2'>
+          <Label>Extension</Label>
+          <Input
+            value={formData.businessPhoneExt}
+            onChange={(e) =>
+              setFormData({ ...formData, businessPhoneExt: e.target.value })
+            }
+          />
+        </div>
+      </div>
+
+      <div className='grid grid-cols-2 gap-4'>
+        <div className='space-y-2'>
+          <Label>Cell Phone</Label>
+          <Input
+            type='tel'
+            value={formData.businessCell}
+            onChange={(e) =>
+              setFormData({ ...formData, businessCell: e.target.value })
+            }
+          />
+        </div>
+        <div className='space-y-2'>
+          <Label>Fax</Label>
+          <Input
+            type='tel'
+            value={formData.faxPhone}
+            onChange={(e) =>
+              setFormData({ ...formData, faxPhone: e.target.value })
+            }
           />
         </div>
       </div>
@@ -240,56 +254,53 @@ export function NewCustomerModal({
   );
 
   const renderPreferencesForm = () => (
-    <div className='space-y-4'>
-      <div>
-        <label className='block text-sm font-medium text-gray-700'>
-          Default Service Level
-        </label>
-        <select
-          className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-          value={formData.defaultServiceLevel || "STD"}
-          onChange={(e) =>
-            setFormData({ ...formData, defaultServiceLevel: e.target.value })
-          }
-        >
-          <option value='STD'>Standard</option>
-          <option value='EXP'>Expedited</option>
-          <option value='ECO'>Economy</option>
-        </select>
+    <div className='space-y-6'>
+      <div className='space-y-4'>
+        <Label>Business Hours</Label>
+        <div className='grid grid-cols-2 gap-4'>
+          <div className='space-y-2'>
+            <Label>Open Time</Label>
+            <Input
+              type='time'
+              value={formData.openTime}
+              onChange={(e) =>
+                setFormData({ ...formData, openTime: e.target.value })
+              }
+            />
+          </div>
+          <div className='space-y-2'>
+            <Label>Close Time</Label>
+            <Input
+              type='time'
+              value={formData.closeTime}
+              onChange={(e) =>
+                setFormData({ ...formData, closeTime: e.target.value })
+              }
+            />
+          </div>
+        </div>
       </div>
-      <div>
-        <label className='block text-sm font-medium text-gray-700'>
-          Default Equipment Type
-        </label>
-        <select
-          className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-          value={formData.defaultEquipmentType || ""}
-          onChange={(e) =>
-            setFormData({ ...formData, defaultEquipmentType: e.target.value })
-          }
-        >
-          <option value=''>Select Equipment Type</option>
-          <option value='VAN'>Van</option>
-          <option value='REEFER'>Reefer</option>
-          <option value='FLATBED'>Flatbed</option>
-        </select>
+
+      <div className='space-y-4'>
+        <div className='flex items-center justify-between'>
+          <Label>Web Portal Access</Label>
+          <Switch
+            checked={formData.webEnabled}
+            onCheckedChange={(checked) =>
+              setFormData({ ...formData, webEnabled: checked })
+            }
+          />
+        </div>
       </div>
-      <div className='flex items-center space-x-2'>
-        <input
-          type='checkbox'
-          id='webEnabled'
-          className='rounded border-gray-300 text-blue-600 focus:ring-blue-500'
-          checked={formData.webEnabled}
+
+      <div className='space-y-2'>
+        <Label>Preferred Driver</Label>
+        <Input
+          value={formData.preferredDriver}
           onChange={(e) =>
-            setFormData({ ...formData, webEnabled: e.target.checked })
+            setFormData({ ...formData, preferredDriver: e.target.value })
           }
         />
-        <label
-          htmlFor='webEnabled'
-          className='text-sm font-medium text-gray-700'
-        >
-          Web Portal Access Enabled
-        </label>
       </div>
     </div>
   );
@@ -320,19 +331,21 @@ export function NewCustomerModal({
             </div>
 
             <div className='bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse'>
-              <button
+              <Button
                 type='submit'
-                className='w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm'
+                disabled={isSubmitting}
+                className='w-full sm:w-auto sm:ml-3'
               >
-                Create Customer
-              </button>
-              <button
+                {isSubmitting ? "Creating..." : "Create Customer"}
+              </Button>
+              <Button
                 type='button'
+                variant='outline'
                 onClick={onClose}
-                className='mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm'
+                className='mt-3 sm:mt-0 w-full sm:w-auto'
               >
                 Cancel
-              </button>
+              </Button>
             </div>
           </form>
         </div>

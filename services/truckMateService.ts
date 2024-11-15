@@ -159,7 +159,7 @@ export const fetchTrips = async (
   if (params.offset !== undefined)
     queryParams.set("offset", params.offset.toString());
   if (params.filter) queryParams.set("$filter", params.filter);
-  if (params.select) queryParams.set("$select", params.select.join(","));
+  // if (params.select) queryParams.set("$select", params.select.join(","));
   if (params.orderBy) queryParams.set("$orderBy", params.orderBy);
   if (params.expand) queryParams.set("expand", params.expand.join(","));
   if (params.codeBehavior) queryParams.set("codeBehavior", params.codeBehavior);

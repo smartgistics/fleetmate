@@ -23,7 +23,6 @@ type TripOnlyKeys = Exclude<keyof Trip, CommonKeys>;
 type ValidKeys = CommonKeys | OrderOnlyKeys | TripOnlyKeys;
 
 type FetchResponse = OrdersResponse | TripsResponse;
-type FetchFunction = typeof fetchOrders | typeof fetchTrips;
 
 // Add these functions after the type definitions and before getTopItemsByRevenue
 
@@ -195,11 +194,11 @@ const fetchAllPages = async <
 export function useDashboard() {
   // Calculate date range for last 8 weeks
   const today = new Date();
-  const eightWeeksAgo = new Date(today);
-  eightWeeksAgo.setDate(today.getDate() - 7 * 8);
+  const thirtyDaysAgo = new Date(today);
+  thirtyDaysAgo.setDate(today.getDate() - 30);
 
   // Format dates for API filter
-  const fromDate = eightWeeksAgo.toISOString().split("T")[0];
+  const fromDate = thirtyDaysAgo.toISOString().split("T")[0];
   const toDate = today.toISOString().split("T")[0];
 
   const orderParams: Required<

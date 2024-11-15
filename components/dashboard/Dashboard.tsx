@@ -2,7 +2,7 @@
 
 import { DashboardCardProps } from "@/types/dashboard";
 import { useDashboard } from "@/hooks/useDashboard";
-import { RevenueChart } from "./RevenueChart";
+// import { RevenueChart } from "./RevenueChart";
 
 // Components
 function DashboardCard({ title, items, valueLabel }: DashboardCardProps) {
@@ -62,16 +62,9 @@ export function Dashboard() {
 
   return (
     <div className='p-6'>
-      <div className='mb-6'>
-        <h1 className='text-2xl font-bold text-gray-900'>Dashboard</h1>
-        <p className='mt-1 text-sm text-gray-500'>
-          Overview of your shipping operations
-        </p>
-      </div>
-
-      <div className='mb-6'>
+      {/* <div className='mb-6'>
         <RevenueChart data={dashboardData.weeklyRevenue} />
-      </div>
+      </div> */}
 
       <div className='grid grid-cols-1 gap-6 mb-6 lg:grid-cols-2'>
         <DashboardCard
