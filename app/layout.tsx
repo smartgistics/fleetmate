@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { SidebarProvider } from "@/components/layout/SidebarContext";
-import { Sidebar } from "@/components/layout/Sidebar";
-import { MainContent } from "@/components/layout/MainContent";
 import { Providers } from "./providers";
 import { Toaster } from "@/components/ui/toaster";
+import { SessionProvider } from "@/components/providers/SessionProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,15 +18,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang='en'>
-      <body className={`${inter.className} bg-gray-100`}>
-        <Providers>
-          <SidebarProvider>
-            <Sidebar />
-            <MainContent>{children}</MainContent>
-          </SidebarProvider>
-          <Toaster />
-        </Providers>
+    <html lang='en' suppressHydrationWarning>
+      <body className={inter.className} suppressHydrationWarning>
+        <SessionProvider>
+          <Providers>
+            <Toaster />
+            {children}
+          </Providers>
+        </SessionProvider>
       </body>
     </html>
   );

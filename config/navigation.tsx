@@ -8,7 +8,7 @@ interface NavigationItem {
 
 export const navigationItems: NavigationItem[] = [
   {
-    path: "/",
+    path: "/dashboard",
     label: "Dashboard",
     icon: (
       <svg

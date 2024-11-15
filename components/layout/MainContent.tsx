@@ -3,6 +3,7 @@
 import { Suspense } from "react";
 import { GlobalSearch } from "@/components/search/GlobalSearch";
 import { useSidebar } from "./SidebarContext";
+import { UserMenu } from "./UserMenu";
 
 export function MainContent({ children }: { children: React.ReactNode }) {
   const { isPinned } = useSidebar();
@@ -29,13 +30,16 @@ export function MainContent({ children }: { children: React.ReactNode }) {
               FleetMate TMS
             </h1>
           </div>
-          <Suspense fallback={<div>Loading...</div>}>
-            <GlobalSearch />
-          </Suspense>
+          <div className='flex items-center gap-4 flex-1 justify-end max-w-2xl'>
+            <Suspense fallback={<div>Loading...</div>}>
+              <GlobalSearch />
+            </Suspense>
+            <UserMenu />
+          </div>
         </div>
       </header>
 
-      <div className='flex-1 overflow-auto'>{children}</div>
+      <div className='flex-1 overflow-auto bg-white'>{children}</div>
     </div>
   );
 }
