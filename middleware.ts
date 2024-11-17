@@ -3,17 +3,23 @@ import { withAuth } from "next-auth/middleware";
 export default withAuth({
   callbacks: {
     authorized: ({ token, req }) => {
-      // Allow auth-related pages and static assets
-      if (
-        req.nextUrl.pathname.startsWith("/auth/") ||
-        req.nextUrl.pathname === "/" ||
-        req.nextUrl.pathname.startsWith("/videos/") ||
-        req.nextUrl.pathname.startsWith("/hero-images/") ||
-        req.nextUrl.pathname === "/public/"
-      ) {
+      const path = req.nextUrl.pathname;
+
+      // Allow public paths
+      const publicPaths = [
+        "/auth",
+        "/",
+        "/videos",
+        "/hero-images",
+        "/public",
+        "/api/auth",
+      ];
+
+      if (publicPaths.some((p) => path.startsWith(p))) {
         return true;
       }
-      // Require token for other protected routes
+
+      // Require token for protected routes
       return !!token;
     },
   },
@@ -21,7 +27,7 @@ export default withAuth({
 
 export const config = {
   matcher: [
-    // Match all paths except:
-    "/((?!api/auth|_next|videos|hero-images|public|favicon.ico).*)",
+    // Match all paths except next internal and public assets
+    "/((?!_next/static|_next/image|favicon.ico).*)",
   ],
 };
