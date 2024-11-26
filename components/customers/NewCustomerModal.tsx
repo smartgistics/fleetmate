@@ -8,6 +8,7 @@ import {
   Switch,
   Textarea,
 } from "@/components/ui";
+import { USA_STATES, CAN_PROVINCES } from '@/constants'
 
 interface NewCustomerModalProps {
   isOpen: boolean;
@@ -18,13 +19,13 @@ interface NewCustomerModalProps {
 const DEFAULT_CUSTOMER: Partial<Client> = {
   clientId: "",
   name: "",
-  status: "Active",
+  status: "active",
   type: "Regular",
   address1: "",
   address2: "",
   city: "",
   province: "",
-  country: "USA",
+  country: "US",
   postalCode: "",
   businessPhone: "",
   businessPhoneExt: "",
@@ -43,6 +44,11 @@ const DEFAULT_CUSTOMER: Partial<Client> = {
   taxId: "",
   webEnabled: true,
 };
+
+const provinces = {
+  CA: CAN_PROVINCES,
+  US: USA_STATES,
+}
 
 export function NewCustomerModal({
   isOpen,
@@ -180,13 +186,16 @@ export function NewCustomerModal({
             value={formData.city}
             onChange={(e) => setFormData({ ...formData, city: e.target.value })}
           />
-          <Input
-            placeholder='State/Province'
+          <Select
             value={formData.province}
-            onChange={(e) =>
-              setFormData({ ...formData, province: e.target.value })
-            }
-          />
+            onChange={(province) => setFormData({ ...formData, province })}
+          >
+            <>
+              {provinces[formData.country].map(({ code, name }) => (
+                <option key={code} value={code}>{name}</option>
+              ))}
+            </>
+          </Select>
         </div>
         <div className='grid grid-cols-2 gap-4'>
           <Input
@@ -202,8 +211,8 @@ export function NewCustomerModal({
               setFormData({ ...formData, country: value })
             }
           >
-            <option value='USA'>United States</option>
-            <option value='CAN'>Canada</option>
+            <option value="US">United States</option>
+            <option value="CA">Canada</option>
           </Select>
         </div>
       </div>

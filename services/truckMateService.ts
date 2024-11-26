@@ -18,6 +18,8 @@ const API_KEY = process.env.TM_API_KEY;
 
 const DEFAULT_LIMIT = 20;
 
+const toTMTruthy = (bool: any) => bool ? 'True' : 'False'
+
 const fetchWithAuth = async <T>(
   url: string,
   options: RequestInit = {},
@@ -289,7 +291,7 @@ export const fetchClients = async (
             // Ensure required fields are present
             clientId: client.clientId || "",
             name: client.name || "",
-            status: client.status || "Active",
+            status: client.status || "active",
             type: client.type || "Regular",
           }))
         : [],
@@ -380,33 +382,32 @@ export const createClient = async (
 
   // Format the request body according to API spec
   const requestBody = {
-    clientId: clientData.clientId, // Required field
-    name: clientData.name, // Required field
-    type: clientData.type || "Regular", // Required field with default
-    status: clientData.status || "Active", // Required field with default
     address1: clientData.address1,
     address2: clientData.address2,
-    city: clientData.city,
-    province: clientData.province,
-    country: clientData.country || "USA",
-    postalCode: clientData.postalCode,
-    businessPhone: clientData.businessPhone,
-    businessPhoneExt: clientData.businessPhoneExt || "",
-    faxPhone: clientData.faxPhone,
-    businessCell: clientData.businessCell || "",
-    openTime: clientData.openTime || "",
-    closeTime: clientData.closeTime || "",
-    comments: clientData.comments || "",
-    preferredDriver: clientData.preferredDriver || "",
-    customerSince:
-      clientData.customerSince || new Date().toISOString().split("T")[0],
-    altContact: clientData.altContact,
+    altBusinessCell: clientData.altBusinessCell || "",
     altBusinessPhone: clientData.altBusinessPhone || "",
     altBusinessPhoneExt: clientData.altBusinessPhoneExt || "",
+    altContact: clientData.altContact,
     altFaxPhone: clientData.altFaxPhone || "",
-    altBusinessCell: clientData.altBusinessCell || "",
+    businessCell: clientData.businessCell || "",
+    businessPhone: clientData.businessPhone,
+    businessPhoneExt: clientData.businessPhoneExt || "",
+    city: clientData.city,
+    clientId: clientData.clientId, // Required field
+    closeTime: clientData.closeTime || undefined,
+    comments: clientData.comments || "",
+    country: clientData.country || "USA",
+    customerSince: clientData.customerSince || new Date().toISOString().split("T")[0],
+    faxPhone: clientData.faxPhone,
+    name: clientData.name, // Required field
+    openTime: clientData.openTime || undefined,
+    postalCode: clientData.postalCode,
+    preferredDriver: clientData.preferredDriver || "",
+    province: clientData.province,
+    status: clientData.status || "active", // Required field with default
     taxId: clientData.taxId,
-    webEnabled: clientData.webEnabled ?? true,
+    type: clientData.type || "Regular", // Required field with default
+    user10: clientData.user10,
     user1: clientData.user1,
     user2: clientData.user2,
     user3: clientData.user3,
@@ -416,7 +417,7 @@ export const createClient = async (
     user7: clientData.user7,
     user8: clientData.user8,
     user9: clientData.user9,
-    user10: clientData.user10,
+    webEnabled: toTMTruthy(clientData.webEnabled),
   };
 
   // Validate required fields before making request
@@ -439,8 +440,8 @@ export const createClient = async (
 
   try {
     const response = await fetchWithAuth<{ client: Client }>(url, {
+      body: JSON.stringify({ clients: [requestBody] }),
       method: "POST",
-      body: JSON.stringify(requestBody),
     });
 
     console.log("Customer creation response:", response);
