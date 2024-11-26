@@ -24,7 +24,7 @@ export interface Client {
   altBusinessPhoneExt?: string;
   altFaxPhone?: string;
   altBusinessCell?: string;
-  status: string;
+  status: 'lost' | 'lead' | 'doNotCall' | 'terminated' | 'prospect' | 'active';
   type: string;
   taxId?: string;
   webEnabled?: boolean;
