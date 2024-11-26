@@ -17,12 +17,6 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ account, profile }) {
-      if (account?.provider === "azure-ad") {
-        return profile?.email?.endsWith("@corporatetraffic.com") ?? false;
-      }
-      return false;
-    },
     async session({ session, token }: { session: Session; token: JWT }) {
       if (session?.user) {
         session.user.id = token.sub ?? "";
