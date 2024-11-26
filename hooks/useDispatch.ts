@@ -53,6 +53,7 @@ export function useDispatch() {
       "user2", // customer
       "carriers",
     ],
+    expand: ["carriers"], // Expand carrier information
     filter:
       "status in ('AVAIL','PLANNED','DISP','ARVSHPR','LOADED','DELVD') AND eTA ne null",
   });

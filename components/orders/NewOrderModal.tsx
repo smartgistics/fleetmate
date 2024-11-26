@@ -7,7 +7,6 @@ import { OrderModalFooter } from "./modal/OrderModalFooter";
 import { CustomerTab } from "./tabs/CustomerTab";
 import { OrderDetailsTab } from "./tabs/OrderDetailsTab";
 import { FinancialsTab } from "./tabs/FinancialsTab";
-import { InitialScreen } from "./modal/InitialScreen";
 
 interface NewOrderModalProps {
   isOpen: boolean;
@@ -15,7 +14,7 @@ interface NewOrderModalProps {
 }
 
 export function NewOrderModal({ isOpen, onClose }: NewOrderModalProps) {
-  const [activeTab, setActiveTab] = useState<string>("initial");
+  const [activeTab, setActiveTab] = useState<string>("customer");
   const [formData, setFormData] = useState<FormData>({
     // Customer Tab
     customer: "",
@@ -70,41 +69,6 @@ export function NewOrderModal({ isOpen, onClose }: NewOrderModalProps) {
     return activeTab === "financials";
   };
 
-  const renderContent = () => {
-    if (activeTab === "initial") {
-      return (
-        <InitialScreen
-          onSelectManual={() => setActiveTab("customer")}
-          onSelectUpload={() => setActiveTab("customer")}
-          onFileProcessed={(data) => {
-            setFormData((prev) => ({ ...prev, ...data }));
-            setActiveTab("customer");
-          }}
-        />
-      );
-    }
-
-    return (
-      <form onSubmit={handleSubmit}>
-        {activeTab === "customer" && (
-          <CustomerTab formData={formData} setFormData={setFormData} />
-        )}
-        {activeTab === "orderDetails" && (
-          <OrderDetailsTab formData={formData} setFormData={setFormData} />
-        )}
-        {activeTab === "financials" && (
-          <FinancialsTab formData={formData} setFormData={setFormData} />
-        )}
-
-        <OrderModalFooter
-          onClose={onClose}
-          onNext={handleNext}
-          isLastTab={isLastTab()}
-        />
-      </form>
-    );
-  };
-
   return (
     <div className='fixed inset-0 z-50 overflow-y-auto'>
       <div className='flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0'>
@@ -139,18 +103,40 @@ export function NewOrderModal({ isOpen, onClose }: NewOrderModalProps) {
               </button>
             </div>
 
-            {/* Tabs - Only show if not on initial screen */}
-            {activeTab !== "initial" && (
-              <div className='border-b border-gray-200'>
-                <OrderModalTabs
-                  activeTab={activeTab}
-                  setActiveTab={setActiveTab}
-                />
-              </div>
-            )}
+            {/* Tabs */}
+            <div className='border-b border-gray-200'>
+              <OrderModalTabs
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+              />
+            </div>
 
             {/* Content */}
-            <div className='px-6 py-4'>{renderContent()}</div>
+            <div className='px-6 py-4'>
+              <form onSubmit={handleSubmit}>
+                {activeTab === "customer" && (
+                  <CustomerTab formData={formData} setFormData={setFormData} />
+                )}
+                {activeTab === "orderDetails" && (
+                  <OrderDetailsTab
+                    formData={formData}
+                    setFormData={setFormData}
+                  />
+                )}
+                {activeTab === "financials" && (
+                  <FinancialsTab
+                    formData={formData}
+                    setFormData={setFormData}
+                  />
+                )}
+
+                <OrderModalFooter
+                  onClose={onClose}
+                  onNext={handleNext}
+                  isLastTab={isLastTab()}
+                />
+              </form>
+            </div>
           </div>
         </div>
       </div>

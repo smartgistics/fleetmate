@@ -2,6 +2,10 @@ import React from "react";
 import { FormData, Client } from "@/types/truckmate";
 import { useQuery } from "@tanstack/react-query";
 import { fetchClients } from "@/services/truckMateService";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { MoreHorizontal } from "lucide-react";
 
 interface CustomerTabProps {
   formData: FormData;
@@ -34,121 +38,148 @@ export function CustomerTab({ formData, setFormData }: CustomerTabProps) {
         ]
           .filter(Boolean)
           .join("\n"),
+        parentAccount: selectedCustomer.parentAccount || "",
+        creditStatus: selectedCustomer.creditStatus || "",
       });
     }
   };
 
   return (
-    <div className='grid grid-cols-2 gap-6'>
+    <div className='space-y-8'>
+      {/* Account Information Section */}
       <div>
-        <label className='block text-sm font-medium text-gray-700 mb-1'>
-          Customer Name *
-        </label>
-        <select
-          className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500'
-          value={formData.customerId}
-          onChange={handleCustomerChange}
-          required
-          disabled={isLoading}
-        >
-          <option value=''>Select a customer</option>
-          {customers?.clients.map((customer) => (
-            <option key={customer.clientId} value={customer.clientId}>
-              {customer.name}
-            </option>
-          ))}
-        </select>
-      </div>
+        <h3 className='text-lg font-semibold mb-4'>Account Information</h3>
+        <div className='grid grid-cols-2 gap-6'>
+          <div className='space-y-2'>
+            <Label htmlFor='companyName'>Company Name</Label>
+            <div className='flex gap-2'>
+              <select
+                id='companyName'
+                className='flex-1 h-10 rounded-md border border-input bg-background px-3 py-2'
+                value={formData.customerId}
+                onChange={handleCustomerChange}
+                disabled={isLoading}
+              >
+                <option value=''>Select a customer</option>
+                {customers?.clients.map((customer) => (
+                  <option key={customer.clientId} value={customer.clientId}>
+                    {customer.name}
+                  </option>
+                ))}
+              </select>
+              <Button variant='ghost' size='icon'>
+                <MoreHorizontal className='h-4 w-4' />
+              </Button>
+            </div>
+          </div>
 
-      <div>
-        <label className='block text-sm font-medium text-gray-700 mb-1'>
-          Customer Reference
-        </label>
-        <input
-          type='text'
-          className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500'
-          value={formData.customerReference}
-          onChange={(e) =>
-            setFormData({ ...formData, customerReference: e.target.value })
-          }
-          placeholder='Enter customer reference number'
-        />
-      </div>
+          <div className='space-y-2'>
+            <Label htmlFor='parentCompany'>Parent Company</Label>
+            <Input
+              id='parentCompany'
+              value={formData.parentAccount}
+              readOnly
+              placeholder='[PARENT ACCOUNT]'
+            />
+          </div>
 
-      <div>
-        <label className='block text-sm font-medium text-gray-700 mb-1'>
-          Customer Contact
-        </label>
-        <input
-          type='text'
-          className='w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50'
-          value={formData.customerContact}
-          readOnly
-          placeholder='Auto-populated from customer selection'
-        />
-      </div>
+          <div className='space-y-2'>
+            <Label htmlFor='customerId'>Customer ID</Label>
+            <Input
+              id='customerId'
+              value={formData.customerId}
+              readOnly
+              placeholder='[Customer ID]'
+            />
+          </div>
 
-      <div>
-        <label className='block text-sm font-medium text-gray-700 mb-1'>
-          Contact Phone
-        </label>
-        <input
-          type='tel'
-          className='w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50'
-          value={formData.contactPhone}
-          readOnly
-          placeholder='Auto-populated from customer selection'
-        />
-      </div>
+          <div className='space-y-2'>
+            <Label htmlFor='status'>Status</Label>
+            <Input
+              id='status'
+              value={formData.status}
+              readOnly
+              placeholder='Active'
+            />
+          </div>
 
-      <div>
-        <label className='block text-sm font-medium text-gray-700 mb-1'>
-          Contact Email
-        </label>
-        <input
-          type='email'
-          className='w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50'
-          value={formData.contactEmail}
-          readOnly
-          placeholder='Auto-populated from customer selection'
-        />
-      </div>
+          <div className='space-y-2'>
+            <Label htmlFor='revenue'>Revenue</Label>
+            <Input
+              id='revenue'
+              value='$XXX,XXX.XXXX'
+              readOnly
+              placeholder='$XXX,XXX.XXXX'
+            />
+          </div>
 
-      <div>
-        <label className='block text-sm font-medium text-gray-700 mb-1'>
-          Billing Address
-        </label>
-        <textarea
-          className='w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50'
-          value={formData.billingAddress}
-          readOnly
-          placeholder='Auto-populated from customer selection'
-          rows={3}
-        />
-      </div>
-
-      {formData.customer && (
-        <div className='col-span-2 bg-blue-50 p-3 rounded-md'>
-          <div className='flex items-center'>
-            <svg
-              className='h-5 w-5 text-blue-400'
-              fill='none'
-              viewBox='0 0 24 24'
-              stroke='currentColor'
-            >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth='2'
-                d='M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
-              />
-            </svg>
-            <span className='ml-2 text-sm text-blue-700'>
-              Contact information auto-populated from customer profile
-            </span>
+          <div className='space-y-2'>
+            <Label htmlFor='creditStatus'>Credit Status</Label>
+            <Input
+              id='creditStatus'
+              value={formData.creditStatus}
+              readOnly
+              placeholder='[STATUS]'
+            />
           </div>
         </div>
-      )}
+      </div>
+
+      {/* Contact Information Section */}
+      <div>
+        <h3 className='text-lg font-semibold mb-4'>Contact Information</h3>
+        <div className='grid grid-cols-2 gap-6'>
+          <div className='space-y-2'>
+            <Label htmlFor='email'>Email</Label>
+            <Input
+              id='email'
+              type='email'
+              value={formData.contactEmail}
+              onChange={(e) =>
+                setFormData({ ...formData, contactEmail: e.target.value })
+              }
+              placeholder='email@address.com'
+            />
+          </div>
+
+          <div className='space-y-2'>
+            <Label htmlFor='phone'>Phone</Label>
+            <Input
+              id='phone'
+              type='tel'
+              value={formData.contactPhone}
+              onChange={(e) =>
+                setFormData({ ...formData, contactPhone: e.target.value })
+              }
+              placeholder='904-555-5555'
+            />
+          </div>
+
+          <div className='space-y-2'>
+            <Label htmlFor='accountManager'>Account Manager</Label>
+            <Input
+              id='accountManager'
+              value={formData.accountManager}
+              onChange={(e) =>
+                setFormData({ ...formData, accountManager: e.target.value })
+              }
+              placeholder='Jim Smith'
+            />
+          </div>
+
+          <div className='space-y-2'>
+            <Label htmlFor='orderPlanner'>Order Planner</Label>
+            <Input
+              id='orderPlanner'
+              value={formData.orderPlanner}
+              onChange={(e) =>
+                setFormData({ ...formData, orderPlanner: e.target.value })
+              }
+              placeholder='Steve Connor'
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -54,7 +54,7 @@ State Management
 UI and Styling
 
 - For all styling enhancements, think about readability and responsiveness.
-- Use Shadcn UI for component foundations (use 'npx shadcn@latest add' to add components and not 'npx shadcn@latest install')
+- Use Shadcn UI for component foundations (use 'npx shadcn@latest add' to add components and not 'npx shadcn-ui@latest install' as that is an outdated command)
 - Use Radix for icons
 - Implement responsive design with Tailwind CSS; use a mobile-first approach.
 - This is a PWA so think about performance and responsiveness, and don't allow zooming

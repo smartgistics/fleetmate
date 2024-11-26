@@ -28,6 +28,8 @@ export interface Client {
   type: string;
   taxId?: string;
   webEnabled?: boolean;
+  parentAccount?: string;
+  creditStatus?: string;
   user1?: string;
   user2?: string;
   user3?: string;

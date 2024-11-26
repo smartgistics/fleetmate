@@ -27,11 +27,11 @@ export default function Carriers() {
     total,
     params,
     updateParams,
-  } = useVendors("linehaulCarrier", {
+  } = useVendors("interliner", {
     limit: DEFAULT_LIMIT,
     offset: 0,
     orderBy: `${sortField} ${sortDirection}`,
-    filter: "isActive eq 'True'",
+    filter: "isInactive eq 'True'",
   });
 
   const handleSort = (field: SortableFields) => {
@@ -163,7 +163,7 @@ export default function Carriers() {
                   {carrier.name}
                 </td>
                 <td className='px-6 py-4 text-gray-900'>
-                  {carrier.isActive === "True" ? "Active" : "Inactive"}
+                  {carrier.isInactive === "True" ? "Active" : "Inactive"}
                 </td>
                 <td className='px-6 py-4 text-gray-900'>{carrier.insurance}</td>
                 <td className='px-6 py-4 text-gray-900'>{carrier.liability}</td>

@@ -24,6 +24,25 @@ const STATUS_COLORS: StatusColors = {
   DELAYED: "bg-red-200",
 };
 
+const FILTER_OPTIONS = {
+  status: [
+    { label: "All", value: "" },
+    { label: "Available", value: "AVAIL" },
+    { label: "Planned", value: "PLANNED" },
+    { label: "Dispatched", value: "DISP" },
+    { label: "At Shipper", value: "ARVSHPR" },
+    { label: "In Transit", value: "LOADED" },
+    { label: "At Consignee", value: "DELVD" },
+  ],
+  equipmentTypes: [
+    { label: "All", value: "" },
+    { label: "Van", value: "VAN" },
+    { label: "Reefer", value: "REEF" },
+    { label: "Flatbed", value: "FLAT" },
+    { label: "Step Deck", value: "STEP" },
+  ],
+};
+
 export default function OperationsPage() {
   const [activeTab, setActiveTab] = useState("dispatch");
   const [searchTerm, setSearchTerm] = useState("");
@@ -34,6 +53,7 @@ export default function OperationsPage() {
     delRegion: "",
     carrier: "",
     date: "",
+    equipmentType: "",
   });
 
   const { trips, isLoading: tripsLoading } = useDispatch();
@@ -163,70 +183,104 @@ export default function OperationsPage() {
       </div>
 
       {/* Filters Section */}
-      <div className='mb-6 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4'>
-        <input
-          type='text'
-          placeholder='Search...'
-          className='px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-          value={searchTerm}
-          onChange={handleSearch}
-        />
-        <input
-          type='text'
-          placeholder='Planner'
-          className='px-4 py-2 border rounded-lg'
-          value={selectedFilters.planner}
-          onChange={(e) => handleFilterChange("planner", e.target.value)}
-        />
-        <input
-          type='text'
-          placeholder='Customer'
-          className='px-4 py-2 border rounded-lg'
-          value={selectedFilters.customer}
-          onChange={(e) => handleFilterChange("customer", e.target.value)}
-        />
-        <input
-          type='text'
-          placeholder='Pick Region'
-          className='px-4 py-2 border rounded-lg'
-          value={selectedFilters.pickRegion}
-          onChange={(e) => handleFilterChange("pickRegion", e.target.value)}
-        />
-        <input
-          type='text'
-          placeholder='Del Region'
-          className='px-4 py-2 border rounded-lg'
-          value={selectedFilters.delRegion}
-          onChange={(e) => handleFilterChange("delRegion", e.target.value)}
-        />
-        <div className='relative'>
-          <input
-            type='date'
-            className='w-full px-4 py-2 border rounded-lg pr-8'
-            value={selectedFilters.date}
-            onChange={(e) => handleFilterChange("date", e.target.value)}
-          />
-          {selectedFilters.date && (
-            <button
-              onClick={handleClearDate}
-              className='absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700'
-              aria-label='Clear date'
-            >
-              <svg
-                className='h-4 w-4'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
+      <div className='mb-6 space-y-4'>
+        {/* Top row - Search and Date Range */}
+        <div className='flex gap-4'>
+          <div className='flex-1'>
+            <input
+              type='text'
+              placeholder='Search by Trip #, Customer, Origin, or Destination...'
+              className='w-full px-4 py-2 border rounded-lg'
+              value={searchTerm}
+              onChange={handleSearch}
+            />
+          </div>
+          <div className='flex gap-2'>
+            <input
+              type='date'
+              className='px-4 py-2 border rounded-lg'
+              value={selectedFilters.date}
+              onChange={(e) => handleFilterChange("date", e.target.value)}
+            />
+            {selectedFilters.date && (
+              <button
+                onClick={handleClearDate}
+                className='p-2 text-gray-500 hover:text-gray-700'
               >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={2}
-                  d='M6 18L18 6M6 6l12 12'
-                />
-              </svg>
-            </button>
-          )}
+                <svg
+                  className='h-5 w-5'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M6 18L18 6M6 6l12 12'
+                  />
+                </svg>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Bottom row - Additional Filters */}
+        <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4'>
+          <select
+            className='px-4 py-2 border rounded-lg'
+            value={selectedFilters.equipmentType}
+            onChange={(e) =>
+              handleFilterChange("equipmentType", e.target.value)
+            }
+          >
+            <option value=''>Equipment Type</option>
+            {FILTER_OPTIONS.equipmentTypes.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+
+          <input
+            type='text'
+            placeholder='Origin City/Region'
+            className='px-4 py-2 border rounded-lg'
+            value={selectedFilters.pickRegion}
+            onChange={(e) => handleFilterChange("pickRegion", e.target.value)}
+          />
+
+          <input
+            type='text'
+            placeholder='Destination City/Region'
+            className='px-4 py-2 border rounded-lg'
+            value={selectedFilters.delRegion}
+            onChange={(e) => handleFilterChange("delRegion", e.target.value)}
+          />
+
+          <input
+            type='text'
+            placeholder='Customer'
+            className='px-4 py-2 border rounded-lg'
+            value={selectedFilters.customer}
+            onChange={(e) => handleFilterChange("customer", e.target.value)}
+          />
+
+          <input
+            type='text'
+            placeholder='Carrier'
+            className='px-4 py-2 border rounded-lg'
+            value={selectedFilters.carrier}
+            onChange={(e) => handleFilterChange("carrier", e.target.value)}
+          />
+
+          <input
+            type='text'
+            placeholder='Planner'
+            className='px-4 py-2 border rounded-lg'
+            value={selectedFilters.planner}
+            onChange={(e) => handleFilterChange("planner", e.target.value)}
+          />
         </div>
       </div>
 
