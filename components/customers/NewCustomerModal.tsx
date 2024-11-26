@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { Client } from "@/types/truckmate";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { Select } from "@/components/ui/select";
+import {
+  Button,
+  Input,
+  Label,
+  Select,
+  Switch,
+  Textarea,
+} from "@/components/ui";
 
 interface NewCustomerModalProps {
   isOpen: boolean;
@@ -121,7 +123,7 @@ export function NewCustomerModal({
           <Label htmlFor='type'>Customer Type</Label>
           <Select
             value={formData.type}
-            onValueChange={(value) => setFormData({ ...formData, type: value })}
+            onChange={(value) => setFormData({ ...formData, type: value })}
           >
             <option value='Regular'>Regular</option>
             <option value='VIP'>VIP</option>
@@ -196,7 +198,7 @@ export function NewCustomerModal({
           />
           <Select
             value={formData.country}
-            onValueChange={(value) =>
+            onChange={(value) =>
               setFormData({ ...formData, country: value })
             }
           >
