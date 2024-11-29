@@ -1,0 +1,23 @@
+.root
+  display: grid
+  height: 100%
+  :global(.MuiDataGrid-columnHeaders)
+    font-size: 1.125rem
+  :global(.MuiTablePagination-toolbar),
+  :global(.MuiTablePagination-selectLabel),
+  :global(.MuiTablePagination-displayedRows)
+    font-size: .75rem
+  :global(.MuiDataGrid-cell--withRenderer)
+    padding: 0
+  :global(.MuiDataGrid-columnHeaderTitle)
+    font-weight: 700
+    color: var(--primaryColor)
+  :global(.MuiDataGrid-cell:focus)
+    outline: none
+  :global(.MuiDataGrid-row:hover), 
+  :global(.MuiDataGrid-row.Mui-selected),
+  :global(.MuiDataGrid-row.Mui-selected:hover)
+    background: var(--white)
+  :global(.MuiDataGrid-row)
+    background: var(--neutral97)
+    border-bottom: 1px

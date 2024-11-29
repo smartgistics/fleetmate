@@ -6,12 +6,18 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint --max-warnings=0"
   },
   "dependencies": {
     "@azure/msal-browser": "^3.27.0",
     "@azure/msal-react": "^2.2.0",
+    "@emotion/react": "^11.13.5",
+    "@emotion/server": "^11.11.0",
+    "@emotion/styled": "^11.13.5",
     "@hello-pangea/dnd": "^17.0.0",
+    "@mui/icons-material": "^6.1.9",
+    "@mui/material": "^6.1.9",
+    "@mui/x-data-grid": "^7.23.0",
     "@radix-ui/react-alert-dialog": "^1.1.2",
     "@radix-ui/react-avatar": "^1.1.1",
     "@radix-ui/react-dialog": "^1.1.2",
@@ -40,18 +46,33 @@
     "sonner": "^1.7.0",
     "tailwind-merge": "^2.5.4",
     "tesseract.js": "^5.1.1",
+    "uuid": "^11.0.3",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@tanstack/eslint-plugin-query": "^5.61.6",
+    "@tanstack/react-query-devtools": "^5.62.0",
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/lodash": "^4.17.13",
     "@types/node": "^20",
     "@types/pdf-parse": "^1.1.4",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@typescript-eslint/eslint-plugin": "^8.16.0",
+    "@typescript-eslint/parser": "^8.16.0",
     "eslint": "^8",
     "eslint-config-next": "15.0.2",
+    "eslint-config-prettier": "^9.1.0",
+    "husky": "^9.1.7",
     "postcss": "^8",
+    "prettier": "^3.4.1",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
+  },
+  "lint-staged": {
+    "*.{ts,js,tsx,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   }
 }

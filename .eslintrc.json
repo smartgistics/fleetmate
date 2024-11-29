@@ -1,3 +1,53 @@
 {
-  "extends": ["next/core-web-vitals", "next/typescript"]
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["import"],
+  "extends": [
+    "next/core-web-vitals",
+    "next/typescript",
+    "prettier",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@tanstack/eslint-plugin-query/recommended",
+    "plugin:import/recommended"
+  ],
+  "ignorePatterns": ["next.config.js"],
+  "rules": {
+    "@next/next/no-img-element": "off",
+    "@typescript-eslint/no-extra-semi": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/no-inferrable-types": "warn",
+    "@typescript-eslint/no-empty-function": "warn",
+    "@typescript-eslint/no-unused-expressions": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_"
+      }
+    ],
+    "react-hooks/exhaustive-deps": "off",
+    "react/display-name": "off",
+    "react/jsx-sort-props": "warn",
+    "prefer-const": "warn",
+    "import/no-unresolved": "error",
+    "no-console": ["error", { "allow": ["error"] }],
+    "no-debugger": 2,
+    "no-unused-expressions": "off"
+  },
+  "settings": {
+    "import/ignore": ["node_modules"],
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts", ".tsx"]
+    },
+    "import/resolver": {
+      "typescript": {
+        "alwaysTryTypes": true
+      }
+    },
+    "react": {
+      "version": "detect"
+    }
+  }
 }
+
