@@ -82,7 +82,7 @@ export default function CustomerDetailsModal({
               Status
             </label>
             <Badge
-              variant={customer.status === "Active" ? "default" : "secondary"}
+              variant={customer.status === "active" ? "default" : "secondary"}
               className='mt-1'
             >
               {customer.status}

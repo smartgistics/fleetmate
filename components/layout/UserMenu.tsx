@@ -23,9 +23,6 @@ export function UserMenu({ collapsed = false }: UserMenuProps) {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  console.log("Session status:", status);
-  console.log("Session data:", session);
-
   if (status === "loading") {
     return <div className='p-4'>Loading...</div>;
   }

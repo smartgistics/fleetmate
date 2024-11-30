@@ -8,7 +8,7 @@ import {
   Switch,
   Textarea,
 } from "@/components/ui";
-import { USA_STATES, CAN_PROVINCES } from '@/constants'
+import { USA_STATES, CAN_PROVINCES } from "@/constants";
 
 interface NewCustomerModalProps {
   isOpen: boolean;
@@ -48,7 +48,7 @@ const DEFAULT_CUSTOMER: Partial<Client> = {
 const provinces = {
   CA: CAN_PROVINCES,
   US: USA_STATES,
-}
+};
 
 export function NewCustomerModal({
   isOpen,
@@ -128,7 +128,7 @@ export function NewCustomerModal({
         <div className='space-y-2'>
           <Label htmlFor='type'>Customer Type</Label>
           <Select
-            value={formData.type}
+            value={formData.type ?? "Regular"}
             onChange={(value) => setFormData({ ...formData, type: value })}
           >
             <option value='Regular'>Regular</option>
@@ -187,13 +187,17 @@ export function NewCustomerModal({
             onChange={(e) => setFormData({ ...formData, city: e.target.value })}
           />
           <Select
-            value={formData.province}
+            value={formData.province ?? ""}
             onChange={(province) => setFormData({ ...formData, province })}
           >
             <>
-              {provinces[formData.country].map(({ code, name }) => (
-                <option key={code} value={code}>{name}</option>
-              ))}
+              {provinces[formData.country as keyof typeof provinces].map(
+                ({ code, name }) => (
+                  <option key={code} value={code}>
+                    {name}
+                  </option>
+                )
+              )}
             </>
           </Select>
         </div>
@@ -206,13 +210,11 @@ export function NewCustomerModal({
             }
           />
           <Select
-            value={formData.country}
-            onChange={(value) =>
-              setFormData({ ...formData, country: value })
-            }
+            value={formData.country ?? "US"}
+            onChange={(value) => setFormData({ ...formData, country: value })}
           >
-            <option value="US">United States</option>
-            <option value="CA">Canada</option>
+            <option value='US'>United States</option>
+            <option value='CA'>Canada</option>
           </Select>
         </div>
       </div>
