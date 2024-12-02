@@ -1,12 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { GridColDef } from '@mui/x-data-grid'
+
 import { Vendor } from '@/types/truckmate'
 import { useVendors } from '@/hooks/useVendors'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons'
-import { Pagination } from '@/components/ui/pagination'
 import { ServerSideDataGrid } from '@/components/DataGrid'
+import { Button } from '@/components/Button'
 
 const DEFAULT_LIMIT = 20
 
@@ -15,9 +17,8 @@ type SortableFields = keyof Pick<
   'vendorId' | 'name' | 'isActive' | 'insurance' | 'liability' | 'vendorSince'
 >
 
-const columns = [
+const columns: GridColDef[] = [
   {
-    id: 'vendorId',
     field: 'vendorId',
     headerName: 'ID',
     align: 'left',
@@ -25,7 +26,6 @@ const columns = [
     renderCell: ({ row }) => row.vendorId,
   },
   {
-    id: 'name',
     field: 'name',
     headerName: 'Carrier Name',
     align: 'left',
@@ -33,7 +33,6 @@ const columns = [
     renderCell: ({ row }) => row.name,
   },
   {
-    id: 'isInactive',
     field: 'isInactive',
     headerName: 'Status',
     align: 'left',
@@ -42,7 +41,6 @@ const columns = [
       /^True$/.test(row.isInactive) ? 'Active' : 'Inactive',
   },
   {
-    id: 'insurance',
     field: 'insurance',
     headerName: 'Insurance',
     align: 'left',
@@ -50,7 +48,6 @@ const columns = [
     renderCell: ({ row }) => row.insurance,
   },
   {
-    id: 'liability',
     field: 'liability',
     headerName: 'Liability',
     align: 'left',
@@ -58,7 +55,6 @@ const columns = [
     renderCell: ({ row }) => row.liability,
   },
   {
-    id: 'vendorSince',
     field: 'vendorSince',
     headerName: 'Vendor Since',
     align: 'left',
@@ -83,7 +79,6 @@ export default function Carriers() {
     isLoading,
     error,
     total,
-    params,
     updateParams,
   } = useVendors('interliner', {
     limit: DEFAULT_LIMIT,
@@ -92,13 +87,7 @@ export default function Carriers() {
     filter: "isInactive eq 'True'",
   })
 
-  const handleSort = ({
-    field,
-    sort,
-  }: {
-    field: SortableFields
-    sort: 'asc' | 'desc'
-  }) => {
+  const handleSort = ({ field, sort }) => {
     setSortField(field)
     setSortDirection(sort)
     updateParams({ orderBy: `${field} ${sort}` })
@@ -124,10 +113,6 @@ export default function Carriers() {
     updateParams({ filter, offset: 0 })
   }
 
-  const handleOffsetChange = (newOffset: number) => {
-    updateParams({ offset: newOffset })
-  }
-
   if (isLoading) {
     return (
       <div className="w-full h-[500px] flex justify-center items-center">
@@ -150,16 +135,11 @@ export default function Carriers() {
     )
   }
 
-  const currentPage =
-    Math.floor((params.offset || 0) / (params.limit || DEFAULT_LIMIT)) + 1
-
   return (
     <div className="p-4 sm:p-6 text-gray-900">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Carriers</h1>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-          Add Carrier
-        </button>
+        <Button>Add Carrier</Button>
       </div>
 
       <div className="mb-6">
@@ -176,8 +156,9 @@ export default function Carriers() {
         <ServerSideDataGrid
           columns={columns}
           data={carriers}
-          disableSelectionOnClick
+          disableRowSelectionOnClick
           isLoading={isLoading}
+          onRowClick={({ row }) => setSelectedCarrier(row)}
           paginationModel={paginationModel}
           rowCount={total}
           setPaginationModel={setPaginationModel}

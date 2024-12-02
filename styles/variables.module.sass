@@ -1,0 +1,78 @@
+@use 'sass:color'
+@import './sass-variables.module'
+
+:root
+  --blue8: #{color.adjust($blue, $lightness: -20%)}
+  --blue18: #{color.adjust($blue, $lightness: -10%)}
+  --blue28: #{$blue}
+  --blue38: #{color.adjust($blue, $lightness: +10%)}
+  --blue48: #{color.adjust($blue, $lightness: +20%)}
+  --blue58: #{color.adjust($blue, $lightness: +30%)}
+  --blue68: #{color.adjust($blue, $lightness: +40%)}
+  --blue78: #{color.adjust($blue, $lightness: +50%)}
+  --blue88: #{color.adjust($blue, $lightness: +60%)}
+  --blue93: #{color.adjust($blue, $lightness: +68%)}
+  --blue98: #{color.adjust($blue, $lightness: +70%)}
+
+  --neutral17: #{$neutral}
+  --neutral37: #{color.adjust($neutral, $lightness: +20%)}
+  --neutral47: #{color.adjust($neutral, $lightness: +30%)}
+  --neutral57: #{color.adjust($neutral, $lightness: +40%)}
+  --neutral67: #{color.adjust($neutral, $lightness: +58%)}
+  --neutral77: #{color.adjust($neutral, $lightness: +60%)}
+  --neutral80: #{color.adjust($neutral, $lightness: +63%)}
+  --neutral87: #{color.adjust($neutral, $lightness: +70%)}
+  --neutral92: #{color.adjust($neutral, $lightness: +75%)}
+  --neutral97: #{color.adjust($neutral, $lightness: +80%)}
+  --neutral98: #{color.adjust($neutral, $lightness: +81%)}
+
+  --goldenrod49: #{$goldenrod}
+  --goldenrod59: #{color.adjust($goldenrod, $lightness: +10%)}
+  --goldenrod69: #{color.adjust($goldenrod, $lightness: +20%)}
+  --goldenrod79: #{color.adjust($goldenrod, $lightness: +30%)}
+  --goldenrod89: #{color.adjust($goldenrod, $lightness: +40%)}
+
+  --red10: #{color.adjust($red, $lightness: -50%)}
+  --red20: #{color.adjust($red, $lightness: -40%)}
+  --red30: #{color.adjust($red, $lightness: -30%)}
+  --red40: #{color.adjust($red, $lightness: -20%)}
+  --red50: #{color.adjust($red, $lightness: -10%)}
+  --red60: #{$red}
+  --red70: #{color.adjust($red, $lightness: +10%)}
+  --red80: #{color.adjust($red, $lightness: +20%)}
+  --red90: #{color.adjust($red, $lightness: +30%)}
+  --red99: #{color.adjust($red, $lightness: +35%)}
+
+  --green28: #{color.adjust($green, $lightness: -20%)}
+  --green38: #{color.adjust($green, $lightness: -10%)}
+  --green48: #{$green}
+  --green58: #{color.adjust($green, $lightness: +10%)}
+  --green68: #{color.adjust($green, $lightness: +20%)}
+  --green78: #{color.adjust($green, $lightness: +30%)}
+  --green88: #{color.adjust($green, $lightness: +40%)}
+  --green98: #{color.adjust($green, $lightness: +48%)}
+
+  --charcoal: #{$charcoal}
+  --white: #{$white}
+  --magenta: #BE6BE4
+  --cyan: #07C5C5
+
+  --primaryColor: var(--blue28)
+  --secondaryColor: var(--blue48)
+  --warningColor: var(--goldenrod49)
+  --errorColor: var(--red60)
+  --successColor: var(--green48)
+  --neutralColor: var(--neutral57)
+
+  // Box Shadow
+  --modalShadow: 0px 11px 30px -7px rgba(0, 0, 0, 0.2), 0px 24px 60px 3px rgba(0, 0, 0, 0.14)
+
+  --borderRadius: 4px
+
+  --topMenuHeight: 80px
+  --mainHeight: calc(100vh - var(--topMenuHeight))
+
+  // Z-Index
+  --topMenuZIndex: 3
+  --sideMenuZIndex: 100
+  --flyoutZIndex: 2

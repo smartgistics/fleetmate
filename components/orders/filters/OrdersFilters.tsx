@@ -1,6 +1,6 @@
 interface OrdersFiltersProps {
-  searchTerm: string;
-  setSearchTerm: (term: string) => void;
+  searchTerm: string
+  setSearchTerm: (term: string) => void
 }
 
 export function OrdersFilters({
@@ -8,14 +8,14 @@ export function OrdersFilters({
   setSearchTerm,
 }: OrdersFiltersProps) {
   return (
-    <div className='mb-4 flex gap-4'>
+    <div className="mb-4 flex gap-4">
       <input
-        type='text'
-        placeholder='Search orders...'
-        className='flex-1 px-4 py-2 border rounded'
-        value={searchTerm}
+        className="flex-1 px-4 py-2 border rounded"
         onChange={(e) => setSearchTerm(e.target.value)}
+        placeholder="Search orders..."
+        type="text"
+        value={searchTerm}
       />
     </div>
-  );
+  )
 }

@@ -1,101 +1,101 @@
-"use client";
+'use client'
 
-import React, { useState, useMemo } from "react";
-import { OrderDetailsModal } from "@/components/orders/OrderDetailsModal";
-import { TripDetailsModal } from "@/components/trips/TripDetailsModal";
-import { DragDropContext, DropResult } from "@hello-pangea/dnd";
-import Tabs from "@/components/Tabs";
-import type { Order, Trip } from "@/types/truckmate";
-import { useOrders } from "@/hooks/useTruckMate";
-import { useDispatch } from "@/hooks/useDispatch";
-import { OperationsColumn } from "@/components/operations/OperationsColumn";
+import React, { useState, useMemo } from 'react'
+import { OrderDetailsModal } from '@/components/orders/OrderDetailsModal'
+import { TripDetailsModal } from '@/components/trips/TripDetailsModal'
+import { DragDropContext, DropResult } from '@hello-pangea/dnd'
+import Tabs from '@/components/Tabs'
+import type { Order, Trip } from '@/types/truckmate'
+import { useOrders } from '@/hooks/useTruckMate'
+import { useDispatch } from '@/hooks/useDispatch'
+import { OperationsColumn } from '@/components/operations/OperationsColumn'
 
 interface StatusColors {
-  NOT_STARTED: string;
-  CAUTION: string;
-  ON_TRACK: string;
-  DELAYED: string;
+  NOT_STARTED: string
+  CAUTION: string
+  ON_TRACK: string
+  DELAYED: string
 }
 
 const STATUS_COLORS: StatusColors = {
-  NOT_STARTED: "bg-blue-200",
-  CAUTION: "bg-yellow-200",
-  ON_TRACK: "bg-green-200",
-  DELAYED: "bg-red-200",
-};
+  NOT_STARTED: 'bg-blue-200',
+  CAUTION: 'bg-yellow-200',
+  ON_TRACK: 'bg-green-200',
+  DELAYED: 'bg-red-200',
+}
 
 const FILTER_OPTIONS = {
   status: [
-    { label: "All", value: "" },
-    { label: "Available", value: "AVAIL" },
-    { label: "Planned", value: "PLANNED" },
-    { label: "Dispatched", value: "DISP" },
-    { label: "At Shipper", value: "ARVSHPR" },
-    { label: "In Transit", value: "LOADED" },
-    { label: "At Consignee", value: "DELVD" },
+    { label: 'All', value: '' },
+    { label: 'Available', value: 'AVAIL' },
+    { label: 'Planned', value: 'PLANNED' },
+    { label: 'Dispatched', value: 'DISP' },
+    { label: 'At Shipper', value: 'ARVSHPR' },
+    { label: 'In Transit', value: 'LOADED' },
+    { label: 'At Consignee', value: 'DELVD' },
   ],
   equipmentTypes: [
-    { label: "All", value: "" },
-    { label: "Van", value: "VAN" },
-    { label: "Reefer", value: "REEF" },
-    { label: "Flatbed", value: "FLAT" },
-    { label: "Step Deck", value: "STEP" },
+    { label: 'All', value: '' },
+    { label: 'Van', value: 'VAN' },
+    { label: 'Reefer', value: 'REEF' },
+    { label: 'Flatbed', value: 'FLAT' },
+    { label: 'Step Deck', value: 'STEP' },
   ],
-};
+}
 
 export default function OperationsPage() {
-  const [activeTab, setActiveTab] = useState("dispatch");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [activeTab, setActiveTab] = useState('dispatch')
+  const [searchTerm, setSearchTerm] = useState('')
   const [selectedFilters, setSelectedFilters] = useState({
-    planner: "",
-    customer: "",
-    pickRegion: "",
-    delRegion: "",
-    carrier: "",
-    date: "",
-    equipmentType: "",
-  });
+    planner: '',
+    customer: '',
+    pickRegion: '',
+    delRegion: '',
+    carrier: '',
+    date: '',
+    equipmentType: '',
+  })
 
-  const { trips, isLoading: tripsLoading } = useDispatch();
-  const { orders, isLoading: ordersLoading } = useOrders();
+  const { trips, isLoading: tripsLoading } = useDispatch()
+  const { orders, isLoading: ordersLoading } = useOrders()
   const [selectedItem, setSelectedItem] = useState<{
-    type: "order" | "trip";
-    data: Order | Trip;
-  } | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+    type: 'order' | 'trip'
+    data: Order | Trip
+  } | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   // Filter trips in memory based on search and filters
   const filteredTrips = useMemo(() => {
-    const searchLower = searchTerm.toLowerCase();
+    const searchLower = searchTerm.toLowerCase()
     const filterTrip = (trip: Trip) => {
       const matchesSearch =
         !searchTerm ||
         trip.origZoneDesc?.toLowerCase().includes(searchLower) ||
-        trip.destZoneDesc?.toLowerCase().includes(searchLower);
+        trip.destZoneDesc?.toLowerCase().includes(searchLower)
 
       const matchesPlanner =
         !selectedFilters.planner ||
         trip.user1
           ?.toLowerCase()
-          .includes(selectedFilters.planner.toLowerCase());
+          .includes(selectedFilters.planner.toLowerCase())
 
       const matchesCustomer =
         !selectedFilters.customer ||
         trip.user2
           ?.toLowerCase()
-          .includes(selectedFilters.customer.toLowerCase());
+          .includes(selectedFilters.customer.toLowerCase())
 
       const matchesPickRegion =
         !selectedFilters.pickRegion ||
         trip.origZoneDesc
           ?.toLowerCase()
-          .includes(selectedFilters.pickRegion.toLowerCase());
+          .includes(selectedFilters.pickRegion.toLowerCase())
 
       const matchesDelRegion =
         !selectedFilters.delRegion ||
         trip.destZoneDesc
           ?.toLowerCase()
-          .includes(selectedFilters.delRegion.toLowerCase());
+          .includes(selectedFilters.delRegion.toLowerCase())
 
       const matchesCarrier =
         !selectedFilters.carrier ||
@@ -103,10 +103,10 @@ export default function OperationsPage() {
           c.vendor?.name
             ?.toLowerCase()
             .includes(selectedFilters.carrier.toLowerCase())
-        );
+        )
 
       const matchesDate =
-        !selectedFilters.date || trip.eTD?.includes(selectedFilters.date);
+        !selectedFilters.date || trip.eTD?.includes(selectedFilters.date)
 
       return (
         matchesSearch &&
@@ -116,8 +116,8 @@ export default function OperationsPage() {
         matchesDelRegion &&
         matchesCarrier &&
         matchesDate
-      );
-    };
+      )
+    }
 
     return {
       available: trips.available.filter(filterTrip),
@@ -126,98 +126,98 @@ export default function OperationsPage() {
       arrivedAtShipper: trips.arrivedAtShipper.filter(filterTrip),
       inTransit: trips.inTransit.filter(filterTrip),
       delivering: trips.delivering.filter(filterTrip),
-    };
-  }, [trips, searchTerm, selectedFilters]);
+    }
+  }, [trips, searchTerm, selectedFilters])
 
   // Handle search - immediately filter in memory
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-  };
+    setSearchTerm(e.target.value)
+  }
 
   // Handle filter changes - immediately filter in memory
   const handleFilterChange = (filterName: string, value: string) => {
-    setSelectedFilters((prev) => ({ ...prev, [filterName]: value }));
-  };
+    setSelectedFilters((prev) => ({ ...prev, [filterName]: value }))
+  }
 
   const handleDragEnd = (result: DropResult) => {
-    if (!result.destination) return;
-    console.log(result);
-  };
+    if (!result.destination) return
+    console.log(result)
+  }
 
   const handleItemClick = (item: Order | Trip) => {
-    const type = "orderId" in item ? "order" : "trip";
-    setSelectedItem({ type, data: item });
-    setIsModalOpen(true);
-  };
+    const type = 'orderId' in item ? 'order' : 'trip'
+    setSelectedItem({ type, data: item })
+    setIsModalOpen(true)
+  }
 
   const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedItem(null);
-  };
+    setIsModalOpen(false)
+    setSelectedItem(null)
+  }
 
   const handleClearDate = () => {
-    handleFilterChange("date", "");
-  };
+    handleFilterChange('date', '')
+  }
 
   if (tripsLoading || ordersLoading) {
     return (
-      <div className='flex items-center justify-center h-screen'>
-        <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900' />
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
       </div>
-    );
+    )
   }
 
   return (
-    <div className='p-4 text-gray-900'>
-      <div className='mb-6'>
+    <div className="p-4 text-gray-900">
+      <div className="mb-6">
         <Tabs
-          tabs={[
-            { label: "Dispatch", value: "dispatch" },
-            { label: "Planning", value: "planning" },
-            { label: "Tracking", value: "tracking" },
-            { label: "Billing", value: "billing" },
-          ]}
           activeTab={activeTab}
           onTabChange={setActiveTab}
+          tabs={[
+            { label: 'Dispatch', value: 'dispatch' },
+            { label: 'Planning', value: 'planning' },
+            { label: 'Tracking', value: 'tracking' },
+            { label: 'Billing', value: 'billing' },
+          ]}
         />
       </div>
 
       {/* Filters Section */}
-      <div className='mb-6 space-y-4'>
+      <div className="mb-6 space-y-4">
         {/* Top row - Search and Date Range */}
-        <div className='flex gap-4'>
-          <div className='flex-1'>
+        <div className="flex gap-4">
+          <div className="flex-1">
             <input
-              type='text'
-              placeholder='Search by Trip #, Customer, Origin, or Destination...'
-              className='w-full px-4 py-2 border rounded-lg'
-              value={searchTerm}
+              className="w-full px-4 py-2 border rounded-lg"
               onChange={handleSearch}
+              placeholder="Search by Trip #, Customer, Origin, or Destination..."
+              type="text"
+              value={searchTerm}
             />
           </div>
-          <div className='flex gap-2'>
+          <div className="flex gap-2">
             <input
-              type='date'
-              className='px-4 py-2 border rounded-lg'
+              className="px-4 py-2 border rounded-lg"
+              onChange={(e) => handleFilterChange('date', e.target.value)}
+              type="date"
               value={selectedFilters.date}
-              onChange={(e) => handleFilterChange("date", e.target.value)}
             />
             {selectedFilters.date && (
               <button
+                className="p-2 text-gray-500 hover:text-gray-700"
                 onClick={handleClearDate}
-                className='p-2 text-gray-500 hover:text-gray-700'
               >
                 <svg
-                  className='h-5 w-5'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
+                  className="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
                   <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
+                    d="M6 18L18 6M6 6l12 12"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                     strokeWidth={2}
-                    d='M6 18L18 6M6 6l12 12'
                   />
                 </svg>
               </button>
@@ -226,15 +226,15 @@ export default function OperationsPage() {
         </div>
 
         {/* Bottom row - Additional Filters */}
-        <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4'>
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
           <select
-            className='px-4 py-2 border rounded-lg'
-            value={selectedFilters.equipmentType}
+            className="px-4 py-2 border rounded-lg"
             onChange={(e) =>
-              handleFilterChange("equipmentType", e.target.value)
+              handleFilterChange('equipmentType', e.target.value)
             }
+            value={selectedFilters.equipmentType}
           >
-            <option value=''>Equipment Type</option>
+            <option value="">Equipment Type</option>
             {FILTER_OPTIONS.equipmentTypes.map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
@@ -243,123 +243,123 @@ export default function OperationsPage() {
           </select>
 
           <input
-            type='text'
-            placeholder='Origin City/Region'
-            className='px-4 py-2 border rounded-lg'
+            className="px-4 py-2 border rounded-lg"
+            onChange={(e) => handleFilterChange('pickRegion', e.target.value)}
+            placeholder="Origin City/Region"
+            type="text"
             value={selectedFilters.pickRegion}
-            onChange={(e) => handleFilterChange("pickRegion", e.target.value)}
           />
 
           <input
-            type='text'
-            placeholder='Destination City/Region'
-            className='px-4 py-2 border rounded-lg'
+            className="px-4 py-2 border rounded-lg"
+            onChange={(e) => handleFilterChange('delRegion', e.target.value)}
+            placeholder="Destination City/Region"
+            type="text"
             value={selectedFilters.delRegion}
-            onChange={(e) => handleFilterChange("delRegion", e.target.value)}
           />
 
           <input
-            type='text'
-            placeholder='Customer'
-            className='px-4 py-2 border rounded-lg'
+            className="px-4 py-2 border rounded-lg"
+            onChange={(e) => handleFilterChange('customer', e.target.value)}
+            placeholder="Customer"
+            type="text"
             value={selectedFilters.customer}
-            onChange={(e) => handleFilterChange("customer", e.target.value)}
           />
 
           <input
-            type='text'
-            placeholder='Carrier'
-            className='px-4 py-2 border rounded-lg'
+            className="px-4 py-2 border rounded-lg"
+            onChange={(e) => handleFilterChange('carrier', e.target.value)}
+            placeholder="Carrier"
+            type="text"
             value={selectedFilters.carrier}
-            onChange={(e) => handleFilterChange("carrier", e.target.value)}
           />
 
           <input
-            type='text'
-            placeholder='Planner'
-            className='px-4 py-2 border rounded-lg'
+            className="px-4 py-2 border rounded-lg"
+            onChange={(e) => handleFilterChange('planner', e.target.value)}
+            placeholder="Planner"
+            type="text"
             value={selectedFilters.planner}
-            onChange={(e) => handleFilterChange("planner", e.target.value)}
           />
         </div>
       </div>
 
       <DragDropContext onDragEnd={handleDragEnd}>
-        <div className='flex min-h-[600px] border-l border-r border-gray-300 w-full bg-white overflow-x-auto'>
-          {activeTab === "dispatch" && (
+        <div className="flex min-h-[600px] border-l border-r border-gray-300 w-full bg-white overflow-x-auto">
+          {activeTab === 'dispatch' && (
             <>
               <OperationsColumn
-                title='Available'
                 items={filteredTrips.available}
+                onItemClick={handleItemClick}
                 statusColor={STATUS_COLORS.NOT_STARTED}
-                onItemClick={handleItemClick}
+                title="Available"
               />
               <OperationsColumn
-                title='Planned'
                 items={filteredTrips.planned}
-                statusColor={STATUS_COLORS.CAUTION}
                 onItemClick={handleItemClick}
+                statusColor={STATUS_COLORS.CAUTION}
+                title="Planned"
               />
               <OperationsColumn
-                title='Dispatched'
                 items={filteredTrips.dispatched}
+                onItemClick={handleItemClick}
                 statusColor={STATUS_COLORS.ON_TRACK}
-                onItemClick={handleItemClick}
+                title="Dispatched"
               />
               <OperationsColumn
-                title='Arrived @ Shipper'
                 items={filteredTrips.arrivedAtShipper}
-                statusColor={STATUS_COLORS.CAUTION}
                 onItemClick={handleItemClick}
+                statusColor={STATUS_COLORS.CAUTION}
+                title="Arrived @ Shipper"
               />
               <OperationsColumn
-                title='In Transit'
                 items={filteredTrips.inTransit}
-                statusColor={STATUS_COLORS.CAUTION}
                 onItemClick={handleItemClick}
+                statusColor={STATUS_COLORS.CAUTION}
+                title="In Transit"
               />
               <OperationsColumn
-                title='Arrived @ Consignee'
                 items={filteredTrips.delivering}
-                statusColor={STATUS_COLORS.CAUTION}
                 onItemClick={handleItemClick}
+                statusColor={STATUS_COLORS.CAUTION}
+                title="Arrived @ Consignee"
               />
             </>
           )}
-          {activeTab === "planning" && (
+          {activeTab === 'planning' && (
             <>
               <OperationsColumn
-                title='New Orders'
-                items={orders.filter((order) => order.status === "New")}
-                statusColor={STATUS_COLORS.NOT_STARTED}
+                items={orders.filter((order) => order.status === 'New')}
                 onItemClick={handleItemClick}
+                statusColor={STATUS_COLORS.NOT_STARTED}
+                title="New Orders"
               />
               <OperationsColumn
-                title='Planning'
-                items={orders.filter((order) => order.status === "Planning")}
-                statusColor={STATUS_COLORS.CAUTION}
+                items={orders.filter((order) => order.status === 'Planning')}
                 onItemClick={handleItemClick}
+                statusColor={STATUS_COLORS.CAUTION}
+                title="Planning"
               />
             </>
           )}
         </div>
       </DragDropContext>
 
-      {selectedItem?.type === "order" ? (
+      {selectedItem?.type === 'order' ? (
         <OrderDetailsModal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
-          order={selectedItem.data as Order}
           onUpdate={handleCloseModal}
+          order={selectedItem.data as Order}
         />
-      ) : selectedItem?.type === "trip" ? (
+      ) : selectedItem?.type === 'trip' ? (
         <TripDetailsModal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
-          trip={selectedItem.data as Trip}
           onUpdate={handleCloseModal}
+          trip={selectedItem.data as Trip}
         />
       ) : null}
     </div>
-  );
+  )
 }

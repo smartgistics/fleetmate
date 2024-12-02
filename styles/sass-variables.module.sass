@@ -1,0 +1,70 @@
+@use 'sass:color'
+
+$blue: #006990
+$neutral: #2D2D2D
+$neutral2: #B3C8D0
+$goldenrod: #EFA00B
+$goldenrod2: #F8C668
+$bronze: #D5A242
+$yellow: #EDF103
+$orange: #FFC409
+$red: #E54B4B
+$red2: #D94F4F
+$green: #44AF69
+$green2: #21B971
+$olive: #7FB738
+$charcoal: #1e1e1e
+$white: #fff
+$magenta: #BE6BE4
+$purple: #9747FF
+$maroon: #95134A
+$cyan: #07C5C5
+$turquoise: #4FD9AF
+
+:export
+  blue: $blue
+  neutral: $neutral
+  goldenrod: $goldenrod
+  red: $red
+  green: $green
+  charcoal: $charcoal
+  white: $white
+  primaryColor: $blue
+  secondaryColor: color.adjust($blue, $lightness: +20%)
+  neutralColor: color.adjust($neutral, $lightness: +40%)
+  warningColor: $goldenrod
+  errorColor: $red
+  successColor: $green
+  textColor: $charcoal
+  chartNeutral: $neutral2
+  chartGreen: $green2
+  chartGoldenrod: $goldenrod2
+  chartMagenta: $magenta
+  chartCyan: $cyan
+  pieBlue1: $blue
+  pieBlue2: color.adjust($blue, $lightness: +20%)
+  pieBlue3: color.adjust($blue, $lightness: +40%)
+  pieOlive1: $olive
+  pieOlive2: color.adjust($olive, $lightness: +20%)
+  pieOlive3: color.adjust($olive, $lightness: +40%)
+  pieTurquoise1: $turquoise
+  pieTurquoise2: color.adjust($turquoise, $lightness: +20%)
+  pieTurquoise3: color.adjust($turquoise, $lightness: +30%)
+  pieYellow1: $yellow
+  pieYellow2: color.adjust($yellow, $lightness: +15%)
+  pieYellow3: color.adjust($yellow, $lightness: +30%)
+  pieOrange1: $orange
+  pieOrange2: color.adjust($orange, $lightness: +20%)
+  pieOrange3: color.adjust($orange, $lightness: +30%)
+  piePurple1: $purple
+  piePurple2: color.adjust($purple, $lightness: +15%)
+  piePurple3: color.adjust($purple, $lightness: +25%)
+  pieMaroon1: $maroon
+  pieMaroon2: color.adjust($maroon, $lightness: +30%)
+  pieMaroon3: color.adjust($maroon, $lightness: +40%)
+  pieRed1: $red2
+  pieRed2: color.adjust($red2, $lightness: +15%)
+  pieRed3: color.adjust($red2, $lightness: +25%)
+  pieBronze1: $bronze
+  pieBronze2: color.adjust($bronze, $lightness: +15%)
+  pieBronze3: color.adjust($bronze, $lightness: +30%)

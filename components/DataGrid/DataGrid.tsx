@@ -14,8 +14,7 @@ export function DataGrid<T = any>({
   rows,
   columns,
   loading,
-  page,
-  pageSize,
+  paginationModel,
   ...rest
 }: DataGridProps<T>) {
   const displayCols = useMemo(() => {
@@ -34,10 +33,8 @@ export function DataGrid<T = any>({
     <div className={cs(styles.root, className)}>
       <MuiDataGrid
         columns={displayCols}
-        experimentalFeatures={{ columnGrouping: true }}
-        pageSize={pageSize}
-        pageSizeOptions={[pageSize]}
-        paginationModel={{ page, pageSize }}
+        pageSizeOptions={[paginationModel.pageSize]}
+        paginationModel={paginationModel}
         rows={displayRows as T[]}
         {...rest}
       />

@@ -1,0 +1,59 @@
+.MuiDataGrid-root
+  --borderColor: var(--neutral80)
+
+.MuiDataGrid-columnSeparator.MuiDataGrid-columnSeparator
+  display: none
+
+.MuiDataGrid-columnHeader
+  + .MuiDataGrid-columnHeader
+    border-left: 1px solid var(--borderColor)
+  .MuiDataGrid-columnHeaderTitleContainer
+    gap: 0 .5rem
+
+.MuiDataGrid-row
+  border: 1px solid var(--borderColor)
+  border-width: 1px 0
+
+.MuiDataGrid-cell
+  padding: 1rem .875rem
+  + .MuiDataGrid-cell
+    border-left: 1px solid var(--borderColor)
+
+.MuiDataGrid-virtualScroller
+  &:before
+    position: absolute
+    top: -20px
+    right: 0
+    left: 0
+    height: 28px
+    content: ''
+    background: linear-gradient(180deg, rgba(0, 0, 0, .53), rgba(0, 0, 0, 0) 100%)
+    filter: blur(15px)
+
+.MuiTabs-root
+  // It seems the design cannot stick to the palette's colors, even though the palettte
+  // originally defined includes 40 colors. Resorting to one-offs from here on out.
+  --tabBlue: #1976D2
+  em
+    display: inline-block
+    margin-left: .5ch
+    font-style: normal
+  .Mui-selected
+    em
+      color: var(--tabBlue)
+
+.MuiTab-root
+  flex-direction: row
+  font-size: 1rem
+  text-transform: none
+  color: hsl(200deg, 3%, 56%)
+  &.Mui-selected
+    color: var(--tabBlue)
+
+.MuiTabs-indicator
+  background: var(--tabBlue)
+
+// Hide MUI X license expired message
+.MuiDataGrid-main
+  > div:last-of-type[style*="z-index: 100000"]
+    display: none

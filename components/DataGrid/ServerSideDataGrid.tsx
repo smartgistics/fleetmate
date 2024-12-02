@@ -1,38 +1,37 @@
-import { GridColumns, GridRowParams, GridValidRowModel } from '@mui/x-data-grid'
+import { GridColDef, GridRowParams, GridValidRowModel } from '@mui/x-data-grid'
 import cs from 'clsx'
 import { useMemo } from 'react'
 
 import { DataGrid } from './DataGrid'
-import { CTGridUpdate } from '@/models'
 
 import styles from './ServerSideDataGrid.module.sass'
 
 /**
- * This is a workaround to require both selectionModel and onSelectionModelChange to be present
+ * This is a workaround to require both rowSelectionModel and onRowSelectionModelChange to be present
  * if isCheckboxSelection is true and neither to be present if isCheckboxSelection is false
  *
  * These props are required for server side pagination to work with row selection
  */
 export type XorSelectionModel =
   | {
-      selectionModel: string[]
+      rowSelectionModel: string[]
       isCheckboxSelection: boolean
-      onSelectionModelChange: (selectionModel: string[]) => void
+      onRowSelectionModelChange: (selectionModel: string[]) => void
     }
   | {
-      selectionModel?: never
-      onSelectionModelChange?: never
+      rowSelectionModel?: never
+      onRowSelectionModelChange?: never
       isCheckboxSelection?: false
     }
 
 export type ServerSideDataGridProps = XorSelectionModel & {
-  className: string
+  className?: string
   classes?: { cell?: string }
-  columns: GridColumns
+  columns: GridColDef[]
   data: any[]
   defaultSortColumn?: string
   disableColumnMenu?: boolean
-  disableSelectionOnClick?: boolean
+  disableRowSelectionOnClick?: boolean
   getRowClassName?: ({ row }) => string
   initialState?: unknown
   isLoading?: boolean
@@ -55,17 +54,17 @@ export const ServerSideDataGrid = (props: ServerSideDataGridProps) => {
     data = [],
     defaultSortColumn,
     disableColumnMenu = true,
-    disableSelectionOnClick,
+    disableRowSelectionOnClick,
     getRowClassName,
     initialState = {},
     isCheckboxSelection = false,
     isLoading,
     isRowSelectable,
     onRowClick,
-    onSelectionModelChange,
+    onRowSelectionModelChange,
     paginationModel,
     rowCount = 0,
-    selectionModel,
+    rowSelectionModel,
     setPaginationModel,
     setSortModel,
     sortModel,
@@ -73,7 +72,7 @@ export const ServerSideDataGrid = (props: ServerSideDataGridProps) => {
 
   const rows = data || []
 
-  const columnsWithSort = useMemo<GridColumns>(() => {
+  const columnsWithSort = useMemo<GridColDef[]>(() => {
     if (!defaultSortColumn) return columns
 
     return columns.map((column) =>
@@ -93,7 +92,7 @@ export const ServerSideDataGrid = (props: ServerSideDataGridProps) => {
       classes={classes}
       columns={columnsWithSort}
       disableColumnMenu={disableColumnMenu}
-      disableSelectionOnClick={disableSelectionOnClick}
+      disableRowSelectionOnClick={disableRowSelectionOnClick}
       getRowClassName={getRowClassName}
       getRowHeight={() => 'auto'}
       initialState={initialState}
@@ -102,15 +101,13 @@ export const ServerSideDataGrid = (props: ServerSideDataGridProps) => {
       loading={isLoading}
       onPaginationModelChange={setPaginationModel}
       onRowClick={onRowClick}
-      onSelectionModelChange={onSelectionModelChange}
+      onRowSelectionModelChange={onRowSelectionModelChange}
       onSortModelChange={setSortModel}
-      page={paginationModel.page}
-      pageSize={paginationModel.pageSize}
       paginationMode="server"
-      rowBuffer={rows.length}
+      paginationModel={paginationModel}
       rowCount={rowCount}
+      rowSelectionModel={rowSelectionModel}
       rows={rows}
-      selectionModel={selectionModel}
       sortModel={sortModel}
       sortingMode="server"
     />

@@ -351,6 +351,11 @@
   resolved "https://registry.yarnpkg.com/@floating-ui/utils/-/utils-0.2.8.tgz#21a907684723bbbaa5f0974cf7730bd797eb8e62"
   integrity sha512-kym7SodPp8/wloecOpcmSnWJsK7M0E5Wg8UcFA+uO4B9s5d0ywXOEro/8HM9x0rW+TljRzul/14UYz3TleT3ig==
 
+"@fontsource/lato@^5.1.0":
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/@fontsource/lato/-/lato-5.1.0.tgz#392559125ddf6a9bd94e361b4e63eca3fa3acd23"
+  integrity sha512-wYa/DeUS/WuaJoR/vY+v74W6gtOm98DgoRdSj4FuMXe0E0XYGAEVOgh+DxusJR3EglRZU6ZZDF7vZ881vV1KGA==
+
 "@hello-pangea/dnd@^17.0.0":
   version "17.0.0"
   resolved "https://registry.npmjs.org/@hello-pangea/dnd/-/dnd-17.0.0.tgz"

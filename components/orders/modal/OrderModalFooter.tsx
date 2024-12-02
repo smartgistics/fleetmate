@@ -1,7 +1,10 @@
+import { Button } from '@/components/Button'
+import { FormFooter } from '@/components/FormFooter'
+
 interface OrderModalFooterProps {
-  onClose: () => void;
-  onNext: () => void;
-  isLastTab: boolean;
+  onClose: () => void
+  onNext: () => void
+  isLastTab: boolean
 }
 
 export function OrderModalFooter({
@@ -10,30 +13,17 @@ export function OrderModalFooter({
   isLastTab,
 }: OrderModalFooterProps) {
   return (
-    <div className='mt-8 flex justify-end border-t pt-4'>
-      <button
-        type='button'
-        onClick={onClose}
-        className='mr-3 px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-500'
-      >
-        Cancel
-      </button>
+    <FormFooter>
       {isLastTab ? (
-        <button
-          type='submit'
-          className='px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700'
-        >
+        <Button color="success" type="submit">
           Create Order
-        </button>
+        </Button>
       ) : (
-        <button
-          type='button'
-          onClick={onNext}
-          className='px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700'
-        >
-          Next
-        </button>
+        <Button onClick={onNext}>Next</Button>
       )}
-    </div>
-  );
+      <Button color="neutral" onClick={onClose} variant="text">
+        Cancel
+      </Button>
+    </FormFooter>
+  )
 }

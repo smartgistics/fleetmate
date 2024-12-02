@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import cs from 'clsx'
 import { ReactNode } from 'react'
@@ -12,11 +12,16 @@ export interface SelectProps {
   value: string
 }
 
-export const Select = ({ children, className, onChange, value }: SelectProps) => (
+export const Select = ({
+  children,
+  className,
+  onChange,
+  value,
+}: SelectProps) => (
   <select
     className={cs(styles.root, className)}
-    value={value}
     onChange={({ target: { value } }) => onChange(value)}
+    value={value}
   >
     {children}
   </select>
