@@ -97,5 +97,14 @@ export const componentsTheme = {
         },
       },
     },
+    MuiDataGrid: {
+      styleOverrides: {
+        root: {
+          '& .MuiDataGrid-cell': {
+            padding: '1rem .875rem',
+          },
+        },
+      },
+    },
   },
 }
