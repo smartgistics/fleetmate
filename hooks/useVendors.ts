@@ -20,6 +20,7 @@ export function useVendors(
       console.log('Fetching vendors with params:', params)
       return fetchVendors(vendorType, params)
     },
+    refetchInterval: false,
   })
 
   const updateParams = (newParams: Partial<TruckMateQueryParams>) => {
