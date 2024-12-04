@@ -1,4 +1,9 @@
-import { GridColDef, GridRowParams, GridValidRowModel } from '@mui/x-data-grid'
+import {
+  GridColDef,
+  GridRowId,
+  GridRowParams,
+  GridValidRowModel,
+} from '@mui/x-data-grid'
 import cs from 'clsx'
 import { useMemo } from 'react'
 
@@ -33,6 +38,7 @@ export type ServerSideDataGridProps = XorSelectionModel & {
   disableColumnMenu?: boolean
   disableRowSelectionOnClick?: boolean
   getRowClassName?: ({ row }) => string
+  getRowId?: (row) => GridRowId
   initialState?: unknown
   isLoading?: boolean
   isRowSelectable?: (params: GridRowParams<GridValidRowModel>) => boolean
@@ -56,6 +62,7 @@ export const ServerSideDataGrid = (props: ServerSideDataGridProps) => {
     disableColumnMenu = true,
     disableRowSelectionOnClick,
     getRowClassName,
+    getRowId = ({ id }) => id,
     initialState = {},
     isCheckboxSelection = false,
     isLoading,
@@ -95,6 +102,7 @@ export const ServerSideDataGrid = (props: ServerSideDataGridProps) => {
       disableRowSelectionOnClick={disableRowSelectionOnClick}
       getRowClassName={getRowClassName}
       getRowHeight={() => 'auto'}
+      getRowId={getRowId}
       initialState={initialState}
       isRowSelectable={isRowSelectable}
       keepNonExistentRowsSelected={true}

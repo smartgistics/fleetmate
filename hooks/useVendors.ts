@@ -1,4 +1,3 @@
-import { v4 } from 'uuid'
 import { useQuery } from '@tanstack/react-query'
 import { fetchVendors } from '@/services/truckMateService'
 import { Vendor, TruckMateQueryParams } from '@/types/truckmate'
@@ -34,13 +33,8 @@ export function useVendors(
     vendors: response?.vendors?.length,
   })
 
-  const vendorsWithIds = (response?.vendors ?? []).map((v) => {
-    v.id = v4()
-    return v
-  })
-
   return {
-    vendors: vendorsWithIds,
+    vendors: response?.vendors ?? [],
     isLoading,
     error,
     total: response?.count ?? 0,

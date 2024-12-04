@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { v4 } from 'uuid'
 import { GridColDef } from '@mui/x-data-grid'
 
 import { Vendor } from '@/types/truckmate'
@@ -157,6 +158,7 @@ export default function Carriers() {
           columns={columns}
           data={carriers}
           disableRowSelectionOnClick
+          getRowId={({ vendorId }) => vendorId || v4()}
           isLoading={isLoading}
           onRowClick={({ row }) => setSelectedCarrier(row)}
           paginationModel={paginationModel}

@@ -1,78 +1,90 @@
 'use client'
 
 import { useState, useMemo, useEffect } from 'react'
-import { Client } from '@/types/truckmate'
-import { useCustomers } from '@/hooks/useTruckMate'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { v4 } from 'uuid'
+import { debounce } from '@mui/material'
+import { GridColDef } from '@mui/x-data-grid'
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons'
+
 import CustomerDetailsModal from '@/components/customers/CustomerDetailsModal'
-import { Pagination } from '@/components/ui/pagination'
 import { NewCustomerModal } from '@/components/customers/NewCustomerModal'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/Button'
-import debounce from 'lodash/debounce'
+import { ServerSideDataGrid } from '@/components/DataGrid'
+import { useCustomers } from '@/hooks/useTruckMate'
+import { Client } from '@/types/truckmate'
 
 const DEFAULT_LIMIT = 20
 
-type MobileField = {
-  key: keyof Client
-  label: string
-  render: (customer: Client) => React.ReactNode
-}
+type SortableFields = keyof Pick<
+  Client,
+  'clientId' | 'name' | 'status' | 'type' | 'altContact' | 'businessPhone'
+>
 
-const MOBILE_FIELDS: MobileField[] = [
+const columns: GridColDef[] = [
   {
-    key: 'clientId',
-    label: 'Account #',
-    render: (customer) => customer.clientId,
+    field: 'clientId',
+    headerName: 'Account #',
+    align: 'left',
+    flex: 0.4,
+    renderCell: ({ row }) => row.clientId,
   },
   {
-    key: 'name',
-    label: 'Name',
-    render: (customer) => customer.name,
+    field: 'name',
+    headerName: 'Name',
+    align: 'left',
+    flex: 1,
+    renderCell: ({ row }) => row.name,
   },
   {
-    key: 'status',
-    label: 'Status',
-    render: (customer) => customer.status,
+    field: 'status',
+    headerName: 'Status',
+    align: 'left',
+    flex: 0.5,
+    renderCell: ({ row }) => row.status,
   },
   {
-    key: 'type',
-    label: 'Type',
-    render: (customer) => customer.type,
+    field: 'type',
+    headerName: 'Type',
+    align: 'left',
+    flex: 0.5,
+    renderCell: ({ row }) => row.type,
   },
   {
-    key: 'altContact',
-    label: 'Contact',
-    render: (customer) => customer.altContact || '-',
+    field: 'altContact',
+    headerName: 'Contact',
+    align: 'left',
+    flex: 0.5,
+    renderCell: ({ row }) => row.altContact,
   },
   {
-    key: 'businessPhone',
-    label: 'Phone',
-    render: (customer) => customer.businessPhone || '-',
+    field: 'businessPhone',
+    headerName: 'Phone',
+    align: 'left',
+    flex: 0.7,
+    renderCell: ({ row }) => row.businessPhone,
   },
 ]
 
 export default function Customers() {
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: DEFAULT_LIMIT,
+  })
+  const [sortModel, setSortModel] = useState([{ field: 'name', sort: 'asc' }])
   const [searchTerm, setSearchTerm] = useState('')
-  const [sortField, setSortField] = useState<keyof Client>('name')
+  const [sortField, setSortField] = useState<SortableFields>('name')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
   const [selectedCustomer, setSelectedCustomer] = useState<Client | null>(null)
   const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false)
 
-  const {
-    customers,
-    isLoading,
-    error,
-    total,
-    params,
-    updateParams,
-    createCustomer,
-  } = useCustomers({
-    limit: DEFAULT_LIMIT,
-    offset: 0,
-    orderBy: `${sortField} ${sortDirection}`,
-    filter: "name ne null and name ne ''",
-  })
+  const { customers, isLoading, error, total, updateParams, createCustomer } =
+    useCustomers({
+      limit: DEFAULT_LIMIT,
+      offset: 0,
+      orderBy: `${sortField} ${sortDirection}`,
+      filter: "name ne null and name ne ''",
+    })
 
   // Debounced search function only handles the API call
   const debouncedSearch = useMemo(
@@ -88,15 +100,6 @@ export default function Customers() {
     [updateParams]
   )
 
-  // Handle sorting
-  const handleSort = (field: keyof Client) => {
-    const newDirection =
-      sortField === field && sortDirection === 'asc' ? 'desc' : 'asc'
-    setSortField(field)
-    setSortDirection(newDirection)
-    updateParams({ orderBy: `${field} ${newDirection}` })
-  }
-
   // Handle search - immediately update UI state, debounce API call
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value
@@ -104,26 +107,31 @@ export default function Customers() {
     debouncedSearch(term)
   }
 
+  // Handle sorting
+  const handleSort = ({ field, sort }) => {
+    setSortField(field)
+    setSortDirection(sort)
+    updateParams({ orderBy: `${field} ${sort}` })
+  }
+
+  useEffect(() => {
+    if (!sortModel.length) {
+      handleSort({ field: 'name', sort: 'asc' })
+      return
+    }
+    handleSort(sortModel[0])
+  }, [sortModel])
+
+  useEffect(() => {
+    updateParams({ offset: paginationModel.page * paginationModel.pageSize })
+  }, [paginationModel])
+
   // Cleanup debounce on unmount
   useEffect(() => {
     return () => {
-      debouncedSearch.cancel()
+      debouncedSearch.clear()
     }
   }, [debouncedSearch])
-
-  // Handle pagination
-  const handleOffsetChange = (page: number) => {
-    const newOffset = (page - 1) * (params.limit || DEFAULT_LIMIT)
-    console.log('Changing page:', {
-      page,
-      newOffset,
-      currentLimit: params.limit,
-    })
-    updateParams({
-      offset: newOffset,
-      orderBy: `${sortField} ${sortDirection}`,
-    })
-  }
 
   if (isLoading) {
     return (
@@ -169,58 +177,20 @@ export default function Customers() {
 
       {/* Table Section */}
       <div className="overflow-x-auto shadow">
-        <table className="min-w-full bg-white rounded-lg border">
-          <thead>
-            <tr className="bg-gray-50">
-              {MOBILE_FIELDS.map(({ key, label }) => (
-                <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                  key={key}
-                  onClick={() => handleSort(key)}
-                >
-                  {label}
-                  {sortField === key && (
-                    <span className="ml-1">
-                      {sortDirection === 'asc' ? '↑' : '↓'}
-                    </span>
-                  )}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {customers?.map((customer) => (
-              <tr
-                className="hover:bg-gray-50 cursor-pointer"
-                key={customer.clientId}
-                onClick={() => setSelectedCustomer(customer)}
-              >
-                {MOBILE_FIELDS.map(({ key, render }) => (
-                  <td className="px-6 py-4" key={`${customer.clientId}-${key}`}>
-                    {render(customer)}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <ServerSideDataGrid
+          columns={columns}
+          data={customers}
+          disableRowSelectionOnClick
+          getRowId={({ clientId }) => clientId || v4()}
+          isLoading={isLoading}
+          onRowClick={({ row }) => setSelectedCustomer(row)}
+          paginationModel={paginationModel}
+          rowCount={total}
+          setPaginationModel={setPaginationModel}
+          setSortModel={setSortModel}
+          sortModel={sortModel}
+        />
       </div>
-
-      {/* Pagination */}
-      {total > (params.limit || DEFAULT_LIMIT) && (
-        <div className="mt-4">
-          <Pagination
-            currentPage={
-              Math.floor(
-                (params.offset || 0) / (params.limit || DEFAULT_LIMIT)
-              ) + 1
-            }
-            onPageChange={handleOffsetChange}
-            pageSize={params.limit || DEFAULT_LIMIT}
-            total={total}
-          />
-        </div>
-      )}
 
       {/* Modals */}
       {selectedCustomer && (
