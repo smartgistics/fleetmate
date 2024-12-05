@@ -93,6 +93,24 @@ export interface Driver {
   abstractExpiryDate?: string
 }
 
+export const VENDOR_TYPES = {
+  agentCarrier: 'Agent Carrier',
+  agentSales: 'Agent Sales',
+  broker: 'Broker',
+  competitorCarrier: 'Competitor Carrier',
+  customsBroker: 'Customs Broker',
+  insurer: 'Insurer',
+  interliner: 'Interliner',
+  linehaulCarrier: 'Line haul carrier',
+  other: 'Other',
+  palletCompany: 'Pallet company',
+  rental: 'Rental',
+  supplier: 'Supplier',
+  vendor: 'Vendor',
+} as const
+
+export type VendorType = keyof typeof VENDOR_TYPES
+
 // Vendor/Carrier types
 export interface Vendor {
   aChargeCodes?: AChargeCode[]
@@ -102,6 +120,7 @@ export interface Vendor {
   businessPhone?: string
   businessPhoneExt?: string
   city: string
+  comment?: string
   contact?: string
   contacts?: Contact[]
   country: string
@@ -122,6 +141,7 @@ export interface Vendor {
   province: string
   rateSheetLinks?: RateSheetLink[]
   shortDescription?: string
+  status?: string
   tariffClasses?: VendorTariffClass[]
   travelModes?: TravelMode[]
   user10?: string
@@ -136,20 +156,7 @@ export interface Vendor {
   user9?: string
   vendorId: string
   vendorSince?: string
-  vendorType:
-    | 'agentCarrier'
-    | 'agentSales'
-    | 'broker'
-    | 'competitorCarrier'
-    | 'customsBroker'
-    | 'insurer'
-    | 'interliner'
-    | 'linehaulCarrier'
-    | 'other'
-    | 'palletCompany'
-    | 'rental'
-    | 'supplier'
-    | 'vendor'
+  vendorType: VendorType
   webEnabled?: 'True' | 'False' | ''
 }
 

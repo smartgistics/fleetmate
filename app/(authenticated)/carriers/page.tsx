@@ -1,15 +1,18 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { v4 } from 'uuid'
+import { debounce } from '@mui/material'
 import { GridColDef } from '@mui/x-data-grid'
 
 import { Vendor } from '@/types/truckmate'
 import { useVendors } from '@/hooks/useVendors'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons'
-import { ServerSideDataGrid } from '@/components/DataGrid'
 import { Button } from '@/components/Button'
+import { CarrierDetailsModal } from '@/components/carriers/CarrierDetailsModal'
+import { ServerSideDataGrid } from '@/components/DataGrid'
+import { NewCarrierModal } from '@/components/carriers/NewCarrierModal'
 
 const DEFAULT_LIMIT = 20
 
@@ -64,7 +67,7 @@ const columns: GridColDef[] = [
   },
 ]
 
-export default function Carriers() {
+export default function CarriersPage() {
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: DEFAULT_LIMIT,
@@ -74,11 +77,13 @@ export default function Carriers() {
   const [sortField, setSortField] = useState<SortableFields>('name')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
   const [selectedCarrier, setSelectedCarrier] = useState<Vendor | null>(null)
+  const [newModalOpen, setNewModalOpen] = useState(false)
 
   const {
     vendors: carriers,
-    isLoading,
+    createVendor,
     error,
+    isLoading,
     total,
     updateParams,
   } = useVendors('interliner', {
@@ -106,12 +111,25 @@ export default function Carriers() {
     updateParams({ offset: paginationModel.page * paginationModel.pageSize })
   }, [paginationModel])
 
-  const handleSearch = (term: string) => {
+  // Debounced search function only handles the API call
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((term: string) => {
+        updateParams({
+          filter: term
+            ? `(contains(tolower(name), '${term.toLowerCase()}') or contains(tolower(vendorId), '${term.toLowerCase()}'))`
+            : "name ne null and name ne ''",
+          offset: 0,
+        })
+      }, 500),
+    [updateParams]
+  )
+
+  // Handle search - immediately update UI state, debounce API call
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const term = e.target.value
     setSearchTerm(term)
-    const filter = term
-      ? `isActive eq 'True' and (contains(name,'${term}') or contains(vendorId,'${term}') or contains(city,'${term}') or contains(province,'${term}'))`
-      : "isActive eq 'True'"
-    updateParams({ filter, offset: 0 })
+    debouncedSearch(term)
   }
 
   if (isLoading) {
@@ -140,13 +158,13 @@ export default function Carriers() {
     <div className="p-4 sm:p-6 text-gray-900">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Carriers</h1>
-        <Button>Add Carrier</Button>
+        <Button onClick={() => setNewModalOpen(true)}>Add Carrier</Button>
       </div>
 
       <div className="mb-6">
         <input
           className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          onChange={(e) => handleSearch(e.target.value)}
+          onChange={handleSearch}
           placeholder="Search carriers..."
           type="text"
           value={searchTerm}
@@ -169,74 +187,16 @@ export default function Carriers() {
         />
       </div>
 
-      {selectedCarrier && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg p-6 max-w-2xl w-full">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-gray-900">
-                Carrier Details
-              </h2>
-              <button
-                className="text-gray-500 hover:text-gray-700"
-                onClick={() => setSelectedCarrier(null)}
-              >
-                ✕
-              </button>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="font-medium text-gray-700">Name</label>
-                <p className="text-gray-900">{selectedCarrier.name}</p>
-              </div>
-              <div>
-                <label className="font-medium text-gray-700">Status</label>
-                <p className="text-gray-900">
-                  {selectedCarrier.isActive === 'True' ? 'Active' : 'Inactive'}
-                </p>
-              </div>
-              <div>
-                <label className="font-medium text-gray-700">Insurance</label>
-                <p className="text-gray-900">{selectedCarrier.insurance}</p>
-              </div>
-              <div>
-                <label className="font-medium text-gray-700">Liability</label>
-                <p className="text-gray-900">{selectedCarrier.liability}</p>
-              </div>
-              <div>
-                <label className="font-medium text-gray-700">Contact</label>
-                <p className="text-gray-900">{selectedCarrier.contact}</p>
-              </div>
-              <div>
-                <label className="font-medium text-gray-700">
-                  Business Phone
-                </label>
-                <p className="text-gray-900">
-                  {selectedCarrier.businessPhone}
-                  {selectedCarrier.businessPhoneExt &&
-                    ` ext. ${selectedCarrier.businessPhoneExt}`}
-                </p>
-              </div>
-              <div>
-                <label className="font-medium text-gray-700">Fax</label>
-                <p className="text-gray-900">{selectedCarrier.faxPhone}</p>
-              </div>
-              <div>
-                <label className="font-medium text-gray-700">Address</label>
-                <p className="text-gray-900">
-                  {selectedCarrier.address1}
-                  {selectedCarrier.address2 && <br />}
-                  {selectedCarrier.address2}
-                  <br />
-                  {selectedCarrier.city}, {selectedCarrier.province}{' '}
-                  {selectedCarrier.postalCode}
-                  <br />
-                  {selectedCarrier.country}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <CarrierDetailsModal
+        carrier={selectedCarrier}
+        onClose={() => setSelectedCarrier(null)}
+      />
+
+      <NewCarrierModal
+        isOpen={newModalOpen}
+        onClose={() => setNewModalOpen(false)}
+        onSubmit={createVendor}
+      />
     </div>
   )
 }

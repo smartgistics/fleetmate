@@ -1,20 +1,23 @@
 import React, { useState } from 'react'
 import { Vendor } from '@/types/truckmate'
 
+import { Button } from '@/components/Button'
+import { FormFooter } from '@/components/FormFooter'
+
+import styles from './CarrierDetailsModal.module.sass'
+
 interface CarrierDetailsModalProps {
-  isOpen: boolean
   onClose: () => void
   carrier: Vendor | null
 }
 
 export function CarrierDetailsModal({
-  isOpen,
   onClose,
   carrier,
 }: CarrierDetailsModalProps) {
   const [activeTab, setActiveTab] = useState('details')
 
-  if (!isOpen || !carrier) return null
+  if (!carrier) return null
 
   const renderTabs = () => (
     <div className="border-b border-gray-200 mb-6">
@@ -246,7 +249,7 @@ export function CarrierDetailsModal({
               </div>
 
               {/* Content */}
-              <div className="flex-1">
+              <div className={styles.column}>
                 <div className="px-4 sm:px-6">
                   {renderTabs()}
                   <div className="py-4">
@@ -255,23 +258,10 @@ export function CarrierDetailsModal({
                   </div>
                 </div>
 
-                {/* Actions */}
-                <div className="px-4 py-6 sm:px-6 border-t border-gray-200 mt-6">
-                  <div className="flex space-x-3">
-                    <button
-                      className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-                      type="button"
-                    >
-                      Edit Carrier
-                    </button>
-                    <button
-                      className="flex-1 px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-600 rounded-md hover:bg-red-50"
-                      type="button"
-                    >
-                      Deactivate Carrier
-                    </button>
-                  </div>
-                </div>
+                <FormFooter>
+                  <Button>Edit Carrier</Button>
+                  <Button color="error">Deactivate Carrier</Button>
+                </FormFooter>
               </div>
             </div>
           </div>

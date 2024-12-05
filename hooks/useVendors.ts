@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { fetchVendors } from '@/services/truckMateService'
+import { fetchVendors, vendorPost } from '@/services/truckMateService'
 import { Vendor, TruckMateQueryParams } from '@/types/truckmate'
 import { useState } from 'react'
 
@@ -8,11 +8,14 @@ export function useVendors(
   initialParams: TruckMateQueryParams = {}
 ) {
   const [params, setParams] = useState<TruckMateQueryParams>(initialParams)
+  const [isPending, setIsPending] = useState<boolean>(false)
+  const [postError, setPostError] = useState<string>('')
 
   const {
     data: response,
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ['vendors', vendorType, params],
     queryFn: () => {
@@ -33,12 +36,31 @@ export function useVendors(
     vendors: response?.vendors?.length,
   })
 
+  const createVendor = async (vendorData: Partial<Vendor>) => {
+    try {
+      setPostError('')
+      setIsPending(true)
+      // TODO: send POST request
+      await vendorPost(vendorData)
+      await refetch()
+    } catch (err) {
+      setPostError(
+        err instanceof Error ? err.message : 'Failed to create carrier'
+      )
+      throw err
+    } finally {
+      setIsPending(false)
+    }
+  }
+
   return {
-    vendors: response?.vendors ?? [],
-    isLoading,
+    createVendor,
     error,
-    total: response?.count ?? 0,
+    isLoading: isLoading || isPending,
     params,
+    postError,
+    total: response?.count ?? 0,
     updateParams,
+    vendors: response?.vendors ?? [],
   }
 }
