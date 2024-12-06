@@ -326,10 +326,10 @@ export const fetchVendors = async (
 
   // Add pagination parameters
   if (params.limit !== undefined) {
-    queryParams.set('$top', params.limit.toString())
+    queryParams.set('limit', params.limit.toString())
   }
   if (params.offset !== undefined) {
-    queryParams.set('$skip', params.offset.toString())
+    queryParams.set('offset', params.offset.toString())
   }
   if (params.orderBy) {
     queryParams.set('$orderBy', params.orderBy)
@@ -338,7 +338,7 @@ export const fetchVendors = async (
     queryParams.set('$select', params.select.join(','))
   }
   if (params.expand) {
-    queryParams.set('$expand', params.expand.join(','))
+    queryParams.set('expand', params.expand.join(','))
   }
 
   const url = `${TM_MASTERDATA_API_URL}/vendors?${queryParams.toString()}`

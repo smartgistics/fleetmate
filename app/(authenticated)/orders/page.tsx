@@ -7,9 +7,6 @@ import { OrderDetailsModal } from '@/components/orders/OrderDetailsModal'
 import { OrdersGrid } from '@/components/orders/OrdersGrid'
 import { OrdersFilters } from '@/components/orders/filters/OrdersFilters'
 import { Button } from '@/components/Button'
-import { PageError } from '@/components/PageError'
-
-const DEFAULT_LIMIT = 20
 
 export default function Orders() {
   const [isNewOrderModalOpen, setIsNewOrderModalOpen] = useState(false)

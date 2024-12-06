@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { v4 } from 'uuid'
 import { GridColDef } from '@mui/x-data-grid'
 
@@ -82,7 +82,7 @@ export const OrdersGrid = ({ onRowClick, searchTerm }: OrdersGridProps) => {
   const [sortModel, setSortModel] = useState([
     { field: 'orderId', sort: 'asc' },
   ])
-  const { orders, isLoading, error, total, params, updateParams } = useOrders({
+  const { orders, isLoading, error, total, updateParams } = useOrders({
     limit: DEFAULT_LIMIT,
     offset: 0,
     orderBy: `${sortModel[0]?.field || 'orderId'} ${sortModel[0]?.sort || 'asc'}`,
