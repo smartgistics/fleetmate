@@ -6,6 +6,7 @@ import { Order } from '@/types/truckmate'
 import { useOrders } from '@/hooks/useTruckMate'
 import { ServerSideDataGrid } from '@/components/DataGrid'
 import { PageError } from '@/components/PageError'
+import { formatDate } from '@/utils'
 
 const DEFAULT_LIMIT = 20
 
@@ -50,7 +51,7 @@ const columns: GridColDef[] = [
     headerName: 'Created Time',
     flex: 1,
     align: 'left',
-    renderCell: ({ row }) => row.createdTime,
+    renderCell: ({ row }) => formatDate(row.createdTime),
   },
   {
     field: 'totalCharges',
