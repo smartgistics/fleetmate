@@ -1,13 +1,13 @@
 'use client'
 
 import { useState } from 'react'
+
 import { Trip } from '@/types/truckmate'
+import { PageError } from '@/components/PageError'
 import { TripDetailsModal } from '@/components/trips/TripDetailsModal'
 import { NewTripModal } from '@/components/trips/NewTripModal'
-import { useTrips } from '@/hooks/useTruckMate'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { ExclamationTriangleIcon } from '@radix-ui/react-icons'
 import { Pagination } from '@/components/ui/pagination'
+import { useTrips } from '@/hooks/useTruckMate'
 
 const DEFAULT_LIMIT = 20
 
@@ -59,15 +59,7 @@ export default function Trips() {
   }
 
   if (error) {
-    return (
-      <div className="p-6">
-        <Alert variant="destructive">
-          <ExclamationTriangleIcon className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      </div>
-    )
+    return <PageError message={error} />
   }
 
   // Calculate current page from offset and limit

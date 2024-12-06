@@ -7,11 +7,10 @@ import { GridColDef } from '@mui/x-data-grid'
 
 import { Vendor } from '@/types/truckmate'
 import { useVendors } from '@/hooks/useVendors'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { ExclamationTriangleIcon } from '@radix-ui/react-icons'
 import { Button } from '@/components/Button'
 import { CarrierDetailsModal } from '@/components/carriers/CarrierDetailsModal'
 import { ServerSideDataGrid } from '@/components/DataGrid'
+import { PageError } from '@/components/PageError'
 import { NewCarrierModal } from '@/components/carriers/NewCarrierModal'
 
 const DEFAULT_LIMIT = 20
@@ -141,17 +140,7 @@ export default function CarriersPage() {
   }
 
   if (error) {
-    return (
-      <div className="p-6">
-        <Alert variant="destructive">
-          <ExclamationTriangleIcon className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>
-            {error instanceof Error ? error.message : 'Failed to load carriers'}
-          </AlertDescription>
-        </Alert>
-      </div>
-    )
+    return <PageError message={error.message} />
   }
 
   return (

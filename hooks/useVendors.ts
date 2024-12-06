@@ -40,7 +40,6 @@ export function useVendors(
     try {
       setPostError('')
       setIsPending(true)
-      // TODO: send POST request
       await vendorPost(vendorData)
       await refetch()
     } catch (err) {

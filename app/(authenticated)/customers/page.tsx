@@ -4,13 +4,12 @@ import { useState, useMemo, useEffect } from 'react'
 import { v4 } from 'uuid'
 import { debounce } from '@mui/material'
 import { GridColDef } from '@mui/x-data-grid'
-import { ExclamationTriangleIcon } from '@radix-ui/react-icons'
 
 import CustomerDetailsModal from '@/components/customers/CustomerDetailsModal'
 import { NewCustomerModal } from '@/components/customers/NewCustomerModal'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/Button'
 import { ServerSideDataGrid } from '@/components/DataGrid'
+import { PageError } from '@/components/PageError'
 import { useCustomers } from '@/hooks/useTruckMate'
 import { Client } from '@/types/truckmate'
 
@@ -142,15 +141,7 @@ export default function Customers() {
   }
 
   if (error) {
-    return (
-      <div className="p-6">
-        <Alert variant="destructive">
-          <ExclamationTriangleIcon className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      </div>
-    )
+    return <PageError message={error} />
   }
 
   return (

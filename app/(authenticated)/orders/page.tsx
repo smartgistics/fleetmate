@@ -5,13 +5,12 @@ import { Order } from '@/types/truckmate'
 import { OrderDetailsModal } from '@/components/orders/OrderDetailsModal'
 import { NewOrderModal } from '@/components/orders/NewOrderModal'
 import { useOrders } from '@/hooks/useTruckMate'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { ExclamationTriangleIcon } from '@radix-ui/react-icons'
 import { OrdersFilters } from '@/components/orders/filters/OrdersFilters'
 import { OrdersTableHeader } from '@/components/orders/table/OrdersTableHeader'
 import { OrdersTableRow } from '@/components/orders/table/OrdersTableRow'
 import { Pagination } from '@/components/ui/pagination'
 import { Button } from '@/components/Button'
+import { PageError } from '@/components/PageError'
 
 const DEFAULT_LIMIT = 20
 
@@ -62,15 +61,7 @@ export default function Orders() {
   }
 
   if (error) {
-    return (
-      <div className="p-6">
-        <Alert variant="destructive">
-          <ExclamationTriangleIcon className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      </div>
-    )
+    return <PageError message={error} />
   }
 
   // Calculate current page from offset and limit
