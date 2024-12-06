@@ -5,6 +5,7 @@ import { GridColDef } from '@mui/x-data-grid'
 import { Order } from '@/types/truckmate'
 import { useOrders } from '@/hooks/useTruckMate'
 import { ServerSideDataGrid } from '@/components/DataGrid'
+import { PageError } from '@/components/PageError'
 
 const DEFAULT_LIMIT = 20
 
@@ -83,7 +84,7 @@ export const OrdersGrid = ({ onRowClick, searchTerm }: OrdersGridProps) => {
   const { orders, isLoading, error, total, params, updateParams } = useOrders({
     limit: DEFAULT_LIMIT,
     offset: 0,
-    orderBy: `${sortModel.field} ${sortModel.sort}`,
+    orderBy: `${sortModel[0]?.field || 'orderId'} ${sortModel[0]?.sort || 'asc'}`,
   })
 
   useEffect(() => {
