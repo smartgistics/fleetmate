@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { signOut } from 'next-auth/react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/Button'
 
 export default function SignOutPage() {
   useEffect(() => {
@@ -55,7 +55,7 @@ export default function SignOutPage() {
             <Button
               className="w-full bg-white hover:bg-gray-50 border-gray-300 text-gray-700 hover:text-gray-900 font-medium"
               onClick={() => (window.location.href = '/')}
-              variant="outline"
+              variant="outlined"
             >
               Return to home
             </Button>

@@ -1,7 +1,7 @@
 'use client'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/Button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,13 +13,7 @@ import {
 import { signOut, useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 
-interface UserMenuProps {
-  collapsed?: boolean
-  onMouseEnter?: () => void
-  onMouseLeave?: () => void
-}
-
-export function UserMenu({ collapsed = false }: UserMenuProps) {
+export function UserMenu() {
   const { data: session, status } = useSession()
   const router = useRouter()
 
@@ -46,16 +40,7 @@ export function UserMenu({ collapsed = false }: UserMenuProps) {
     <div className="flex justify-end">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            className={`
-              w-full h-auto p-2 
-              ${collapsed ? 'justify-center' : 'justify-start'}
-              bg-gray-100 hover:bg-gray-200 
-              text-gray-900
-              border border-gray-200
-            `}
-            variant="secondary"
-          >
+          <Button variant="outlined">
             <Avatar className="h-8 w-8 bg-blue-600">
               <AvatarImage
                 alt={session.user.name ?? ''}

@@ -4,8 +4,6 @@ import { useQuery } from '@tanstack/react-query'
 import { fetchClients } from '@/services/truckMateService'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
-import { MoreHorizontal } from 'lucide-react'
 
 interface CustomerTabProps {
   formData: FormData
@@ -67,9 +65,6 @@ export function CustomerTab({ formData, setFormData }: CustomerTabProps) {
                   </option>
                 ))}
               </select>
-              <Button size="icon" variant="ghost">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
             </div>
           </div>
 

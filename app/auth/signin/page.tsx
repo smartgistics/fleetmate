@@ -2,7 +2,7 @@
 
 import { signIn } from 'next-auth/react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/Button'
 
 export default function SignIn() {
   return (
@@ -107,7 +107,7 @@ export default function SignIn() {
             </div>
 
             <Button
-              className="w-full bg-[#2F2F2F] hover:bg-[#1F1F1F] text-white font-medium py-6 flex items-center justify-center space-x-2"
+              className="w-full bg-[#2F2F2F] hover:bg-[#1F1F1F] text-white font-medium py-2 flex items-center justify-center space-x-2"
               onClick={() => signIn('azure-ad', { callbackUrl: '/dashboard' })}
             >
               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">

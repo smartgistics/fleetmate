@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/Button'
 
 export default function HomePage() {
   return (
@@ -25,17 +25,10 @@ export default function HomePage() {
               FleetMate TMS
             </p>
             <div className="space-x-4">
-              <Button
-                asChild
-                className="bg-blue-600 hover:bg-blue-700 text-lg py-6 px-8"
-              >
+              <Button color="secondary" size="large">
                 <Link href="/auth/signin">Get Started</Link>
               </Button>
-              <Button
-                asChild
-                className="bg-transparent border-white text-white hover:bg-white/10 text-lg py-6 px-8"
-                variant="outline"
-              >
+              <Button color="white" size="large" variant="outlined">
                 <Link href="#features">Learn More</Link>
               </Button>
             </div>
@@ -334,7 +327,7 @@ export default function HomePage() {
           </p>
           <Button
             className="bg-white text-blue-600 px-12 py-6 text-xl font-semibold rounded-xl hover:bg-blue-50 transition-colors"
-            size="lg"
+            size="large"
           >
             Schedule a Demo
           </Button>
