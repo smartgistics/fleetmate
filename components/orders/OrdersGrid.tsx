@@ -102,14 +102,6 @@ export const OrdersGrid = ({ onRowClick, searchTerm }: OrdersGridProps) => {
     updateParams({ filter: searchTerm, offset: 0 }) // Reset to first page on new search
   }, [searchTerm])
 
-  if (isLoading) {
-    return (
-      <div className="w-full h-[500px] flex justify-center items-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
-      </div>
-    )
-  }
-
   if (error) {
     return <PageError message={error} />
   }
