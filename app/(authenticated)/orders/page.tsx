@@ -2,13 +2,10 @@
 
 import { useState } from 'react'
 import { Order } from '@/types/truckmate'
-import { OrderDetailsModal } from '@/components/orders/OrderDetailsModal'
 import { NewOrderModal } from '@/components/orders/NewOrderModal'
-import { useOrders } from '@/hooks/useTruckMate'
+import { OrderDetailsModal } from '@/components/orders/OrderDetailsModal'
+import { OrdersGrid } from '@/components/orders/OrdersGrid'
 import { OrdersFilters } from '@/components/orders/filters/OrdersFilters'
-import { OrdersTableHeader } from '@/components/orders/table/OrdersTableHeader'
-import { OrdersTableRow } from '@/components/orders/table/OrdersTableRow'
-import { Pagination } from '@/components/ui/pagination'
 import { Button } from '@/components/Button'
 import { PageError } from '@/components/PageError'
 
@@ -17,56 +14,12 @@ const DEFAULT_LIMIT = 20
 export default function Orders() {
   const [isNewOrderModalOpen, setIsNewOrderModalOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
-  const [sortField, setSortField] = useState<keyof Order>('orderId')
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
-
-  const { orders, isLoading, error, total, params, updateParams } = useOrders({
-    limit: DEFAULT_LIMIT,
-    offset: 0,
-    orderBy: `${sortField} ${sortDirection}`,
-  })
-
-  // Handle sorting
-  const handleSort = (field: keyof Order) => {
-    const newDirection =
-      sortField === field && sortDirection === 'asc' ? 'desc' : 'asc'
-    setSortField(field)
-    setSortDirection(newDirection)
-    updateParams({ orderBy: `${field} ${newDirection}` })
-  }
-
-  // Handle search
-  const handleSearch = (term: string) => {
-    setSearchTerm(term)
-    updateParams({ filter: term, offset: 0 }) // Reset to first page on new search
-  }
-
-  // Handle pagination
-  const handleOffsetChange = (newOffset: number) => {
-    updateParams({ offset: newOffset })
-  }
 
   const handleOrderUpdate = (updatedOrder: Order) => {
     console.log('Order updated:', updatedOrder)
     setSelectedOrder(null)
   }
-
-  if (isLoading) {
-    return (
-      <div className="w-full h-[500px] flex justify-center items-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
-      </div>
-    )
-  }
-
-  if (error) {
-    return <PageError message={error} />
-  }
-
-  // Calculate current page from offset and limit
-  const currentPage =
-    Math.floor((params.offset || 0) / (params.limit || DEFAULT_LIMIT)) + 1
 
   return (
     <div className="p-6 text-gray-900">
@@ -75,41 +28,14 @@ export default function Orders() {
         <Button onClick={() => setIsNewOrderModalOpen(true)}>New Order</Button>
       </div>
 
-      <OrdersFilters searchTerm={searchTerm} setSearchTerm={handleSearch} />
+      <OrdersFilters searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
       <div className="overflow-x-auto shadow">
-        <table className="min-w-full bg-white rounded-lg border">
-          <thead>
-            <OrdersTableHeader
-              handleSort={handleSort}
-              sortDirection={sortDirection}
-              sortField={sortField}
-            />
-          </thead>
-          <tbody className="text-gray-900">
-            {orders.map((order) => (
-              <OrdersTableRow
-                key={order.orderId}
-                onClick={() => setSelectedOrder(order)}
-                order={order}
-              />
-            ))}
-          </tbody>
-        </table>
+        <OrdersGrid
+          onRowClick={({ row }) => setSelectedOrder(row)}
+          searchTerm={searchTerm}
+        />
       </div>
-
-      {total > (params.limit || DEFAULT_LIMIT) && (
-        <div className="mt-4">
-          <Pagination
-            currentPage={currentPage}
-            onPageChange={(page) =>
-              handleOffsetChange((page - 1) * (params.limit || DEFAULT_LIMIT))
-            }
-            pageSize={params.limit || DEFAULT_LIMIT}
-            total={total}
-          />
-        </div>
-      )}
 
       {isNewOrderModalOpen && (
         <NewOrderModal
