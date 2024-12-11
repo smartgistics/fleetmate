@@ -1,0 +1,50 @@
+.root
+  display: grid
+  height: 100%
+  grid-template-rows: 1fr auto 
+  overflow: hidden
+
+.main
+  display: grid
+  grid-template-columns: auto 1fr
+  height: 100%
+  overflow: hidden
+
+.stepNav
+  border-right: 1px solid var(--neutral80)
+  background: var(--neutral97)
+  width: 100%
+  overflow-y: auto
+  li
+    max-width: 100%
+    text-overflow: ellipsis
+    --textColor: var(--neutral57)
+    --iconColor: var(--neutral80)
+    border-bottom: 1px solid var(--neutral80)
+    &.completedStep
+      --textColor: var(--primaryColor)
+      --iconColor: var(--successColor)
+    &.activeStep
+      --textColor: var(--primaryColor)
+      --iconColor: var(--primaryColor)
+      button
+        font-weight: 700
+
+  button
+    width: 100%
+    padding: 15px
+    justify-content: flex-start
+    position: relative
+    color: var(--textColor)
+
+  .icon
+    margin-right: .5rem
+    fill: var(--iconColor)
+
+.steps
+  overflow-y: auto
+  article
+    display: flex
+    flex-direction: column
+    gap: 1.5rem
+    padding: 1rem 3.25rem 1rem 1.5rem
