@@ -1,7 +1,7 @@
 'use client'
 
 import cs from 'clsx'
-import React, { Fragment, useState } from 'react'
+import React, { ChangeEvent, Fragment, useState } from 'react'
 import { v4 } from 'uuid'
 import { Close as CloseIcon } from '@mui/icons-material'
 import {
@@ -12,21 +12,13 @@ import {
   Typography,
 } from '@mui/material'
 
-import { FormData } from '@/types/truckmate'
-import { OrderModalTabs } from './modal/OrderModalTabs'
-import { OrderModalFooter } from './modal/OrderModalFooter'
-import { CustomerTab } from './tabs/CustomerTab'
-import { OrderDetailsTab } from './tabs/OrderDetailsTab'
-import { FinancialsTab } from './tabs/FinancialsTab'
 import { Button } from '@/components/Button'
 import { FormWizard } from '@/components/FormWizard'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 
 import styles from './NewOrderModal.module.sass'
 
 interface NewOrderModalProps {
-  isOpen: boolean
   onClose: () => void
 }
 
@@ -73,17 +65,19 @@ const CustomersStep = ({ fields, setFields }) => {
           {column.map((section, j) => (
             <Fragment key={`section_${j}`}>
               <Typography variant="h5">{section.title}</Typography>
-              {Object.entries(section.fields).map(([name, label], k) => (
-                <Fragment key={`field_${k}`}>
-                  <Label htmlFor={name}>{label}</Label>
-                  <Input
-                    id={name}
-                    name={name}
-                    onChange={handleChange}
-                    value={fields[name]}
-                  />
-                </Fragment>
-              ))}
+              {Object.entries(section.fields).map(
+                ([name, label]: [name: string, label: string], k) => (
+                  <Fragment key={`field_${k}`}>
+                    <label htmlFor={name}>{label}</label>
+                    <Input
+                      id={name}
+                      name={name}
+                      onChange={handleChange}
+                      value={fields[name]}
+                    />
+                  </Fragment>
+                )
+              )}
             </Fragment>
           ))}
         </div>
@@ -155,12 +149,14 @@ const OrderDetails = ({ fields, setFields }) => {
           <FormControlLabel
             control={<Switch checked={fields.temperatureControlled} />}
             label="Temperature Controlled?"
-            onChange={({ target: { checked } }) =>
+            onChange={({
+              target: { checked },
+            }: ChangeEvent<HTMLInputElement>) =>
               setFields({ ...fields, temperatureControlled: checked })
             }
           />
         </FormGroup>
-        <Label htmlFor="temperatureMin">Range:</Label>
+        <label htmlFor="temperatureMin">Range:</label>
         <Input
           name="temperatureMin"
           onChange={handleChange}
@@ -186,7 +182,7 @@ const OrderDetails = ({ fields, setFields }) => {
 
         <div className={styles.commodityFields}>
           <div>
-            <Label htmlFor="weight">Weight</Label>
+            <label htmlFor="weight">Weight</label>
             <Input
               name="weight"
               onChange={handleCommodityChange}
@@ -196,7 +192,7 @@ const OrderDetails = ({ fields, setFields }) => {
             <Typography variant="caption">lbs</Typography>
           </div>
           <div>
-            <Label htmlFor="pieces">Pieces</Label>
+            <label htmlFor="pieces">Pieces</label>
             <Input
               name="pieces"
               onChange={handleCommodityChange}
@@ -205,7 +201,7 @@ const OrderDetails = ({ fields, setFields }) => {
             />
           </div>
           <div>
-            <Label htmlFor="pallets">Pallets</Label>
+            <label htmlFor="pallets">Pallets</label>
             <Input
               name="pallets"
               onChange={handleCommodityChange}
@@ -214,7 +210,7 @@ const OrderDetails = ({ fields, setFields }) => {
             />
           </div>
           <div>
-            <Label htmlFor="cube">Cube</Label>
+            <label htmlFor="cube">Cube</label>
             <Input
               name="cube"
               onChange={handleCommodityChange}
@@ -223,7 +219,7 @@ const OrderDetails = ({ fields, setFields }) => {
             />
           </div>
           <div>
-            <Label htmlFor="volume">Volume</Label>
+            <label htmlFor="volume">Volume</label>
             <Input
               name="volume"
               onChange={handleCommodityChange}
@@ -263,8 +259,8 @@ const OrderDetails = ({ fields, setFields }) => {
   )
 }
 
-export const NewOrderModal = (props) => {
-  const { isOpen, onClose } = props
+export const NewOrderModal = (props: NewOrderModalProps) => {
+  const { onClose } = props
   const [fields, setFields] = useState({
     customerName: '',
     parentCompany: '',

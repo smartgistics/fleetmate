@@ -35,10 +35,7 @@ export default function Orders() {
       </div>
 
       {isNewOrderModalOpen && (
-        <NewOrderModal
-          isOpen={isNewOrderModalOpen}
-          onClose={() => setIsNewOrderModalOpen(false)}
-        />
+        <NewOrderModal onClose={() => setIsNewOrderModalOpen(false)} />
       )}
 
       <OrderDetailsModal
