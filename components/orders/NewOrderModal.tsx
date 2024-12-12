@@ -279,9 +279,9 @@ const OrderDetails = ({ fields, setFields }) => {
 const initialLocation = {
   confirmed: false,
   scheduler: '',
-  pickupDate: new Date(),
-  pickupWindowStart: new Date(),
-  pickupWindowEnd: new Date(),
+  appointmentDate: new Date(),
+  appointmentWindowStart: new Date(),
+  appointmentWindowEnd: new Date(),
   address1: '',
   address2: '',
   city: '',
@@ -291,20 +291,20 @@ const initialLocation = {
   comment: '',
 }
 
-const Pickup = ({ fields, setFields }) => {
+const DeliveryLocation = ({ deliveryField, fields, setFields, type }) => {
   const [location, setLocation] = useState(initialLocation)
 
   const onAdd = () => {
     setFields({
       ...fields,
-      locations: [...fields.locations, { ...location, id: v4() }],
+      [deliveryField]: [...fields[deliveryField], { ...location, id: v4() }],
     })
     setLocation(initialLocation)
   }
   const onRemove = (id) => {
     setFields({
       ...fields,
-      locations: fields.locations.filter((c) => c.id !== id),
+      [deliveryField]: fields[deliveryField].filter((c) => c.id !== id),
     })
   }
 
@@ -314,11 +314,11 @@ const Pickup = ({ fields, setFields }) => {
   return (
     <article className={styles.pickup}>
       <Typography>
-        Add pickup locations and assign appointment details. These marked with{' '}
-        <mark>blue links</mark> are confirmed.
+        Add {type.toLowerCase()} locations and assign appointment details. These
+        marked with <mark>blue links</mark> are confirmed.
       </Typography>
 
-      <Typography component="h5">Pickup Locations</Typography>
+      <Typography component="h5">{type} Locations</Typography>
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <FormGroup>
@@ -345,52 +345,52 @@ const Pickup = ({ fields, setFields }) => {
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DatePicker
               className={styles.datePicker}
-              label="Pickup date"
+              label={`${type} date`}
               minDate={new Date()}
-              name="pickupDate"
-              onChange={(pickupDate) =>
-                setLocation({ ...location, pickupDate })
+              name="appointmentDate"
+              onChange={(appointmentDate) =>
+                setLocation({ ...location, appointmentDate })
               }
               slotProps={{
                 textField: {
                   variant: 'standard',
                 },
               }}
-              value={location.pickupDate}
+              value={location.appointmentDate}
             />
           </LocalizationProvider>
         </Grid>
         <Grid item xs={3}>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <TimePicker
-              label="Pickup start time"
-              name="pickupWindowStart"
-              onChange={(pickupWindowStart) =>
-                setLocation({ ...location, pickupWindowStart })
+              label={`${type} start time`}
+              name="appointmentWindowStart"
+              onChange={(appointmentWindowStart) =>
+                setLocation({ ...location, appointmentWindowStart })
               }
               slotProps={{
                 textField: {
                   variant: 'standard',
                 },
               }}
-              value={location.pickupWindowStart}
+              value={location.appointmentWindowStart}
             />
           </LocalizationProvider>
         </Grid>
         <Grid item xs={3}>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <TimePicker
-              label="Pickup end time"
-              name="pickupWindowEnd"
-              onChange={(pickupWindowEnd) =>
-                setLocation({ ...location, pickupWindowEnd })
+              label={`${type} end time`}
+              name="appointmentWindowEnd"
+              onChange={(appointmentWindowEnd) =>
+                setLocation({ ...location, appointmentWindowEnd })
               }
               slotProps={{
                 textField: {
                   variant: 'standard',
                 },
               }}
-              value={location.pickupWindowEnd}
+              value={location.appointmentWindowEnd}
             />
           </LocalizationProvider>
         </Grid>
@@ -450,7 +450,7 @@ const Pickup = ({ fields, setFields }) => {
       </Grid>
 
       <ul>
-        {fields.locations.map((l) => (
+        {fields[deliveryField].map((l) => (
           <li key={l.id}>
             <Grid container spacing={2}>
               <Grid item xs={9}>
@@ -459,7 +459,7 @@ const Pickup = ({ fields, setFields }) => {
               <Grid item xs={2}>
                 <Typography>
                   {l.confirmed ? (
-                    <CheckIcon color="success" />
+                    <CheckIcon color="secondary" />
                   ) : (
                     <CircleIcon sx={{ color: 'var(--neutral57)' }} />
                   )}{' '}
@@ -473,9 +473,9 @@ const Pickup = ({ fields, setFields }) => {
               </Grid>
               <Grid item xs={12}>
                 <Typography variant="subtitle1">
-                  Pickup date: {formatDate(l.pickupDate)} between{' '}
-                  {formatTime(l.pickupWindowStart)} and{' '}
-                  {formatTime(l.pickupWindowEnd)}
+                  Pickup date: {formatDate(l.appointmentDate)} between{' '}
+                  {formatTime(l.appointmentWindowStart)} and{' '}
+                  {formatTime(l.appointmentWindowEnd)}
                 </Typography>
               </Grid>
               <Grid item xs={12}>
@@ -516,7 +516,8 @@ export const NewOrderModal = (props: NewOrderModalProps) => {
     temperatureMin: undefined,
     temperatureMax: undefined,
     commodities: [],
-    locations: [],
+    pickup: [],
+    dropoff: [],
   })
 
   const handleSubmit = () => {
@@ -538,7 +539,27 @@ export const NewOrderModal = (props: NewOrderModalProps) => {
     },
     {
       name: 'Pickup',
-      component: <Pickup fields={fields} setFields={setFields} />,
+      component: (
+        <DeliveryLocation
+          deliveryField="pickup"
+          fields={fields}
+          setFields={setFields}
+          type="Pickup"
+        />
+      ),
+      submitText: 'Next: Dropoff',
+      validateComplete: () => true,
+    },
+    {
+      name: 'Dropoff',
+      component: (
+        <DeliveryLocation
+          deliveryField="dropoff"
+          fields={fields}
+          setFields={setFields}
+          type="Delivery"
+        />
+      ),
       submitText: 'Next: Dropoff',
       validateComplete: () => true,
     },
