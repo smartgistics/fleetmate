@@ -3,18 +3,33 @@
 import cs from 'clsx'
 import React, { ChangeEvent, Fragment, useState } from 'react'
 import { v4 } from 'uuid'
-import { Close as CloseIcon } from '@mui/icons-material'
+import {
+  Add as AddIcon,
+  CheckCircle as CheckIcon,
+  Circle as CircleIcon,
+  Close as CloseIcon,
+  Delete as DeleteIcon,
+} from '@mui/icons-material'
 import {
   FormGroup,
   FormControlLabel,
+  Grid,
   IconButton,
   Switch,
   Typography,
 } from '@mui/material'
+import {
+  DatePicker,
+  LocalizationProvider,
+  TimePicker,
+} from '@mui/x-date-pickers'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'
 
 import { Button } from '@/components/Button'
 import { FormWizard } from '@/components/FormWizard'
-import { Input } from '@/components/ui/input'
+import { Input, Select } from '@/components/ui'
+import { STATES_ALL } from '@/constants'
+import { formatDate, formatTime } from '@/utils'
 
 import styles from './NewOrderModal.module.sass'
 
@@ -59,7 +74,7 @@ const CustomersStep = ({ fields, setFields }) => {
     setFields({ ...fields, [name]: value })
 
   return (
-    <article>
+    <article className={styles.twoCol}>
       {localFields.map((column, i) => (
         <div className={styles.column} key={`column_${i}`}>
           {column.map((section, j) => (
@@ -119,30 +134,32 @@ const OrderDetails = ({ fields, setFields }) => {
 
   return (
     <article>
-      <Input
-        name="orderType"
-        onChange={handleChange}
-        placeholder="Order Type"
-        value={fields.orderType}
-      />
-      <Input
-        name="serviceType"
-        onChange={handleChange}
-        placeholder="Service Type"
-        value={fields.serviceType}
-      />
-      <Input
-        name="equipmentType"
-        onChange={handleChange}
-        placeholder="Equipment Type"
-        value={fields.equipmentType}
-      />
-      <Input
-        name="serviceLevel"
-        onChange={handleChange}
-        placeholder="Service Level"
-        value={fields.serviceLevel}
-      />
+      <div className={styles.twoCol}>
+        <Input
+          name="orderType"
+          onChange={handleChange}
+          placeholder="Order Type"
+          value={fields.orderType}
+        />
+        <Input
+          name="serviceType"
+          onChange={handleChange}
+          placeholder="Service Type"
+          value={fields.serviceType}
+        />
+        <Input
+          name="equipmentType"
+          onChange={handleChange}
+          placeholder="Equipment Type"
+          value={fields.equipmentType}
+        />
+        <Input
+          name="serviceLevel"
+          onChange={handleChange}
+          placeholder="Service Level"
+          value={fields.serviceLevel}
+        />
+      </div>
 
       <div className={styles.tempRange}>
         <FormGroup>
@@ -259,6 +276,225 @@ const OrderDetails = ({ fields, setFields }) => {
   )
 }
 
+const initialLocation = {
+  confirmed: false,
+  scheduler: '',
+  pickupDate: new Date(),
+  pickupWindowStart: new Date(),
+  pickupWindowEnd: new Date(),
+  address1: '',
+  address2: '',
+  city: '',
+  province: '',
+  postalCode: '',
+  country: 'US',
+  comment: '',
+}
+
+const Pickup = ({ fields, setFields }) => {
+  const [location, setLocation] = useState(initialLocation)
+
+  const onAdd = () => {
+    setFields({
+      ...fields,
+      locations: [...fields.locations, { ...location, id: v4() }],
+    })
+    setLocation(initialLocation)
+  }
+  const onRemove = (id) => {
+    setFields({
+      ...fields,
+      locations: fields.locations.filter((c) => c.id !== id),
+    })
+  }
+
+  const handleLocationChange = ({ target: { name, value } }) =>
+    setLocation({ ...location, [name]: value })
+
+  return (
+    <article className={styles.pickup}>
+      <Typography>
+        Add pickup locations and assign appointment details. These marked with{' '}
+        <mark>blue links</mark> are confirmed.
+      </Typography>
+
+      <Typography component="h5">Pickup Locations</Typography>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <FormGroup>
+            <FormControlLabel
+              control={<Switch checked={location.confirmed} />}
+              label="Confirmed"
+              onChange={({
+                target: { checked },
+              }: ChangeEvent<HTMLInputElement>) =>
+                setLocation({ ...location, confirmed: checked })
+              }
+            />
+          </FormGroup>
+        </Grid>
+        <Grid item xs={12}>
+          <Input
+            name="scheduler"
+            onChange={handleLocationChange}
+            placeholder="Scheduler"
+            value={location.scheduler}
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <DatePicker
+              className={styles.datePicker}
+              label="Pickup date"
+              minDate={new Date()}
+              name="pickupDate"
+              onChange={(pickupDate) =>
+                setLocation({ ...location, pickupDate })
+              }
+              slotProps={{
+                textField: {
+                  variant: 'standard',
+                },
+              }}
+              value={location.pickupDate}
+            />
+          </LocalizationProvider>
+        </Grid>
+        <Grid item xs={3}>
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <TimePicker
+              label="Pickup start time"
+              name="pickupWindowStart"
+              onChange={(pickupWindowStart) =>
+                setLocation({ ...location, pickupWindowStart })
+              }
+              slotProps={{
+                textField: {
+                  variant: 'standard',
+                },
+              }}
+              value={location.pickupWindowStart}
+            />
+          </LocalizationProvider>
+        </Grid>
+        <Grid item xs={3}>
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <TimePicker
+              label="Pickup end time"
+              name="pickupWindowEnd"
+              onChange={(pickupWindowEnd) =>
+                setLocation({ ...location, pickupWindowEnd })
+              }
+              slotProps={{
+                textField: {
+                  variant: 'standard',
+                },
+              }}
+              value={location.pickupWindowEnd}
+            />
+          </LocalizationProvider>
+        </Grid>
+
+        <Grid item xs={12}>
+          <Input
+            name="address1"
+            onChange={handleLocationChange}
+            placeholder="Address"
+            value={location.address1}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Input
+            name="address2"
+            onChange={handleLocationChange}
+            placeholder="Address line 2"
+            value={location.address2}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <Input
+            name="city"
+            onChange={handleLocationChange}
+            placeholder="City"
+            value={location.city}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <Select
+            onChange={(province) => setLocation({ ...location, province })}
+            value={location.province ?? ''}
+          >
+            <>
+              {STATES_ALL.map(({ code, name }) => (
+                <option key={code} value={code}>
+                  {name}
+                </option>
+              ))}
+            </>
+          </Select>
+        </Grid>
+        <Grid item xs={4}>
+          <Input
+            name="postalCode"
+            onChange={handleLocationChange}
+            placeholder="Zip/Postal code"
+            value={location.postalCode}
+          />
+        </Grid>
+        <Grid item xs={1}>
+          <Button color="success" onClick={onAdd}>
+            <AddIcon />
+            Add
+          </Button>
+        </Grid>
+      </Grid>
+
+      <ul>
+        {fields.locations.map((l) => (
+          <li key={l.id}>
+            <Grid container spacing={2}>
+              <Grid item xs={9}>
+                <Typography>{l.scheduler}</Typography>
+              </Grid>
+              <Grid item xs={2}>
+                <Typography>
+                  {l.confirmed ? (
+                    <CheckIcon color="success" />
+                  ) : (
+                    <CircleIcon sx={{ color: 'var(--neutral57)' }} />
+                  )}{' '}
+                  Confirmed
+                </Typography>
+              </Grid>
+              <Grid item xs={1}>
+                <IconButton onClick={() => onRemove(l.id)}>
+                  <DeleteIcon />
+                </IconButton>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="subtitle1">
+                  Pickup date: {formatDate(l.pickupDate)} between{' '}
+                  {formatTime(l.pickupWindowStart)} and{' '}
+                  {formatTime(l.pickupWindowEnd)}
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography component="address">
+                  {l.address1}
+                  {l.address2 ? <br /> : null}
+                  {l.address2}
+                  <br />
+                  {l.city}, {l.province} {l.postalCode}
+                </Typography>
+              </Grid>
+            </Grid>
+          </li>
+        ))}
+      </ul>
+    </article>
+  )
+}
+
 export const NewOrderModal = (props: NewOrderModalProps) => {
   const { onClose } = props
   const [fields, setFields] = useState({
@@ -280,6 +516,7 @@ export const NewOrderModal = (props: NewOrderModalProps) => {
     temperatureMin: undefined,
     temperatureMax: undefined,
     commodities: [],
+    locations: [],
   })
 
   const handleSubmit = () => {
@@ -297,6 +534,12 @@ export const NewOrderModal = (props: NewOrderModalProps) => {
       name: 'Order Details',
       component: <OrderDetails fields={fields} setFields={setFields} />,
       submitText: 'Next: Pickup',
+      validateComplete: () => true,
+    },
+    {
+      name: 'Pickup',
+      component: <Pickup fields={fields} setFields={setFields} />,
+      submitText: 'Next: Dropoff',
       validateComplete: () => true,
     },
   ]

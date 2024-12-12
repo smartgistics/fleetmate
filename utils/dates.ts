@@ -8,3 +8,7 @@ export function formatDate(
   const date = new Date(dateString)
   return format(date, formatting)
 }
+
+export const formatTime = (dateParam: Date | string | number) => {
+  return format(new Date(dateParam), 'h:mmaaa')
+}
