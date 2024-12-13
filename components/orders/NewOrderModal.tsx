@@ -11,6 +11,7 @@ import {
   DeliveryLocationStep,
   FinancialsStep,
   OrderDetailsStep,
+  SummaryStep,
   capacityStepValidator,
   customersStepValidator,
   deliveryLocationStepValidator,
@@ -103,6 +104,12 @@ export const NewOrderModal = (props: NewOrderModalProps) => {
       component: <CapacityStep />,
       submitText: 'Assign & Save',
       validateComplete: capacityStepValidator,
+    },
+    {
+      name: 'Summary',
+      component: <SummaryStep fields={fields} />,
+      submitText: 'Create Order',
+      validateComplete: () => true,
     },
   ]
 
