@@ -9,10 +9,12 @@ import {
   CapacityStep,
   CustomersStep,
   DeliveryLocationStep,
+  FinancialsStep,
   OrderDetailsStep,
   capacityStepValidator,
   customersStepValidator,
   deliveryLocationStepValidator,
+  financialsStepValidator,
   orderDetailsStepValidator,
 } from './NewOrder'
 
@@ -43,6 +45,7 @@ export const NewOrderModal = (props: NewOrderModalProps) => {
     commodities: [],
     pickup: [],
     dropoff: [],
+    aCharges: [],
   })
 
   const handleSubmit = () => {
@@ -86,8 +89,14 @@ export const NewOrderModal = (props: NewOrderModalProps) => {
           type="Delivery"
         />
       ),
-      submitText: 'Next: Dropoff',
+      submitText: 'Next: Financials',
       validateComplete: deliveryLocationStepValidator,
+    },
+    {
+      name: 'Financials',
+      component: <FinancialsStep fields={fields} setFields={setFields} />,
+      submitText: 'Next: Capacity',
+      validateComplete: financialsStepValidator,
     },
     {
       name: 'Capacity',
