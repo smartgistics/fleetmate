@@ -1,0 +1,41 @@
+.twoCol.twoCol
+  display: grid
+  grid-template-columns: 1fr 1fr
+  gap: 1.5rem
+
+.tempRange
+  grid-column: span 2
+  display: flex
+  align-items: baseline
+  gap: 0 .5rem
+  span
+    white-space: nowrap
+  [type="number"]
+    width: 80px
+
+.flex
+  display: flex
+  gap: 0 .5rem
+
+.commodities
+  li
+    display: grid
+    grid-template-columns: 1fr auto
+    padding: .75rem 1rem
+    margin-top: 1rem
+    border: 1px solid var(--secondaryColor)
+    border-radius: 4px
+    background: var(--blue98)
+    p
+      grid-column: span 2
+    button
+      position: relative
+      transform: translate(.75rem, -.75rem)
+      grid-column: 2
+      grid-row: 1
+
+.commodityFields
+  display: grid
+  grid-template-columns: repeat(5, 1fr)
+  gap: 0 1rem
+  padding-top: 1rem
