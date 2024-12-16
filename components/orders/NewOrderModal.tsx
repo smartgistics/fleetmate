@@ -13,10 +13,10 @@ import {
   OrderDetailsStep,
   SummaryStep,
   capacityStepValidator,
-  customersStepValidator,
+  customersSchema,
   deliveryLocationStepValidator,
   financialsStepValidator,
-  orderDetailsStepValidator,
+  orderDetailsSchema,
 } from './NewOrder'
 
 interface NewOrderModalProps {
@@ -55,6 +55,19 @@ export const NewOrderModal = (props: NewOrderModalProps) => {
     return true
   }
 
+  const validateStep = (schema) => {
+    return async () => {
+      try {
+        await schema.validate(fields, { abortEarly: false })
+        setError('')
+        return true
+      } catch (error) {
+        setError(`• ${error.errors.join('\r\n• ')}`)
+        return false
+      }
+    }
+  }
+
   const formSteps: FormWizardStep[] = [
     {
       name: 'Customer',
@@ -62,16 +75,15 @@ export const NewOrderModal = (props: NewOrderModalProps) => {
         <CustomersStep error={error} fields={fields} setFields={setFields} />
       ),
       submitText: 'Next: Order Details',
-      validateComplete: async () => {
-        const isValid = await customersStepValidator(fields, setError)
-        return isValid
-      },
+      validateComplete: validateStep(customersSchema),
     },
     {
       name: 'Order Details',
-      component: <OrderDetailsStep fields={fields} setFields={setFields} />,
+      component: (
+        <OrderDetailsStep error={error} fields={fields} setFields={setFields} />
+      ),
       submitText: 'Next: Pickup',
-      validateComplete: orderDetailsStepValidator,
+      validateComplete: validateStep(orderDetailsSchema),
     },
     {
       name: 'Pickup',
@@ -115,7 +127,7 @@ export const NewOrderModal = (props: NewOrderModalProps) => {
       name: 'Summary',
       component: <SummaryStep fields={fields} />,
       submitText: 'Create Order',
-      validateComplete: () => true,
+      validateComplete: async () => true,
     },
   ]
 

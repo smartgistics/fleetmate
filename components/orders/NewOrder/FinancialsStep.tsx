@@ -148,6 +148,6 @@ export const FinancialsStep = ({ fields, setFields }) => {
   )
 }
 
-export const financialsStepValidator = () => {
+export const financialsStepValidator = async () => {
   return true
 }

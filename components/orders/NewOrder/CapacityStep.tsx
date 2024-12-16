@@ -47,6 +47,6 @@ export const CapacityStep = () => {
   )
 }
 
-export const capacityStepValidator = () => {
+export const capacityStepValidator = async () => {
   return true
 }

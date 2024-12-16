@@ -1,5 +1,6 @@
 import { ChangeEvent, useState } from 'react'
 import { v4 } from 'uuid'
+import * as yup from 'yup'
 import {
   FormGroup,
   FormControlLabel,
@@ -11,6 +12,7 @@ import { Close as CloseIcon } from '@mui/icons-material'
 
 import { Button } from '@/components/Button'
 import { Input } from '@/components/ui'
+import { StepError } from './StepError'
 
 import styles from './OrderDetailsStep.module.sass'
 
@@ -23,7 +25,7 @@ const initialCommodity = {
   volume: 0,
 }
 
-export const OrderDetailsStep = ({ fields, setFields }) => {
+export const OrderDetailsStep = ({ error, fields, setFields }) => {
   const [commodity, setCommodity] = useState(initialCommodity)
   const onAdd = () => {
     setFields({
@@ -47,6 +49,11 @@ export const OrderDetailsStep = ({ fields, setFields }) => {
 
   return (
     <article>
+      {error && (
+        <div className={styles.error}>
+          <StepError>{error}</StepError>
+        </div>
+      )}
       <div className={styles.twoCol}>
         <Input
           name="orderType"
@@ -189,6 +196,26 @@ export const OrderDetailsStep = ({ fields, setFields }) => {
   )
 }
 
-export const orderDetailsStepValidator = () => {
+const sx = (s) => `${s} is required`
+
+const tempValues = function (_, ctx) {
+  const { temperatureControlled, temperatureMax, temperatureMin } = this.parent
+  if (!temperatureControlled) {
+    return true
+  }
+  if (isNaN(temperatureMax) || isNaN(temperatureMin)) {
+    return ctx.createError({
+      message: 'Temperature min and max are required if temperature controlled',
+    })
+  }
   return true
 }
+
+export const orderDetailsSchema = yup.object().shape({
+  orderType: yup.string().required(sx('Order Type')),
+  serviceType: yup.string().required(sx('Service Type')),
+  equipmentType: yup.string().required(sx('Equipment Type')),
+  serviceLevel: yup.string().required(sx('Service Level')),
+  temperatureControlled: yup.boolean().test(tempValues),
+  commodities: yup.array().min(1, sx('At least one commodity')),
+})

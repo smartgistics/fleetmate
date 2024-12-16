@@ -252,6 +252,6 @@ export const DeliveryLocationStep = ({
   )
 }
 
-export const deliveryLocationStepValidator = () => {
+export const deliveryLocationStepValidator = async () => {
   return true
 }

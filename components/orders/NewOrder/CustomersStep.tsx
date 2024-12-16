@@ -3,7 +3,6 @@ import { Typography } from '@mui/material'
 import * as yup from 'yup'
 
 import { Input } from '@/components/ui'
-import { NOOP } from '@/constants'
 import { StepError } from './StepError'
 
 import styles from './CustomersStep.module.sass'
@@ -97,7 +96,7 @@ const orderOwnerValidator = requireEither(
   sx('At least one order owner')
 )
 
-const customersSchema = yup.object().shape({
+export const customersSchema = yup.object().shape({
   customerName: yup.string().required(sx('Company name')),
   customerId: yup.string().required(sx('Customer ID')),
   status: yup.string().required(sx('Status')),
@@ -106,16 +105,3 @@ const customersSchema = yup.object().shape({
   accountManager: yup.string().test(orderOwnerValidator),
   orderPlanner: yup.string().test(orderOwnerValidator),
 })
-
-export const customersStepValidator = async (
-  fields,
-  setError: (str) => void = NOOP
-) => {
-  try {
-    await customersSchema.validate(fields, { abortEarly: false })
-    return true
-  } catch (error) {
-    setError(`• ${error.errors.join('\r\n• ')}`)
-    return false
-  }
-}

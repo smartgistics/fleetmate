@@ -18,7 +18,7 @@ export interface FormWizardStep {
   name: ReactNode | string
   submitText?: string
   hideIcon?: boolean
-  validateComplete: () => boolean
+  validateComplete: () => Promise<boolean>
 }
 
 export interface FormWizardProps {
