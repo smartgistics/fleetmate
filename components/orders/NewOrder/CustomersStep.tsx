@@ -1,5 +1,6 @@
 import { Fragment } from 'react'
 import { Typography } from '@mui/material'
+import * as yup from 'yup'
 
 import { Input } from '@/components/ui'
 import { NOOP } from '@/constants'
@@ -42,7 +43,6 @@ const localFields = [
 export const CustomersStep = ({ error, fields, setFields }) => {
   const handleChange = ({ target: { name, value } }) =>
     setFields({ ...fields, [name]: value })
-  console.log(error)
 
   return (
     <article className={styles.twoCol}>
@@ -77,41 +77,45 @@ export const CustomersStep = ({ error, fields, setFields }) => {
   )
 }
 
-export const customersStepValidator = (
+const sx = (s) => `${s} is required`
+
+const requireEither = ([prop1, prop2], message) => {
+  return function (val, ctx) {
+    const field1 = this.parent[prop1]
+    const field2 = this.parent[prop2]
+    if (!field1 && !field2) return ctx.createError({ message })
+    return true
+  }
+}
+
+const contactMethodValidator = requireEither(
+  ['phone', 'email'],
+  sx('At least one contact method')
+)
+const orderOwnerValidator = requireEither(
+  ['accountManager', 'orderPlanner'],
+  sx('At least one order owner')
+)
+
+const customersSchema = yup.object().shape({
+  customerName: yup.string().required(sx('Company name')),
+  customerId: yup.string().required(sx('Customer ID')),
+  status: yup.string().required(sx('Status')),
+  email: yup.string().test(contactMethodValidator),
+  phone: yup.string().test(contactMethodValidator),
+  accountManager: yup.string().test(orderOwnerValidator),
+  orderPlanner: yup.string().test(orderOwnerValidator),
+})
+
+export const customersStepValidator = async (
   fields,
   setError: (str) => void = NOOP
 ) => {
-  let isValid = true
-  // Fields that need to be truthy
-  const truthyErrors = Object.entries({
-    customerName: 'Company Name',
-    customerId: 'Customer ID',
-    status: 'Status',
-  }).reduce((errors, [field, label]) => {
-    if (!fields[field]) {
-      errors.push(label)
-    }
-    return errors
-  }, [])
-  if (truthyErrors.length) {
-    setError(
-      `${truthyErrors.join(', ')} ${truthyErrors.length > 1 ? 'are' : 'is'} required`
-    )
-    isValid = false
+  try {
+    await customersSchema.validate(fields, { abortEarly: false })
+    return true
+  } catch (error) {
+    setError(`• ${error.errors.join('\r\n• ')}`)
+    return false
   }
-  // Need either contact email or phone
-  if (!fields.email && !fields.phone) {
-    setError('At least one contact method is required')
-    isValid = false
-  }
-  // Need either an account manager or order planner
-  if (!fields.accountManager && !fields.orderPlanner) {
-    setError('At least one order owner is required')
-    isValid = false
-  }
-
-  if (isValid) {
-    setError('')
-  }
-  return isValid
 }

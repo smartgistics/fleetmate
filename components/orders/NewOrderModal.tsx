@@ -62,7 +62,10 @@ export const NewOrderModal = (props: NewOrderModalProps) => {
         <CustomersStep error={error} fields={fields} setFields={setFields} />
       ),
       submitText: 'Next: Order Details',
-      validateComplete: () => customersStepValidator(fields, setError),
+      validateComplete: async () => {
+        const isValid = await customersStepValidator(fields, setError)
+        return isValid
+      },
     },
     {
       name: 'Order Details',

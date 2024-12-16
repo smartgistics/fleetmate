@@ -69,7 +69,8 @@ export const FormWizard = ({
 
   const onStepSubmit = async (e) => {
     e.preventDefault()
-    if (!activeStep.validateComplete()) {
+    const isValid = await activeStep.validateComplete()
+    if (!isValid) {
       return
     }
     if (!completedSteps.includes(activeStep.name)) {
