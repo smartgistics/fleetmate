@@ -24,6 +24,7 @@ interface NewOrderModalProps {
 }
 
 export const NewOrderModal = (props: NewOrderModalProps) => {
+  const [error, setError] = useState('')
   const { onClose } = props
   const [fields, setFields] = useState({
     customerName: '',
@@ -57,9 +58,11 @@ export const NewOrderModal = (props: NewOrderModalProps) => {
   const formSteps: FormWizardStep[] = [
     {
       name: 'Customer',
-      component: <CustomersStep fields={fields} setFields={setFields} />,
+      component: (
+        <CustomersStep error={error} fields={fields} setFields={setFields} />
+      ),
       submitText: 'Next: Order Details',
-      validateComplete: customersStepValidator,
+      validateComplete: () => customersStepValidator(fields, setError),
     },
     {
       name: 'Order Details',
