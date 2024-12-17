@@ -1,5 +1,6 @@
 import { ChangeEvent, useState } from 'react'
 import { v4 } from 'uuid'
+import * as yup from 'yup'
 import {
   Add as AddIcon,
   CheckCircle as CheckIcon,
@@ -25,6 +26,7 @@ import { Button } from '@/components/Button'
 import { Input, Select } from '@/components/ui'
 import { STATES_ALL } from '@/constants'
 import { formatDate, formatTime } from '@/utils'
+import { StepError } from './StepError'
 
 import styles from './DeliveryLocationStep.module.sass'
 
@@ -44,6 +46,7 @@ const initialLocation = {
 }
 
 export const DeliveryLocationStep = ({
+  error,
   deliveryField,
   fields,
   setFields,
@@ -70,6 +73,11 @@ export const DeliveryLocationStep = ({
 
   return (
     <article className={styles.pickup}>
+      {error && (
+        <div className={styles.error}>
+          <StepError>{error}</StepError>
+        </div>
+      )}
       <Typography>
         Add {type.toLowerCase()} locations and assign appointment details. These
         marked with <mark>blue links</mark> are confirmed.
@@ -252,6 +260,25 @@ export const DeliveryLocationStep = ({
   )
 }
 
-export const deliveryLocationStepValidator = async () => {
-  return true
-}
+const sx = (s) => `${s} is required`
+
+const deliveryLocationSchema = yup.object().shape({
+  scheduler: yup.string().required(sx('Scheduler')),
+  appointmentDate: yup.date().required(sx('Appointment date')),
+  address1: yup.string().required(sx('Address')),
+  city: yup.string().required(sx('City')),
+  province: yup.string().required(sx('State or province')),
+  postalCode: yup.string().required(sx('Zip or postal code')),
+})
+
+export const pickupSchema = yup.object().shape({
+  pickup: yup
+    .array(deliveryLocationSchema)
+    .min(1, sx('At least one pickup location')),
+})
+
+export const dropoffSchema = yup.object().shape({
+  dropoff: yup
+    .array(deliveryLocationSchema)
+    .min(1, sx('At least one dropoff location')),
+})

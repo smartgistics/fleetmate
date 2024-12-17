@@ -14,9 +14,10 @@ import {
   SummaryStep,
   capacityStepValidator,
   customersSchema,
-  deliveryLocationStepValidator,
+  dropoffSchema,
   financialsStepValidator,
   orderDetailsSchema,
+  pickupSchema,
 } from './NewOrder'
 
 interface NewOrderModalProps {
@@ -90,26 +91,28 @@ export const NewOrderModal = (props: NewOrderModalProps) => {
       component: (
         <DeliveryLocationStep
           deliveryField="pickup"
+          error={error}
           fields={fields}
           setFields={setFields}
           type="Pickup"
         />
       ),
       submitText: 'Next: Dropoff',
-      validateComplete: deliveryLocationStepValidator,
+      validateComplete: validateStep(pickupSchema),
     },
     {
       name: 'Dropoff',
       component: (
         <DeliveryLocationStep
           deliveryField="dropoff"
+          error={error}
           fields={fields}
           setFields={setFields}
           type="Delivery"
         />
       ),
       submitText: 'Next: Financials',
-      validateComplete: deliveryLocationStepValidator,
+      validateComplete: validateStep(dropoffSchema),
     },
     {
       name: 'Financials',
