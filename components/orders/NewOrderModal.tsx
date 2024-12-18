@@ -44,16 +44,17 @@ export const NewOrderModal = (props: NewOrderModalProps) => {
   const [error, setError] = useState('')
   const { onClose } = props
   const [fields, setFields] = useState({
-    customerName: '',
-    parentCompany: '',
-    customerId: '',
-    status: '',
-    revenue: '',
-    creditStatus: '',
-    email: '',
-    phone: '',
-    accountManager: '',
-    orderPlanner: '',
+    caller: {
+      parentCompany: '',
+      customerId: '',
+      status: '',
+      revenue: '',
+      creditStatus: '',
+      email: '',
+      businessPhone: '',
+      accountManager: '',
+      orderPlanner: '',
+    },
     orderType: '',
     serviceType: '',
     equipmentType: '',

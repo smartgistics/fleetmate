@@ -565,22 +565,7 @@ export const createOrder = async (clientData) => {
   const { pickup, dropoff } = clientData
 
   const requestBody = {
-    caller: {
-      name: clientData.customerName,
-      // parentCompany?
-      clientId: clientData.customerId,
-      // status?
-      // revenue?
-      // creditStatus?
-      email: clientData.email,
-      phone: clientData.phone,
-      // accountManager?
-      // orderPlanner?
-      // serviceType?
-      opCode: clientData.orderType,
-      serviceLevel: clientData.serviceLevel,
-      requestedEquipment: clientData.equipmentType,
-    },
+    caller: clientData.caller,
     details: clientData.commodities.map((c, i) => ({
       temperatureControlled: toTMTruthy(clientData.temperatureControlled),
       // No temp min/max fields, so we need to use the extra fields
