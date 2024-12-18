@@ -1,15 +1,16 @@
 'use server'
 
 import {
-  TruckMateQueryParams,
-  OrdersResponse,
-  TripsResponse,
+  Client,
   ClientsResponse,
   CommoditiesResponse,
-  VendorsResponse,
-  Client,
+  Order,
+  OrdersResponse,
   TripsQueryParams,
+  TripsResponse,
+  TruckMateQueryParams,
   Vendor,
+  VendorsResponse,
 } from '@/types/truckmate'
 
 const TRUCKMATE_API_URL = process.env.TRUCKMATE_API_URL
@@ -553,4 +554,98 @@ export const createClient = async (
 
     throw new Error(errorMessage)
   }
+}
+
+export const createOrder = async (clientData) => {
+  if (!TRUCKMATE_API_URL) {
+    throw new Error('TRUCKMATE_API_URL is not configured')
+  }
+
+  const url = `${TRUCKMATE_API_URL}/orders`
+  const { pickup, dropoff } = clientData
+
+  const requestBody = {
+    caller: {
+      name: clientData.customerName,
+      // parentCompany?
+      clientId: clientData.customerId,
+      // status?
+      // revenue?
+      // creditStatus?
+      email: clientData.email,
+      phone: clientData.phone,
+      // accountManager?
+      // orderPlanner?
+      // serviceType?
+      opCode: clientData.orderType,
+      serviceLevel: clientData.serviceLevel,
+      requestedEquipment: clientData.equipmentType,
+    },
+    details: clientData.commodities.map((c, i) => ({
+      temperatureControlled: toTMTruthy(clientData.temperatureControlled),
+      // No temp min/max fields, so we need to use the extra fields
+      field11: parseInt(clientData.temperatureMin, 10),
+      field20: parseInt(clientData.temperatureMax, 10),
+      weight: parseInt(c.weight, 10),
+      pieces: parseInt(c.pieces, 10),
+      pallets: parseInt(c.pallets, 10),
+      cube: parseInt(c.cube, 10),
+      volume: parseInt(c.volume, 10),
+      commodity: c.code,
+    })),
+    shipper: pickup,
+    consignee: dropoff,
+    pickUpBy: pickup.appointmentWindowStart.toISOString().split('T')[0],
+    pickUpByEnd: pickup.appointmentWindowEnd.toISOString().split('T')[0],
+    deliverBy: dropoff.appointmentWindowStart.toISOString().split('T')[0],
+    deliverByEnd: dropoff.appointmentWindowEnd.toISOString().split('T')[0],
+  }
+
+  console.log('Creating new order:', {
+    url,
+    requestBody,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-API-Version': '1.0',
+      Authorization: 'Bearer [REDACTED]',
+    },
+  })
+
+  let response
+  try {
+    const data = await fetchWithAuth<{ order: Order }>(url, {
+      body: JSON.stringify({ orders: [requestBody] }),
+      method: 'POST',
+    })
+
+    response = data.order
+    console.log('Order creation response:', response)
+  } catch (error) {
+    let errorMessage = 'Failed to create order: '
+
+    if (error instanceof Error) {
+      console.error('Order creation error details:', {
+        message: error.message,
+        stack: error.stack,
+        requestBody,
+        url,
+      })
+
+      if (error.message.includes('400')) {
+        errorMessage +=
+          'Invalid input parameters. Please check all required fields.'
+      } else if (error.message.includes('500')) {
+        errorMessage +=
+          'Internal server error. The server encountered an unexpected condition.'
+      } else {
+        errorMessage += error.message
+      }
+    } else {
+      console.error('Unknown error during customer creation:', error)
+      errorMessage += 'An unexpected error occurred'
+    }
+
+    response = { error: { message: errorMessage } }
+  }
+  return response
 }

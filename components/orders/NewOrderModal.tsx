@@ -5,6 +5,7 @@ import { Close as CloseIcon } from '@mui/icons-material'
 import { Typography } from '@mui/material'
 
 import { FormWizard, FormWizardStep } from '@/components/FormWizard'
+import { createOrder } from '@/services'
 import {
   CapacityStep,
   CustomersStep,
@@ -22,6 +23,21 @@ import {
 
 interface NewOrderModalProps {
   onClose: () => void
+}
+
+const initialLocation = {
+  confirmed: false,
+  name: '',
+  appointmentDate: new Date(),
+  appointmentWindowStart: new Date(),
+  appointmentWindowEnd: new Date(),
+  address1: '',
+  address2: '',
+  city: '',
+  province: '',
+  postalCode: '',
+  country: 'US',
+  comment: '',
 }
 
 export const NewOrderModal = (props: NewOrderModalProps) => {
@@ -46,12 +62,17 @@ export const NewOrderModal = (props: NewOrderModalProps) => {
     temperatureMin: undefined,
     temperatureMax: undefined,
     commodities: [],
-    pickup: [],
-    dropoff: [],
+    pickup: initialLocation,
+    dropoff: initialLocation,
     aCharges: [],
   })
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    const res = await createOrder(fields)
+    if (res.error) {
+      setError(res.error.message)
+      return false
+    }
     onClose()
     return true
   }

@@ -1,17 +1,9 @@
-import { ChangeEvent, useState } from 'react'
-import { v4 } from 'uuid'
+import { ChangeEvent } from 'react'
 import * as yup from 'yup'
-import {
-  Add as AddIcon,
-  CheckCircle as CheckIcon,
-  Circle as CircleIcon,
-  Delete as DeleteIcon,
-} from '@mui/icons-material'
 import {
   FormControlLabel,
   FormGroup,
   Grid,
-  IconButton,
   Switch,
   Typography,
 } from '@mui/material'
@@ -22,28 +14,11 @@ import {
 } from '@mui/x-date-pickers'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'
 
-import { Button } from '@/components/Button'
 import { Input, Select } from '@/components/ui'
 import { STATES_ALL } from '@/constants'
-import { formatDate, formatTime } from '@/utils'
 import { StepError } from './StepError'
 
 import styles from './DeliveryLocationStep.module.sass'
-
-const initialLocation = {
-  confirmed: false,
-  scheduler: '',
-  appointmentDate: new Date(),
-  appointmentWindowStart: new Date(),
-  appointmentWindowEnd: new Date(),
-  address1: '',
-  address2: '',
-  city: '',
-  province: '',
-  postalCode: '',
-  country: 'US',
-  comment: '',
-}
 
 export const DeliveryLocationStep = ({
   error,
@@ -52,24 +27,11 @@ export const DeliveryLocationStep = ({
   setFields,
   type,
 }) => {
-  const [location, setLocation] = useState(initialLocation)
-
-  const onAdd = () => {
-    setFields({
-      ...fields,
-      [deliveryField]: [...fields[deliveryField], { ...location, id: v4() }],
-    })
-    setLocation(initialLocation)
-  }
-  const onRemove = (id) => {
-    setFields({
-      ...fields,
-      [deliveryField]: fields[deliveryField].filter((c) => c.id !== id),
-    })
-  }
-
   const handleLocationChange = ({ target: { name, value } }) =>
-    setLocation({ ...location, [name]: value })
+    setFields({
+      ...fields,
+      [deliveryField]: { ...fields[deliveryField], [name]: value },
+    })
 
   return (
     <article className={styles.pickup}>
@@ -88,22 +50,28 @@ export const DeliveryLocationStep = ({
         <Grid item xs={12}>
           <FormGroup>
             <FormControlLabel
-              control={<Switch checked={location.confirmed} />}
+              control={<Switch checked={fields[deliveryField].confirmed} />}
               label="Confirmed"
               onChange={({
                 target: { checked },
               }: ChangeEvent<HTMLInputElement>) =>
-                setLocation({ ...location, confirmed: checked })
+                setFields({
+                  ...fields,
+                  [deliveryField]: {
+                    ...fields[deliveryField],
+                    confirmed: checked,
+                  },
+                })
               }
             />
           </FormGroup>
         </Grid>
         <Grid item xs={12}>
           <Input
-            name="scheduler"
+            name="name"
             onChange={handleLocationChange}
             placeholder="Scheduler"
-            value={location.scheduler}
+            value={fields[deliveryField].name}
           />
         </Grid>
         <Grid item xs={6}>
@@ -114,14 +82,20 @@ export const DeliveryLocationStep = ({
               minDate={new Date()}
               name="appointmentDate"
               onChange={(appointmentDate) =>
-                setLocation({ ...location, appointmentDate })
+                setFields({
+                  ...fields,
+                  [deliveryField]: {
+                    ...fields[deliveryField],
+                    appointmentDate,
+                  },
+                })
               }
               slotProps={{
                 textField: {
                   variant: 'standard',
                 },
               }}
-              value={location.appointmentDate}
+              value={fields[deliveryField].appointmentDate}
             />
           </LocalizationProvider>
         </Grid>
@@ -131,14 +105,20 @@ export const DeliveryLocationStep = ({
               label={`${type} start time`}
               name="appointmentWindowStart"
               onChange={(appointmentWindowStart) =>
-                setLocation({ ...location, appointmentWindowStart })
+                setFields({
+                  ...fields,
+                  [deliveryField]: {
+                    ...fields[deliveryField],
+                    appointmentWindowStart,
+                  },
+                })
               }
               slotProps={{
                 textField: {
                   variant: 'standard',
                 },
               }}
-              value={location.appointmentWindowStart}
+              value={fields[deliveryField].appointmentWindowStart}
             />
           </LocalizationProvider>
         </Grid>
@@ -148,14 +128,20 @@ export const DeliveryLocationStep = ({
               label={`${type} end time`}
               name="appointmentWindowEnd"
               onChange={(appointmentWindowEnd) =>
-                setLocation({ ...location, appointmentWindowEnd })
+                setFields({
+                  ...fields,
+                  [deliveryField]: {
+                    ...fields[deliveryField],
+                    appointmentWindowEnd,
+                  },
+                })
               }
               slotProps={{
                 textField: {
                   variant: 'standard',
                 },
               }}
-              value={location.appointmentWindowEnd}
+              value={fields[deliveryField].appointmentWindowEnd}
             />
           </LocalizationProvider>
         </Grid>
@@ -165,7 +151,7 @@ export const DeliveryLocationStep = ({
             name="address1"
             onChange={handleLocationChange}
             placeholder="Address"
-            value={location.address1}
+            value={fields[deliveryField].address1}
           />
         </Grid>
         <Grid item xs={12}>
@@ -173,7 +159,7 @@ export const DeliveryLocationStep = ({
             name="address2"
             onChange={handleLocationChange}
             placeholder="Address line 2"
-            value={location.address2}
+            value={fields[deliveryField].address2}
           />
         </Grid>
         <Grid item xs={4}>
@@ -181,13 +167,18 @@ export const DeliveryLocationStep = ({
             name="city"
             onChange={handleLocationChange}
             placeholder="City"
-            value={location.city}
+            value={fields[deliveryField].city}
           />
         </Grid>
         <Grid item xs={4}>
           <Select
-            onChange={(province) => setLocation({ ...location, province })}
-            value={location.province ?? ''}
+            onChange={(province) =>
+              setFields({
+                ...fields,
+                [deliveryField]: { ...fields[deliveryField], province },
+              })
+            }
+            value={fields[deliveryField].province ?? ''}
           >
             <>
               {STATES_ALL.map(({ code, name }) => (
@@ -203,59 +194,10 @@ export const DeliveryLocationStep = ({
             name="postalCode"
             onChange={handleLocationChange}
             placeholder="Zip/Postal code"
-            value={location.postalCode}
+            value={fields[deliveryField].postalCode}
           />
         </Grid>
-        <Grid item xs={1}>
-          <Button color="success" onClick={onAdd}>
-            <AddIcon />
-            Add
-          </Button>
-        </Grid>
       </Grid>
-
-      <ul>
-        {fields[deliveryField].map((l) => (
-          <li key={l.id}>
-            <Grid container spacing={2}>
-              <Grid item xs={9}>
-                <Typography>{l.scheduler}</Typography>
-              </Grid>
-              <Grid item xs={2}>
-                <Typography>
-                  {l.confirmed ? (
-                    <CheckIcon color="secondary" />
-                  ) : (
-                    <CircleIcon sx={{ color: 'var(--neutral57)' }} />
-                  )}{' '}
-                  Confirmed
-                </Typography>
-              </Grid>
-              <Grid item xs={1}>
-                <IconButton onClick={() => onRemove(l.id)}>
-                  <DeleteIcon />
-                </IconButton>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography variant="subtitle1">
-                  Pickup date: {formatDate(l.appointmentDate)} between{' '}
-                  {formatTime(l.appointmentWindowStart)} and{' '}
-                  {formatTime(l.appointmentWindowEnd)}
-                </Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography component="address">
-                  {l.address1}
-                  {l.address2 ? <br /> : null}
-                  {l.address2}
-                  <br />
-                  {l.city}, {l.province} {l.postalCode}
-                </Typography>
-              </Grid>
-            </Grid>
-          </li>
-        ))}
-      </ul>
     </article>
   )
 }
@@ -263,7 +205,7 @@ export const DeliveryLocationStep = ({
 const sx = (s) => `${s} is required`
 
 const deliveryLocationSchema = yup.object().shape({
-  scheduler: yup.string().required(sx('Scheduler')),
+  name: yup.string().required(sx('Scheduler')),
   appointmentDate: yup.date().required(sx('Appointment date')),
   address1: yup.string().required(sx('Address')),
   city: yup.string().required(sx('City')),
@@ -272,13 +214,9 @@ const deliveryLocationSchema = yup.object().shape({
 })
 
 export const pickupSchema = yup.object().shape({
-  pickup: yup
-    .array(deliveryLocationSchema)
-    .min(1, sx('At least one pickup location')),
+  pickup: deliveryLocationSchema,
 })
 
 export const dropoffSchema = yup.object().shape({
-  dropoff: yup
-    .array(deliveryLocationSchema)
-    .min(1, sx('At least one dropoff location')),
+  dropoff: deliveryLocationSchema,
 })

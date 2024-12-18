@@ -34,7 +34,7 @@ export interface FormWizardProps {
   disableStepSelection?: boolean
   footerControls?: ReactNode
   onCancel: () => void
-  onSubmit: () => boolean
+  onSubmit: () => Promise<boolean>
   resetSteps?: MutableRefObject<() => void>
   hideCancelButton?: boolean
   hideFooterOnLastStep?: boolean
