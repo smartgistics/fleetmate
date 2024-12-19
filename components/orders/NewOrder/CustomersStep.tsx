@@ -109,6 +109,67 @@ const CustomerAutocomplete = ({ onChange, onClear }) => {
   )
 }
 
+const ContactAutocomplete = ({ label, onChange, onClear, options = [] }) => {
+  const [term, setTerm] = useState('')
+  const [displayValue, setDisplayValue] = useState('')
+
+  const localOptions = useMemo(
+    () =>
+      options.map(({ clientId, name }) => ({
+        label: name,
+        value: clientId,
+      })),
+    [JSON.stringify(options)]
+  )
+
+  const clearField = () => {
+    setTerm('')
+    setDisplayValue('')
+    onClear()
+  }
+
+  useEffect(clearField, [JSON.stringify(options)])
+
+  const handleChange = (_, value) => {
+    const selected =
+      options.find(({ clientId }) => clientId === value?.value) || {}
+    setDisplayValue(value.label)
+    onChange(selected)
+  }
+
+  const handleInputChange = (_, value, reason) => {
+    if (reason === 'clear') {
+      clearField()
+      return
+    }
+    setTerm(value)
+  }
+
+  return (
+    <FormControl className={styles.autocomplete} fullWidth size="small">
+      <Autocomplete
+        disablePortal
+        fullWidth
+        inputValue={displayValue}
+        isOptionEqualToValue={(option: any, value) => option.value === value}
+        onChange={handleChange}
+        onInputChange={handleInputChange}
+        options={localOptions}
+        renderInput={(params) => (
+          <TextField
+            label={label}
+            size="small"
+            variant="outlined"
+            {...params}
+          />
+        )}
+        size="small"
+        value={displayValue}
+      />
+    </FormControl>
+  )
+}
+
 const TextInput = ({ label, value }) => (
   <>
     <label>{label}</label>
@@ -116,22 +177,6 @@ const TextInput = ({ label, value }) => (
   </>
 )
 
-const localFields = [
-  {
-    title: 'Contact Information',
-    fields: {
-      email: 'Email',
-      businessPhone: 'Phone',
-    },
-  },
-  {
-    title: 'Order Owners',
-    fields: {
-      accountManager: 'Account Manager',
-      orderPlanner: 'Order Planner',
-    },
-  },
-]
 export const CustomersStep = ({ error, fields, setFields }) => (
   <article className={styles.twoCol}>
     {error && (
@@ -158,20 +203,23 @@ export const CustomersStep = ({ error, fields, setFields }) => (
     </div>
 
     <div className={styles.column}>
-      {localFields.map((section, i) => (
-        <Fragment key={`section_${i}`}>
-          <Typography variant="h5">{section.title}</Typography>
-          {Object.entries(section.fields).map(
-            ([name, label]: [name: string, label: string], k) => (
-              <TextInput
-                key={`field_${k}`}
-                label={label}
-                value={fields.caller[name]}
-              />
-            )
-          )}
-        </Fragment>
-      ))}
+      <Typography variant="h5">Contact Information</Typography>
+      <TextInput label="Email" value={fields.caller.email} />
+      <TextInput label="Phone" value={fields.caller.businessPhone} />
+
+      <Typography variant="h5">Order Owners</Typography>
+      <ContactAutocomplete
+        label="Account Manager"
+        onChange={(accountManager) => setFields({ ...fields, accountManager })}
+        onClear={() => setFields({ ...fields, accountManager: {} })}
+        options={fields.caller.contacts}
+      />
+      <ContactAutocomplete
+        label="Order Planner"
+        onChange={(orderPlanner) => setFields({ ...fields, orderPlanner })}
+        onClear={() => setFields({ ...fields, orderPlanner: {} })}
+        options={fields.caller.contacts}
+      />
     </div>
   </article>
 )
