@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Close as CloseIcon } from '@mui/icons-material'
 import { Typography } from '@mui/material'
 
 import { FormWizard, FormWizardStep } from '@/components/FormWizard'
+import { useZonesGet } from '@/hooks'
 import { createOrder } from '@/services'
 import {
   CapacityStep,
@@ -67,6 +68,11 @@ export const NewOrderModal = (props: NewOrderModalProps) => {
     dropoff: initialLocation,
     aCharges: [],
   })
+  const zonesGet = useZonesGet()
+
+  useEffect(() => {
+    zonesGet.execute()
+  }, [])
 
   const handleSubmit = async () => {
     const res = await createOrder(fields)
@@ -117,6 +123,7 @@ export const NewOrderModal = (props: NewOrderModalProps) => {
           fields={fields}
           setFields={setFields}
           type="Pickup"
+          zones={zonesGet.zones}
         />
       ),
       submitText: 'Next: Dropoff',
@@ -131,6 +138,7 @@ export const NewOrderModal = (props: NewOrderModalProps) => {
           fields={fields}
           setFields={setFields}
           type="Delivery"
+          zones={zonesGet.zones}
         />
       ),
       submitText: 'Next: Financials',

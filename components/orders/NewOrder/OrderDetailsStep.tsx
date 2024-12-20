@@ -11,13 +11,15 @@ import {
 import { Close as CloseIcon } from '@mui/icons-material'
 
 import { Button } from '@/components/Button'
-import { Input } from '@/components/ui'
+import { Input, Select } from '@/components/ui'
+import { EQUIPMENT_ENUM, OP_CODES_ENUM, SERVICE_LEVELS_ENUM } from '@/constants'
 import { StepError } from './StepError'
 
 import styles from './OrderDetailsStep.module.sass'
 
 const initialCommodity = {
   code: '',
+  description: '',
   weight: 0,
   pieces: 0,
   pallets: 0,
@@ -27,6 +29,7 @@ const initialCommodity = {
 
 export const OrderDetailsStep = ({ error, fields, setFields }) => {
   const [commodity, setCommodity] = useState(initialCommodity)
+
   const onAdd = () => {
     setFields({
       ...fields,
@@ -55,30 +58,50 @@ export const OrderDetailsStep = ({ error, fields, setFields }) => {
         </div>
       )}
       <div className={styles.twoCol}>
-        <Input
-          name="orderType"
-          onChange={handleChange}
-          placeholder="Order Type"
+        <Select
+          onChange={(orderType) => setFields({ ...fields, orderType })}
           value={fields.orderType}
-        />
-        <Input
-          name="serviceType"
-          onChange={handleChange}
-          placeholder="Service Type"
+        >
+          <option value="">Order Type</option>
+          {Object.entries(OP_CODES_ENUM).map(([k, v]) => (
+            <option key={`orderType_${k}`} value={k}>
+              {v}
+            </option>
+          ))}
+        </Select>
+        <Select
+          onChange={(serviceType) => setFields({ ...fields, serviceType })}
           value={fields.serviceType}
-        />
-        <Input
-          name="equipmentType"
-          onChange={handleChange}
-          placeholder="Equipment Type"
+        >
+          <option value="">Service Type</option>
+          {Object.entries(OP_CODES_ENUM).map(([k, v]) => (
+            <option key={`serviceType_${k}`} value={k}>
+              {v}
+            </option>
+          ))}
+        </Select>
+        <Select
+          onChange={(equipmentType) => setFields({ ...fields, equipmentType })}
           value={fields.equipmentType}
-        />
-        <Input
-          name="serviceLevel"
-          onChange={handleChange}
-          placeholder="Service Level"
+        >
+          <option value="">Equipment Type</option>
+          {Object.entries(EQUIPMENT_ENUM).map(([k, v]) => (
+            <option key={`equipmentType_${k}`} value={k}>
+              {v}
+            </option>
+          ))}
+        </Select>
+        <Select
+          onChange={(serviceLevel) => setFields({ ...fields, serviceLevel })}
           value={fields.serviceLevel}
-        />
+        >
+          <option value="">Service Level</option>
+          {Object.entries(SERVICE_LEVELS_ENUM).map(([k, v]) => (
+            <option key={`serviceLevel_${k}`} value={k}>
+              {v}
+            </option>
+          ))}
+        </Select>
       </div>
 
       <div className={styles.tempRange}>
@@ -167,10 +190,18 @@ export const OrderDetailsStep = ({ error, fields, setFields }) => {
         </div>
         <div className={styles.flex}>
           <Input
+            maxLength={10}
             name="code"
             onChange={handleCommodityChange}
-            placeholder="Commodity Code and Description"
+            placeholder="Commodity Code"
             value={commodity.code}
+          />
+          <Input
+            maxLength={80}
+            name="description"
+            onChange={handleCommodityChange}
+            placeholder="Commodity Description"
+            value={commodity.description}
           />
           <Button color="success" onClick={onAdd}>
             Add
@@ -181,6 +212,7 @@ export const OrderDetailsStep = ({ error, fields, setFields }) => {
           {fields.commodities.map((c) => (
             <li key={c.id}>
               <Typography variant="h5">{c.code}</Typography>
+              <Typography>{c.description}</Typography>
               <Typography color="neutral" variant="body2">
                 {c.weight} lbs, {c.pieces} pieces, {c.pallets} pallets, {c.cube}{' '}
                 cube, {c.volume} volume

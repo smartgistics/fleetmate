@@ -26,12 +26,14 @@ export const DeliveryLocationStep = ({
   fields,
   setFields,
   type,
+  zones,
 }) => {
   const handleLocationChange = ({ target: { name, value } }) =>
     setFields({
       ...fields,
       [deliveryField]: { ...fields[deliveryField], [name]: value },
     })
+  const zoneType = deliveryField === 'pickup' ? 'startZone' : 'endZone'
 
   return (
     <article className={styles.pickup}>
@@ -73,6 +75,19 @@ export const DeliveryLocationStep = ({
             placeholder="Scheduler"
             value={fields[deliveryField].name}
           />
+        </Grid>
+        <Grid item xs={12}>
+          <Select
+            onChange={(val) => setFields({ ...fields, [zoneType]: val })}
+            value={fields[zoneType]}
+          >
+            <option value="">Zone</option>
+            {zones.zones.map(({ zoneId, shortDescription }) => (
+              <option key={zoneId} value={zoneId}>
+                {shortDescription} ({zoneId})
+              </option>
+            ))}
+          </Select>
         </Grid>
         <Grid item xs={6}>
           <LocalizationProvider dateAdapter={AdapterDateFns}>

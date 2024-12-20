@@ -8,7 +8,7 @@ export const SummaryStep = ({ fields }) => (
       <Grid item xs={6}>
         <Typography component="h6">Account</Typography>
         <Typography component="p" variant="subtitle2">
-          {fields.customerName}
+          {fields.caller.name}
         </Typography>
         {Object.entries({
           parentCompany: 'Parent',
@@ -18,22 +18,22 @@ export const SummaryStep = ({ fields }) => (
           creditStatus: 'Credit Status',
         }).map(([field, label]) => (
           <Typography key={field} variant="body2">
-            {label}: {fields[field]}
+            {label}: {fields.caller[field]}
           </Typography>
         ))}
       </Grid>
       <Grid item xs={6}>
         <Typography component="h6">Contact</Typography>
-        <Typography variant="body2">{fields.email}</Typography>
-        <Typography variant="body2">{fields.phone}</Typography>
+        <Typography variant="body2">{fields.caller.email}</Typography>
+        <Typography variant="body2">{fields.caller.businessPhone}</Typography>
         <Typography component="p" variant="subtitle2">
           Order Owners
         </Typography>
         <Typography variant="body2">
-          Account manager: {fields.accountManager}
+          Account manager: {fields.caller.accountManager}
         </Typography>
         <Typography variant="body2">
-          Order planner: {fields.orderPlanner}
+          Order planner: {fields.caller.orderPlanner}
         </Typography>
       </Grid>
 

@@ -82,6 +82,7 @@ const CustomerAutocomplete = ({ onChange, onClear }) => {
       onClear()
     }
     setTerm(value)
+    setDisplayValue(value)
   }
 
   return (
@@ -110,7 +111,6 @@ const CustomerAutocomplete = ({ onChange, onClear }) => {
 }
 
 const ContactAutocomplete = ({ label, onChange, onClear, options = [] }) => {
-  const [term, setTerm] = useState('')
   const [displayValue, setDisplayValue] = useState('')
 
   const localOptions = useMemo(
@@ -123,7 +123,6 @@ const ContactAutocomplete = ({ label, onChange, onClear, options = [] }) => {
   )
 
   const clearField = () => {
-    setTerm('')
     setDisplayValue('')
     onClear()
   }
@@ -142,13 +141,14 @@ const ContactAutocomplete = ({ label, onChange, onClear, options = [] }) => {
       clearField()
       return
     }
-    setTerm(value)
+    setDisplayValue(value)
   }
 
   return (
     <FormControl className={styles.autocomplete} fullWidth size="small">
       <Autocomplete
         disablePortal
+        freeSolo
         fullWidth
         inputValue={displayValue}
         isOptionEqualToValue={(option: any, value) => option.value === value}
@@ -177,52 +177,57 @@ const TextInput = ({ label, value }) => (
   </>
 )
 
-export const CustomersStep = ({ error, fields, setFields }) => (
-  <article className={styles.twoCol}>
-    {error && (
-      <div className={styles.error}>
-        <StepError>{error}</StepError>
+export const CustomersStep = ({ error, fields, setFields }) => {
+  console.log(fields)
+  return (
+    <article className={styles.twoCol}>
+      {error && (
+        <div className={styles.error}>
+          <StepError>{error}</StepError>
+        </div>
+      )}
+      <div className={styles.column}>
+        <Typography variant="h5">Account Information</Typography>
+        <label htmlFor="customerName">Company Name</label>
+        <CustomerAutocomplete
+          onChange={(caller) => {
+            setFields({ ...fields, caller })
+          }}
+          onClear={() => {
+            setFields({ ...fields, caller: {} })
+          }}
+        />
+        <TextInput label="Parent Company" value={fields.caller.parentCompany} />
+        <TextInput label="Customer ID" value={fields.caller.clientId} />
+        <TextInput label="Status" value={fields.caller.status} />
+        <TextInput label="Revenue" value={fields.caller.revenue} />
+        <TextInput label="Credit Status" value={fields.caller.creditStatus} />
       </div>
-    )}
-    <div className={styles.column}>
-      <Typography variant="h5">Account Information</Typography>
-      <label htmlFor="customerName">Company Name</label>
-      <CustomerAutocomplete
-        onChange={(caller) => {
-          setFields({ ...fields, caller })
-        }}
-        onClear={() => {
-          setFields({ ...fields, caller: {} })
-        }}
-      />
-      <TextInput label="Parent Company" value={fields.caller.parentCompany} />
-      <TextInput label="Customer ID" value={fields.caller.clientId} />
-      <TextInput label="Status" value={fields.caller.status} />
-      <TextInput label="Revenue" value={fields.caller.revenue} />
-      <TextInput label="Credit Status" value={fields.caller.creditStatus} />
-    </div>
 
-    <div className={styles.column}>
-      <Typography variant="h5">Contact Information</Typography>
-      <TextInput label="Email" value={fields.caller.email} />
-      <TextInput label="Phone" value={fields.caller.businessPhone} />
+      <div className={styles.column}>
+        <Typography variant="h5">Contact Information</Typography>
+        <TextInput label="Email" value={fields.caller.email} />
+        <TextInput label="Phone" value={fields.caller.businessPhone} />
 
-      <Typography variant="h5">Order Owners</Typography>
-      <ContactAutocomplete
-        label="Account Manager"
-        onChange={(accountManager) => setFields({ ...fields, accountManager })}
-        onClear={() => setFields({ ...fields, accountManager: {} })}
-        options={fields.caller.contacts}
-      />
-      <ContactAutocomplete
-        label="Order Planner"
-        onChange={(orderPlanner) => setFields({ ...fields, orderPlanner })}
-        onClear={() => setFields({ ...fields, orderPlanner: {} })}
-        options={fields.caller.contacts}
-      />
-    </div>
-  </article>
-)
+        <Typography variant="h5">Order Owners</Typography>
+        <ContactAutocomplete
+          label="Account Manager"
+          onChange={(accountManager) =>
+            setFields({ ...fields, accountManager })
+          }
+          onClear={() => setFields({ ...fields, accountManager: {} })}
+          options={fields.caller.contacts}
+        />
+        <ContactAutocomplete
+          label="Order Planner"
+          onChange={(orderPlanner) => setFields({ ...fields, orderPlanner })}
+          onClear={() => setFields({ ...fields, orderPlanner: {} })}
+          options={fields.caller.contacts}
+        />
+      </div>
+    </article>
+  )
+}
 
 const sx = (s) => `${s} is required`
 

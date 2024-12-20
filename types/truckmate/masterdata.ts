@@ -1,4 +1,5 @@
 import { ServiceLevel, Commodity, PaginatedTruckMateResponse } from './common'
+import { UNIT_TYPES } from '@/constants'
 
 // Client/Account related types
 export interface Client {
@@ -344,3 +345,5 @@ interface TravelMode {
   matrixId?: number
   isDefault?: boolean
 }
+
+export type UnitType = keyof typeof UNIT_TYPES
